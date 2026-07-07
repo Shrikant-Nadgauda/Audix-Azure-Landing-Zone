@@ -1688,3 +1688,329 @@ terraform version
 > 🚀 **Project Status:** Terraform Project Successfully Initialized
 
 ---
+
+# 🔐 Understanding `.terraform` Folder and Lock File (Part 8)
+
+> **Document:** `08-Understanding-.terraform-and-Lock-File.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Working%20Directory-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Git](https://img.shields.io/badge/Git-Version%20Control-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-Portfolio-181717?style=for-the-badge&logo=github)
+![DevOps](https://img.shields.io/badge/DevOps-Industry%20Practice-success?style=for-the-badge)
+
+---
+
+# 📖 Understanding `.terraform` Folder and Lock File
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 02 - Terraform Configuration
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम Terraform द्वारा Automatically Create होने वाले `.terraform` Folder और `.terraform.lock.hcl` File को विस्तार से समझेंगे।
+
+इसके बाद आज का काम GitHub पर Push करेंगे और पहली Git Tag भी Create करेंगे।
+
+---
+
+# 🤔 `.terraform` Folder क्या है?
+
+जब हम पहली बार
+
+```bash
+terraform init
+```
+
+चलाते हैं, तब Terraform एक Hidden Folder Create करता है।
+
+```text
+.terraform
+```
+
+यह Folder Terraform की Working Directory होती है।
+
+---
+
+# 📂 `.terraform` Folder के अंदर क्या होता है?
+
+```text
+.terraform
+│
+└── providers
+    │
+    └── registry.terraform.io
+        │
+        └── hashicorp
+            │
+            └── azurerm
+```
+
+इसके अंदर Download किए गए Providers Store होते हैं।
+
+---
+
+# 🤔 `.terraform.lock.hcl` क्या है?
+
+यह Terraform की Dependency Lock File होती है।
+
+इसमें Installed Provider की Exact Version Store रहती है।
+
+उदाहरण
+
+```text
+hashicorp/azurerm
+
+Version : 4.x.x
+
+Checksum : XXXXXXX
+```
+
+---
+
+# 🌍 Real World Scenario
+
+Developer A
+
+```text
+Windows Laptop
+```
+
+Developer B
+
+```text
+MacBook
+```
+
+Developer C
+
+```text
+Linux Build Server
+```
+
+यदि Lock File Commit नहीं होगी तो तीनों अलग-अलग Provider Version Download कर सकते हैं।
+
+इसीलिए Enterprise Projects में
+
+```text
+.terraform.lock.hcl
+```
+
+को हमेशा GitHub में Commit किया जाता है।
+
+---
+
+# ❌ क्या `.terraform` Folder GitHub पर Push करना चाहिए?
+
+**नहीं।**
+
+कभी भी नहीं।
+
+यह Folder प्रत्येक System पर दोबारा Generate हो जाता है।
+
+---
+
+# 📄 `.gitignore` में क्या Add करेंगे?
+
+Open
+
+```text
+.gitignore
+```
+
+नीचे दिया गया Content Add करें।
+
+```gitignore
+# Terraform Working Directory
+.terraform/
+
+# Terraform State Files
+*.tfstate
+*.tfstate.*
+
+# Crash Logs
+crash.log
+
+# Variable Files
+*.auto.tfvars
+
+# Sensitive Files
+*.tfvars.json
+
+# Terraform Override Files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI Configuration
+.terraformrc
+terraform.rc
+```
+
+अब Git `.terraform` Folder को Ignore करेगा।
+
+---
+
+# 🏗️ Verify करें
+
+Command
+
+```bash
+git status
+```
+
+अब `.terraform` Folder दिखाई नहीं देना चाहिए।
+
+---
+
+# 🚀 GitHub पर Project Push करें
+
+Stage Files
+
+```bash
+git add .
+```
+
+Commit
+
+```bash
+git commit -m "Configure Terraform initialization and project foundation"
+```
+
+Push
+
+```bash
+git push origin main
+```
+
+---
+
+# 🏷️ Industry Practice - Git Tag
+
+Enterprise Projects में Milestones Mark करने के लिए Git Tag का उपयोग किया जाता है।
+
+आज हमारा पहला Milestone Complete हुआ है।
+
+---
+
+## Current Tags देखें
+
+```bash
+git tag
+```
+
+यदि कोई Output नहीं आता है तो अभी कोई Tag नहीं है।
+
+---
+
+## पहला Tag Create करें
+
+```bash
+git tag -a v0.1.0 -m "Project foundation completed"
+```
+
+---
+
+## Tag Verify करें
+
+```bash
+git tag
+```
+
+Output
+
+```text
+v0.1.0
+```
+
+---
+
+## GitHub पर Tag Push करें
+
+```bash
+git push origin v0.1.0
+```
+
+अब GitHub Repository के **Releases / Tags** Section में यह Tag दिखाई देगा।
+
+---
+
+# 💡 Version Naming Convention
+
+```text
+v0.1.0 → Project Foundation
+
+v0.2.0 → Resource Group
+
+v0.3.0 → Networking
+
+v0.4.0 → Security
+
+v0.5.0 → Virtual Machines
+
+v1.0.0 → Production Ready
+```
+
+इसी प्रकार हम पूरे Project में Real Industry Versioning Follow करेंगे।
+
+---
+
+# ✅ Best Practices
+
+- `.terraform/` Folder कभी Commit न करें।
+- `.terraform.lock.hcl` हमेशा Commit करें।
+- प्रत्येक Major Milestone पर Git Tag Create करें।
+- Meaningful Commit Message लिखें।
+- Push करने से पहले `git status` अवश्य Check करें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ `.terraform` Folder क्या है।
+- ✅ `.terraform.lock.hcl` क्या है।
+- ✅ `.gitignore` Configure करना।
+- ✅ GitHub पर Project Push करना।
+- ✅ Git Tag Create करना।
+- ✅ Industry Standard Versioning।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `07-Terraform-Init-and-Project-Initialization.md` | `README.md` | `09-Understanding-provider.tf.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git add .
+
+git commit -m "Configure Terraform initialization and project foundation"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.1.0 -m "Project foundation completed"
+
+git push origin v0.1.0
+```
+
+---
+
+> 🚀 **Project Status:** Phase 01 Completed • Version **v0.1.0** Released
+
+---
+
+
