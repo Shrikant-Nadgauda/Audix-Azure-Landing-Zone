@@ -4684,4 +4684,736 @@ git push origin v0.7.0
 
 > 🚀 **Project Status:** Azure Virtual Network Successfully Deployed • Version **v0.7.0**
 
+# 🌐 Create Multiple Azure Subnets using `for_each` (Part 16)
+
+> **Document:** `16-Create-Multiple-Subnets-Using-for_each.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-for__each-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Subnets-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![Networking](https://img.shields.io/badge/Networking-Landing%20Zone-success?style=for-the-badge)
+![DevOps](https://img.shields.io/badge/Enterprise-Best%20Practices-orange?style=for-the-badge)
+
+---
+
+# 🌐 Create Multiple Azure Subnets using `for_each`
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 06 - Networking
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे—
+
+- `for_each` क्या होता है?
+- `count` और `for_each` में अंतर
+- Multiple Subnets एक ही Code से कैसे बनाते हैं
+- Azure Bastion Subnet का Special Name क्यों होता है
+- Azure Bastion के लिए `/26` Subnet क्यों आवश्यक है
+
+---
+
+# 📚 हमारा वर्तमान Architecture
+
+```text
+Internet
+    │
+    ▼
+Azure Subscription
+    │
+    ▼
+Resource Group
+    │
+    ▼
+Virtual Network (10.0.0.0/16)
+```
+
+अब इसके अंदर Multiple Subnets बनाएंगे।
+
+---
+
+# 🏗️ Final Network Architecture
+
+```text
+Internet
+    │
+    ▼
+Virtual Network (10.0.0.0/16)
+    │
+    ├──────────────┬──────────────────┬────────────────────┐
+    ▼              ▼                  ▼
+Netflix       StreamFlix      AzureBastionSubnet
+10.0.1.0/24   10.0.2.0/24        10.0.3.0/26
+```
+
+---
+
+# 🤔 `for_each` क्या होता है?
+
+`for_each` Terraform का Loop है।
+
+यदि एक जैसा Resource कई बार बनाना हो,
+
+तो बार-बार Code लिखने की आवश्यकता नहीं होती।
+
+एक ही Resource Block कई Objects Create कर सकता है।
+
+---
+
+# ❌ Without `for_each`
+
+तीन Subnet बनाने के लिए—
+
+```terraform
+resource "azurerm_subnet" "subnet1" {}
+
+resource "azurerm_subnet" "subnet2" {}
+
+resource "azurerm_subnet" "subnet3" {}
+```
+
+यह तरीका बड़े Project में Maintain करना कठिन होता है।
+
+---
+
+# ✅ With `for_each`
+
+```terraform
+resource "azurerm_subnet" "subnet" {
+
+    for_each = local.subnets
+
+}
+```
+
+बस एक ही Resource Block।
+
+Terraform स्वयं सभी Subnets Create कर देगा।
+
+यही Enterprise Standard है।
+
+---
+
+# 📄 Open File
+
+```text
+locals.tf
+```
+
+---
+
+# ✍️ Step 1 - Local Variable Create करें
+
+```terraform
+locals {
+
+  subnets = {
+
+    Netflix = {
+
+      address_prefix = "10.0.1.0/24"
+
+    }
+
+    StreamFlix = {
+
+      address_prefix = "10.0.2.0/24"
+
+    }
+
+    AzureBastionSubnet = {
+
+      address_prefix = "10.0.3.0/26"
+
+    }
+
+  }
+
+}
+```
+
+---
+
+# 🤔 हमने `locals` क्यों Use किया?
+
+यदि भविष्य में
+
+- HR
+- Finance
+- Production
+- Database
+
+जैसे नए Subnets जोड़ने हों,
+
+तो केवल Local Variable में एक नया Block Add करना होगा।
+
+Terraform Automatically नया Subnet Create कर देगा।
+
+---
+
+# 📄 Open File
+
+```text
+main.tf
+```
+
+---
+
+# ✍️ Step 2 - Create Multiple Subnets
+
+```terraform
+resource "azurerm_subnet" "subnet" {
+
+  for_each = local.subnets
+
+  name = each.key
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+  virtual_network_name = azurerm_virtual_network.vnet.name
+
+  address_prefixes = [
+
+    each.value.address_prefix
+
+  ]
+
+}
+```
+
+---
+
+# 🔍 Code Explanation
+
+## `for_each`
+
+```terraform
+for_each = local.subnets
+```
+
+Terraform Local Variable के प्रत्येक Object पर Loop चलाएगा।
+
+---
+
+## `each.key`
+
+```terraform
+name = each.key
+```
+
+Subnet का Name बनेगा।
+
+Output
+
+```text
+Netflix
+
+StreamFlix
+
+AzureBastionSubnet
+```
+
+---
+
+## `each.value.address_prefix`
+
+```terraform
+address_prefixes = [
+
+    each.value.address_prefix
+
+]
+```
+
+हर Subnet का अपना CIDR Automatically Assign होगा।
+
+---
+
+# 🧠 Terraform अंदर क्या करता है?
+
+```text
+Read local.subnets
+        │
+        ▼
+for_each Loop Start
+        │
+        ▼
+Netflix
+        │
+        ▼
+Create Subnet
+        │
+        ▼
+StreamFlix
+        │
+        ▼
+Create Subnet
+        │
+        ▼
+AzureBastionSubnet
+        │
+        ▼
+Create Subnet
+```
+
+---
+
+# 🤔 AzureBastionSubnet का नाम यही क्यों होना चाहिए?
+
+Azure Bastion एक Managed Service है।
+
+Azure केवल उसी Subnet को पहचानता है जिसका नाम बिल्कुल यही हो—
+
+```text
+AzureBastionSubnet
+```
+
+यदि नाम बदल दिया—
+
+```text
+Bastion
+
+Subnet-Bastion
+
+MyBastion
+```
+
+तो Azure Bastion Deploy नहीं होगा।
+
+> **यह Azure की Mandatory Requirement है।**
+
+---
+
+# 🤔 `/26` Subnet क्यों?
+
+Azure Bastion के लिए Microsoft Minimum `/26` Size Recommend करता है।
+
+```text
+AzureBastionSubnet
+
+10.0.3.0/26
+```
+
+इससे Bastion भविष्य में Scale हो सकता है।
+
+यदि `/27` या उससे छोटा Subnet होगा,
+
+तो Bastion Deployment Fail हो सकता है।
+
+---
+
+# 🚀 Terraform Workflow
+
+```text
+main.tf + locals.tf
+        │
+        ▼
+terraform fmt
+        │
+        ▼
+terraform validate
+        │
+        ▼
+terraform plan
+        │
+        ▼
+terraform apply
+        │
+        ▼
+Azure Portal
+        │
+        ▼
+3 Subnets Created
+```
+
+---
+
+# 🌐 Azure Portal Verification
+
+```
+Resource Group
+
+↓
+
+Virtual Network
+
+↓
+
+Subnets
+```
+
+Expected Output
+
+```text
+Netflix
+
+StreamFlix
+
+AzureBastionSubnet
+```
+
+---
+
+# 💡 Enterprise Benefits of `for_each`
+
+✅ कम Code
+
+✅ आसान Maintenance
+
+✅ Future Scalability
+
+✅ Dynamic Infrastructure
+
+✅ Production Standard
+
+---
+
+# 📌 Best Practices
+
+- Multiple Resources के लिए हमेशा `for_each` Prefer करें।
+- `AzureBastionSubnet` का नाम कभी Change न करें।
+- Bastion के लिए Minimum `/26` रखें।
+- Naming Convention पूरे Project में एक जैसा रखें।
+- Subnet CIDR Planning पहले करें, बाद में बदलना कठिन होता है।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ `for_each` क्या है।
+- ✅ Multiple Subnets कैसे Create करते हैं।
+- ✅ `each.key` और `each.value` क्या हैं।
+- ✅ AzureBastionSubnet का Mandatory Name।
+- ✅ Bastion के लिए `/26` क्यों आवश्यक है।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `15-Understanding-CIDR-and-Create-Subnets.md` | `README.md` | `17-Create-Network-Security-Group.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git commit -m "Create Azure subnets using for_each"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.9.0 -m "Azure subnets deployed using for_each"
+
+git push origin v0.9.0
+```
+
+---
+
+> 🚀 **Project Status:** Multiple Azure Subnets Successfully Deployed • Version **v0.9.0**
+
+---
+
+# 🔒 Create Azure Network Security Group (Part 17)
+
+> **Document:** `17-Create-Network-Security-Group.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-NSG-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Network%20Security%20Group-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![Security](https://img.shields.io/badge/Security-Landing%20Zone-success?style=for-the-badge)
+![DevOps](https://img.shields.io/badge/Enterprise-Best%20Practices-orange?style=for-the-badge)
+
+---
+
+# 🔒 Create Azure Network Security Group (NSG)
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 07 - Network Security
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे—
+
+- Network Security Group (NSG) क्या होता है?
+- Azure में NSG क्यों जरूरी है?
+- NSG कैसे Traffic Control करता है?
+- Terraform से NSG Create करना
+
+---
+
+# 📚 अभी तक हमारा Architecture
+
+```text
+Internet
+    │
+    ▼
+Virtual Network (10.0.0.0/16)
+    │
+    ├──────────────┬──────────────────┬────────────────────┐
+    ▼              ▼                  ▼
+Netflix       StreamFlix      AzureBastionSubnet
+10.0.1.0/24   10.0.2.0/24        10.0.3.0/26
+```
+
+अब तक Network बन चुका है।
+
+लेकिन अभी कोई Security नहीं है।
+
+---
+
+# 🤔 NSG क्या होता है?
+
+Network Security Group (NSG) Azure का Firewall है।
+
+यह Decide करता है—
+
+- कौन अंदर आ सकता है।
+- कौन बाहर जा सकता है।
+- कौन सा Port Open रहेगा।
+- कौन सा Port Block रहेगा।
+
+---
+
+# 🌍 Real World Example
+
+मान लीजिए आपकी Company की Building है।
+
+Building के Gate पर Security Guard खड़ा है।
+
+वह हर व्यक्ति से पूछता है—
+
+- आप कौन हैं?
+- कहाँ जा रहे हैं?
+- आपके पास Permission है या नहीं?
+
+Azure में यही काम **Network Security Group (NSG)** करता है।
+
+---
+
+# 🏗️ Architecture after NSG
+
+```text
+Internet
+    │
+    ▼
+Network Security Group (NSG)
+    │
+    ▼
+Virtual Network
+    │
+    ├──────────────┬──────────────────┬────────────────────┐
+    ▼              ▼                  ▼
+Netflix       StreamFlix      AzureBastionSubnet
+```
+
+---
+
+# 📛 Naming Convention
+
+| Resource | Name |
+|----------|------|
+| Network Security Group | `nsg-dev-eastus-audix-001` |
+
+---
+
+# 📄 Open File
+
+```text
+main.tf
+```
+
+---
+
+# ✍️ Step 1 - Create NSG
+
+```terraform
+resource "azurerm_network_security_group" "nsg" {
+
+  name = "nsg-dev-eastus-audix-001"
+
+  location = azurerm_resource_group.rg.location
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+}
+```
+
+---
+
+# 🔍 Code Explanation
+
+## Resource Type
+
+```terraform
+azurerm_network_security_group
+```
+
+Azure में नया NSG Create करता है।
+
+---
+
+## Local Name
+
+```terraform
+nsg
+```
+
+Terraform का Internal Reference।
+
+---
+
+## Name
+
+```terraform
+name = "nsg-dev-eastus-audix-001"
+```
+
+Azure Portal में दिखाई देने वाला Name।
+
+---
+
+## Location
+
+```terraform
+location = azurerm_resource_group.rg.location
+```
+
+Resource Group की Location Automatically Use होगी।
+
+---
+
+## Resource Group
+
+```terraform
+resource_group_name = azurerm_resource_group.rg.name
+```
+
+NSG इसी Resource Group में Create होगा।
+
+---
+
+# 🚀 Terraform Workflow
+
+```text
+main.tf
+    │
+    ▼
+terraform fmt
+    │
+    ▼
+terraform validate
+    │
+    ▼
+terraform plan
+    │
+    ▼
+terraform apply
+    │
+    ▼
+Azure Portal
+```
+
+---
+
+# 🌐 Azure Portal Verification
+
+```
+Resource Group
+
+↓
+
+Network Security Group
+```
+
+Expected Output
+
+```text
+nsg-dev-eastus-audix-001
+```
+
+---
+
+# ❓ अभी Rule क्यों नहीं बनाए?
+
+अभी हमने केवल NSG Resource Create किया है।
+
+Rules अगले Chapter में बनाएंगे क्योंकि—
+
+- पहले NSG समझना जरूरी है।
+- फिर Inbound और Outbound Rules समझेंगे।
+- उसके बाद NSG को Subnet के साथ Associate करेंगे।
+
+यही तरीका Enterprise Projects में Follow किया जाता है।
+
+---
+
+# 📌 Best Practices
+
+- NSG का नाम Naming Convention के अनुसार रखें।
+- NSG Create और Rules Create अलग-अलग Steps में करें।
+- Default Rules को समझे बिना Delete न करें।
+- Production में "Allow Any" Rule Avoid करें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ NSG क्या है।
+- ✅ Azure में NSG क्यों जरूरी है।
+- ✅ Terraform से NSG Create करना।
+- ✅ NSG और Firewall का संबंध।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `16-Create-Multiple-Subnets-Using-for_each.md` | `README.md` | `18-Create-NSG-Rules-and-Associate-with-Subnets.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git commit -m "Create Azure Network Security Group"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v1.0.0 -m "Azure Network Security Group created"
+
+git push origin v1.0.0
+```
+
+---
+
+> 🚀 **Project Status:** Network Security Group Created • Next Step: Configure NSG Rules and Associate with Subnets
+
+---
+
 
