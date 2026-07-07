@@ -92,3 +92,34 @@ resource "azurerm_storage_account" "storage" {
 # इसलिए यहाँ Implicit Dependency अपने आप काम कर रही है और यही Best Practice है।
 
 }
+
+resource "azurerm_storage_container" "tfstate" {
+
+# यह Azure Blob Storage Container Create करेगा।
+# भविष्य में Terraform State File (terraform.tfstate) इसी Container के अंदर Store होगी।
+
+  name = "tfstate"
+
+# Container का नाम है।
+# Terraform Projects में "tfstate" नाम सबसे अधिक उपयोग किया जाता है।
+
+  storage_account_id = azurerm_storage_account.storage.id
+
+# यहाँ हमने Storage Account का ID Reference किया है।
+# इसे Implicit Dependency कहते हैं।
+# Terraform स्वयं समझ जाता है कि पहले Storage Account बनेगा, उसके बाद Container बनेगा।
+
+  container_access_type = "private"
+
+# Container केवल Authorized Users के लिए उपलब्ध रहेगा।
+# Terraform State File में Sensitive Information हो सकती है,
+# इसलिए इसे हमेशा Private रखना चाहिए।
+
+# depends_on = [azurerm_storage_account.storage]
+
+# यह Explicit Dependency है।
+# वर्तमान Code में इसकी आवश्यकता नहीं है क्योंकि हमने Storage Account का Reference दिया है।
+# Terraform स्वयं Dependency समझ रहा है, इसलिए Implicit Dependency ही Best Practice है।
+
+}
+
