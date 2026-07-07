@@ -1,5 +1,4 @@
-````markdown
-<div align="center">
+`<div align="center">
 
 # ☁️ Audix Azure Landing Zone using Terraform
 
