@@ -546,3 +546,627 @@ git push origin v4.0.0
 > 🚀 **Project Status:** README Planning Complete. अगले Chapter से Professional Enterprise README.md बनाना शुरू करेंगे, बिल्कुल वैसे जैसे Microsoft, HashiCorp और Enterprise DevOps Teams अपनी GitHub Repository Design करती हैं.
 
 ---
+
+# 📚 Documentation Strategy for Enterprise GitHub Repository
+
+> **Document:** `00.1-Documentation-Strategy.md`
+
+![GitHub](https://img.shields.io/badge/GitHub-Documentation-black?style=for-the-badge&logo=github)
+![Terraform](https://img.shields.io/badge/Terraform-Enterprise-7B42BC?style=for-the-badge&logo=terraform)
+![Azure](https://img.shields.io/badge/Azure-Landing%20Zone-0078D4?style=for-the-badge&logo=microsoftazure)
+![Learning](https://img.shields.io/badge/Learning-Step%20By%20Step-success?style=for-the-badge)
+
+---
+
+# 📚 Documentation Strategy
+
+> **Project:** **Audix Azure Landing Zone using Terraform**
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे—
+
+- README कहाँ रहेगा?
+- Documentation कहाँ रखेंगे?
+- Modules के README कहाँ होंगे?
+- GitHub Repository Professional कैसे बनती है?
+- Learning Repository और Enterprise Repository में क्या अंतर होता है?
+
+---
+
+# 🤔 सबसे पहला Question
+
+Repository Open होते ही
+
+कौन सी File Open होती है?
+
+उत्तर—
+
+```text
+README.md
+```
+
+यही GitHub का Home Page होता है।
+
+---
+
+# 🎯 इसलिए
+
+Root Directory में
+
+हमेशा
+
+```text
+README.md
+```
+
+रहेगी।
+
+---
+
+# 📂 Root Folder
+
+```text
+Audix-Azure-Landing-Zone/
+
+│
+
+├── README.md
+
+├── versions.tf
+
+├── provider.tf
+
+├── backend.tf
+
+├── main.tf
+
+├── outputs.tf
+
+└── .gitignore
+```
+
+---
+
+# 📌 लेकिन...
+
+हमारे Project में
+
+40+
+
+Documentation Files हैं।
+
+क्या इन्हें भी Root Folder में रखेंगे?
+
+उत्तर—
+
+❌ बिल्कुल नहीं।
+
+---
+
+# 💡 क्यों?
+
+कल्पना करो...
+
+Root Folder में
+
+```text
+README.md
+
+01.md
+
+02.md
+
+03.md
+
+...
+
+40.md
+
+main.tf
+
+provider.tf
+
+backend.tf
+
+outputs.tf
+```
+
+सब मिला दिया।
+
+---
+
+GitHub ऐसा दिखाई देगा—
+
+😵😵😵
+
+---
+
+# 🎯 Professional तरीका
+
+Documentation
+
+हमेशा
+
+अलग Folder में रखी जाती है।
+
+---
+
+# 📂 Final Structure
+
+```text
+Audix-Azure-Landing-Zone/
+
+│
+
+├── docs/
+
+│
+
+├── modules/
+
+│
+
+├── environments/
+
+│
+
+├── README.md
+
+│
+
+├── provider.tf
+
+├── versions.tf
+
+├── backend.tf
+
+├── main.tf
+
+└── outputs.tf
+```
+
+---
+
+# 📂 docs Folder
+
+यहीं
+
+हमारे
+
+सारे Learning Chapters रहेंगे।
+
+```text
+docs/
+
+│
+
+├── 01-Project-Initialization.md
+
+├── 02-Git-Initialization.md
+
+├── 03-Terraform-Installation.md
+
+...
+
+├── 35-HTTPS.md
+
+├── 36-WAF.md
+
+├── 37-Modules.md
+
+...
+
+└── 40-Final-Cleanup.md
+```
+
+---
+
+# 📚 अब दूसरा Question
+
+Modules का Documentation कहाँ रहेगा?
+
+उत्तर—
+
+Module के अंदर।
+
+---
+
+Example
+
+```text
+modules/
+
+│
+
+└── virtual_network/
+
+        │
+
+        ├── main.tf
+
+        ├── variables.tf
+
+        ├── outputs.tf
+
+        └── README.md
+```
+
+---
+
+# 🤔 Module README क्यों?
+
+क्योंकि
+
+यदि कोई Developer
+
+केवल
+
+Virtual Network Module
+
+Use करना चाहता है
+
+तो उसे
+
+पूरी Repository पढ़ने की आवश्यकता नहीं होगी।
+
+---
+
+वह
+
+सिर्फ
+
+```text
+modules/virtual_network/README.md
+```
+
+खोलेगा।
+
+---
+
+उसमें लिखा होगा—
+
+```text
+Module Purpose
+
+↓
+
+Required Variables
+
+↓
+
+Outputs
+
+↓
+
+Example Usage
+```
+
+बस।
+
+---
+
+# 📚 Example
+
+```text
+modules/
+
+├── resource_group/
+
+│      └── README.md
+
+│
+
+├── virtual_network/
+
+│      └── README.md
+
+│
+
+├── virtual_machine/
+
+│      └── README.md
+
+│
+
+├── application_gateway/
+
+│      └── README.md
+
+│
+
+└── load_balancer/
+
+       └── README.md
+```
+
+---
+
+# 🤔 क्या हर Module का README होगा?
+
+हाँ।
+
+Production Projects में
+
+लगभग
+
+हर Module
+
+का अपना README होता है।
+
+लेकिन...
+
+---
+
+# 📌 हमारा तरीका
+
+अभी नहीं।
+
+---
+
+पहले
+
+पूरा Project Complete करेंगे।
+
+उसके बाद
+
+हर Module का
+
+README बनाएँगे।
+
+क्योंकि
+
+अभी Module ही Complete नहीं है।
+
+---
+
+# 📚 Repository Documentation
+
+```text
+README.md
+
+↓
+
+Project Introduction
+
+↓
+
+Architecture
+
+↓
+
+Roadmap
+
+↓
+
+Quick Start
+
+↓
+
+Documentation Link
+```
+
+---
+
+# 📚 docs Folder
+
+```text
+Learning Material
+
+↓
+
+40 Chapters
+
+↓
+
+Step by Step Guide
+```
+
+---
+
+# 📚 Module README
+
+```text
+Only Module
+
+Documentation
+```
+
+---
+
+# 🌍 Complete Repository
+
+```text
+Audix-Azure-Landing-Zone/
+
+│
+
+├── README.md                  ← Home Page
+
+│
+
+├── docs/                      ← Complete Course
+
+│      ├── 01-Initialization.md
+
+│      ├── 02-Git.md
+
+│      ├── 03-Terraform.md
+
+│      ├── ...
+
+│      ├── 37-Modules.md
+
+│      └── 40-Production.md
+
+│
+
+├── modules/
+
+│      ├── resource_group/
+
+│      │      ├── main.tf
+│      │      ├── variables.tf
+│      │      ├── outputs.tf
+│      │      └── README.md
+
+│      ├── virtual_network/
+
+│      │      ├── main.tf
+│      │      ├── variables.tf
+│      │      ├── outputs.tf
+│      │      └── README.md
+
+│      ├── virtual_machine/
+
+│      ├── application_gateway/
+
+│      ├── load_balancer/
+
+│      └── network_security_group/
+
+│
+
+├── environments/
+
+│      ├── dev/
+
+│      ├── uat/
+
+│      └── prod/
+
+│
+
+├── provider.tf
+
+├── versions.tf
+
+├── backend.tf
+
+├── main.tf
+
+├── outputs.tf
+
+└── .gitignore
+```
+
+---
+
+# 💼 हमारी Repository का उद्देश्य
+
+यह Repository
+
+सिर्फ Code Repository नहीं होगी।
+
+यह बनेगी—
+
+```text
+Learning Repository
+
++
+
+Enterprise Project
+
++
+
+Terraform Reference
+
++
+
+Interview Preparation
+
++
+
+GitHub Portfolio
+```
+
+---
+
+# 🎯 हमारा Documentation Rule
+
+## 📍 Root README
+
+```text
+Project Introduction
+```
+
+---
+
+## 📍 docs Folder
+
+```text
+Complete Learning
+```
+
+---
+
+## 📍 Module README
+
+```text
+Individual Module Guide
+```
+
+---
+
+## 📍 Code
+
+```text
+Terraform Files
+```
+
+---
+
+# 🚀 सबसे अच्छी बात
+
+आज तुम Learner हो।
+
+लेकिन
+
+यदि कल
+
+कोई नया Engineer
+
+तुम्हारी GitHub Repository Open करे...
+
+तो उसे बिना किसी Training के
+
+Step by Step
+
+पूरा Azure Landing Zone
+
+समझ आ जाना चाहिए।
+
+यही एक अच्छे Documentation Engineer की पहचान है।
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git commit -m "Design enterprise documentation strategy"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v4.0.1 -m "Documentation strategy completed"
+
+git push origin v4.0.1
+```
+
+---
+
+> 🚀 **Project Status:** Documentation Strategy तैयार है। अब अगला Chapter होगा **README.md (Home Page)**, जो पूरी Repository का Professional Landing Page बनेगा।
+
+---
+
