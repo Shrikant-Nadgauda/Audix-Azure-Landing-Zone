@@ -123,3 +123,54 @@ resource "azurerm_storage_container" "tfstate" {
 
 }
 
+
+
+
+resource "azurerm_virtual_network" "vnet" {
+
+# यह Azure Virtual Network Create करेगा।
+# Virtual Network Azure Cloud के अंदर हमारा Private Network होता है।
+# भविष्य में बनने वाली सभी Virtual Machines इसी Network के अंदर रहेंगी।
+
+  name = "vnet-dev-southeastasia-audix-001"
+
+# Enterprise Naming Convention
+# vnet = Virtual Network
+# dev = Environment
+# southeastasia = Azure Region
+# audix = Company Name
+# 001 = Resource Number
+
+  location = azurerm_resource_group.rg.location
+
+# VNet उसी Region में Create होगा जहाँ हमारा Resource Group है।
+# Resource Group का Reference होने के कारण यहाँ Implicit Dependency अपने आप बन जाती है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# VNet इसी Resource Group के अंदर Create होगा।
+# Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
+
+  address_space = ["10.0.0.0/16"]
+
+# पूरे Virtual Network का Address Space।
+# इसी Range के अंदर आगे सभी Subnets Create होंगे।
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# depends_on = [azurerm_resource_group.rg]
+
+# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+# Terraform Resource Group का Reference देखकर स्वयं समझ जाता है
+# कि पहले Resource Group Create होगा, उसके बाद Virtual Network।
+# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+
+}
+
