@@ -42,3 +42,53 @@ resource "azurerm_resource_group" "rg" {
   }
 
 }
+
+
+
+resource "azurerm_storage_account" "storage" {
+
+# यह Azure Storage Account Create करेगा।
+# Terraform State File भविष्य में इसी Storage Account के अंदर Store होगी।
+
+  name = "stdevaudix001"
+
+# Storage Account का नाम पूरे Azure में Unique होना चाहिए।
+# इसमें केवल Small Letters और Numbers ही Allow होते हैं।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# यहाँ हमने Resource Group का नाम Hardcode नहीं किया।
+# हमने Resource Group का Reference दिया है।
+# इसे Implicit Dependency कहते हैं।
+# Terraform स्वयं समझ जाता है कि पहले Resource Group बनेगा, उसके बाद Storage Account।
+
+  location = azurerm_resource_group.rg.location
+
+# Storage Account उसी Region में Create होगा जहाँ Resource Group है।
+
+  account_tier = "Standard"
+
+# Standard Performance Storage उपयोग किया जाएगा।
+
+  account_replication_type = "LRS"
+
+# LRS (Locally Redundant Storage) एक ही Region में Data की 3 Copies रखता है।
+# Learning Project और Terraform Backend के लिए यह सबसे उपयुक्त और Cost Effective विकल्प है।
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# depends_on = [azurerm_resource_group.rg]
+
+# यह Explicit Dependency कहलाती है।
+# इसका उपयोग तब किया जाता है जब Terraform स्वयं Dependency समझ नहीं पाता।
+# वर्तमान Code में इसकी आवश्यकता नहीं है क्योंकि हमने Resource Group का Reference दिया है।
+# इसलिए यहाँ Implicit Dependency अपने आप काम कर रही है और यही Best Practice है।
+
+}
