@@ -2726,4 +2726,532 @@ git push origin v0.3.0
 
 ---
 
+# 🗄️ Create Storage Account, Understand Backend Block & Terraform State (Part 10)
 
+> **Document:** `10-Create-Storage-Account-and-Backend-Block.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Backend-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure Storage](https://img.shields.io/badge/Azure-Storage%20Account-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![Terraform State](https://img.shields.io/badge/Terraform-State-success?style=for-the-badge)
+![Git](https://img.shields.io/badge/Git-Workflow-F05032?style=for-the-badge&logo=git)
+
+---
+
+# 📖 Create Storage Account, Understand Backend Block & Terraform State
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 03 - Terraform Backend Foundation
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे—
+
+- Azure Storage Account क्यों बनाते हैं?
+- Terraform State File क्या होती है?
+- Backend Block क्या होता है?
+- Local Backend और Remote Backend में अंतर
+- Storage Account Create करना
+- Backend Block लिखना
+- Git Status का महत्व
+- Industry Workflow
+
+---
+
+# 🌍 Real World Scenario
+
+मान लीज़िए आपकी Company में 8 DevOps Engineers एक ही Terraform Project पर काम कर रहे हैं।
+
+अगर सभी Developers अपनी Local Machine की State File Use करेंगे तो—
+
+- किसी का Resource Delete हो सकता है।
+- किसी का Infrastructure Overwrite हो सकता है।
+- Drift आ सकता है।
+- Team Collaboration खराब हो जाएगी।
+
+इसीलिए Enterprise Projects में Terraform State हमेशा Remote Backend में Store की जाती है।
+
+---
+
+# 🤔 Terraform State File क्या है?
+
+जब Terraform कोई Resource Create करता है,
+
+तो वह उसकी पूरी Information एक File में Save करता है।
+
+उस File का नाम होता है—
+
+```text
+terraform.tfstate
+```
+
+---
+
+उदाहरण
+
+```text
+Terraform
+
+      │
+
+      ▼
+
+Create Resource
+
+      │
+
+      ▼
+
+Azure
+
+      │
+
+      ▼
+
+terraform.tfstate
+```
+
+यही File Terraform को बताती है—
+
+- कौन सा Resource पहले से बना हुआ है।
+- कौन सा Resource Update करना है।
+- कौन सा Resource Delete करना है।
+
+---
+
+# 🤔 Backend क्या होता है?
+
+Backend वह Location होती है जहाँ Terraform अपनी State File Store करता है।
+
+---
+
+## Local Backend
+
+```text
+Developer Laptop
+
+│
+
+└── terraform.tfstate
+```
+
+केवल Learning Project के लिए ठीक है।
+
+---
+
+## Remote Backend
+
+```text
+Developer
+
+        │
+
+        ▼
+
+Azure Storage Account
+
+        │
+
+        ▼
+
+terraform.tfstate
+```
+
+Production Projects में हमेशा यही उपयोग होता है।
+
+---
+
+# 🏗️ Step 1 - पहले Resource Group Deploy करें
+
+यदि Resource Group पहले से Deploy नहीं है तो—
+
+```bash
+terraform apply
+```
+
+---
+
+# 🏗️ Step 2 - Azure Storage Account Create करें
+
+Azure Portal
+
+```
+Storage Accounts
+
+↓
+
+Create
+
+↓
+
+Resource Group
+
+↓
+
+Storage Account Name
+
+↓
+
+Region
+
+↓
+
+Review + Create
+```
+
+---
+
+## Naming Convention
+
+| Resource | Name |
+|----------|------|
+| Storage Account | `staudixtfstate001` |
+| Container | `tfstate` |
+
+> ⚠️ Storage Account Name पूरी Azure में Unique होना चाहिए।
+
+---
+
+# 🏗️ Step 3 - Blob Container Create करें
+
+Storage Account
+
+↓
+
+Containers
+
+↓
+
+Create
+
+Container Name
+
+```text
+tfstate
+```
+
+---
+
+# 🤔 Backend Block क्या होता है?
+
+Terraform को यह बताता है कि State File कहाँ Store करनी है।
+
+---
+
+Open
+
+```text
+provider.tf
+```
+
+या
+
+```text
+backend.tf
+```
+
+> **Industry Best Practice:** Backend Configuration को हमेशा अलग `backend.tf` File में रखें।
+
+Create करें
+
+```text
+backend.tf
+```
+
+---
+
+अब नीचे दिया गया Code लिखें।
+
+```terraform
+terraform {
+
+  backend "azurerm" {
+
+    resource_group_name  = "rg-dev-eastus-audix-001"
+
+    storage_account_name = "staudixtfstate001"
+
+    container_name       = "tfstate"
+
+    key                  = "landing-zone.tfstate"
+
+  }
+
+}
+```
+
+---
+
+# 🔍 Code Explanation
+
+## backend "azurerm"
+
+Terraform Azure Storage Account को Backend की तरह Use करेगा।
+
+---
+
+## resource_group_name
+
+Storage Account किस Resource Group में है।
+
+---
+
+## storage_account_name
+
+Azure Storage Account का नाम।
+
+---
+
+## container_name
+
+Blob Container का नाम।
+
+---
+
+## key
+
+State File का नाम।
+
+```text
+landing-zone.tfstate
+```
+
+Production में अक्सर अलग-अलग Environment के लिए अलग-अलग State Files होती हैं।
+
+उदाहरण
+
+```text
+dev.tfstate
+
+uat.tfstate
+
+prod.tfstate
+```
+
+---
+
+# 🏗️ Step 4 - Backend Initialize करें
+
+Command
+
+```bash
+terraform init
+```
+
+Terraform पूछेगा—
+
+```text
+Do you want to copy existing state?
+```
+
+Type करें
+
+```text
+yes
+```
+
+अब आपकी Local State Azure Storage में चली जाएगी।
+
+---
+
+# 🔍 Verify करें
+
+Azure Portal
+
+↓
+
+Storage Account
+
+↓
+
+Container
+
+↓
+
+tfstate
+
+↓
+
+Expected File
+
+```text
+landing-zone.tfstate
+```
+
+---
+
+# 🤔 Git Status इतना Important क्यों है?
+
+हर Professional Engineer किसी भी काम की शुरुआत और अंत में यही Command चलाता है।
+
+```bash
+git status
+```
+
+यह Command बताती है—
+
+- कौन सी File बदली है।
+- कौन सी नई File बनी है।
+- कौन सी File Commit नहीं हुई।
+- कौन सी File Git Ignore कर रहा है।
+
+---
+
+## Example
+
+```bash
+git status
+```
+
+Output
+
+```text
+Changes not staged for commit:
+
+modified:
+
+provider.tf
+
+new file:
+
+backend.tf
+```
+
+अब हमें पता चल गया कि कौन-कौन सी Files GitHub पर जाने वाली हैं।
+
+---
+
+# 💡 Daily Git Workflow
+
+```bash
+git status
+
+↓
+
+terraform fmt
+
+↓
+
+terraform validate
+
+↓
+
+terraform plan
+
+↓
+
+git add .
+
+↓
+
+git status
+
+↓
+
+git commit
+
+↓
+
+git push
+```
+
+> 🚀 यही Workflow लगभग हर DevOps Engineer Follow करता है।
+
+---
+
+# 🛠️ Important Commands
+
+Terraform Initialize
+
+```bash
+terraform init
+```
+
+Format
+
+```bash
+terraform fmt
+```
+
+Validate
+
+```bash
+terraform validate
+```
+
+Preview
+
+```bash
+terraform plan
+```
+
+Git Status
+
+```bash
+git status
+```
+
+---
+
+# ✅ Best Practices
+
+- Backend Configuration हमेशा अलग `backend.tf` File में रखें।
+- State File को कभी Delete न करें।
+- State File को GitHub पर Commit न करें।
+- Storage Account के लिए Globally Unique Name रखें।
+- प्रत्येक Commit से पहले `git status` चलाएँ।
+- `terraform fmt` और `terraform validate` बिना Commit किए कभी Push न करें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Terraform State क्या है।
+- ✅ Backend क्या है।
+- ✅ Local और Remote Backend में अंतर।
+- ✅ Azure Storage Account का उपयोग।
+- ✅ Backend Block Configure करना।
+- ✅ Git Status का महत्व।
+- ✅ Professional Terraform Workflow।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `09-Understanding-provider.tf.md` | `README.md` | `11-Understanding-Terraform-Plan-Apply-and-Destroy.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git status
+
+git commit -m "Configure remote backend for Terraform state management"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.3.0 -m "Terraform remote backend configured"
+
+git push origin v0.3.0
+```
+
+---
+
+> 🚀 **Project Status:** Remote Backend Configured • Version **v0.3.0**
+
+---
