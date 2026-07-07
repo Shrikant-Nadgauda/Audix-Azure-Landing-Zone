@@ -1823,6 +1823,8 @@ Open
 नीचे दिया गया Content Add करें।
 
 ```gitignore
+
+```
 # Terraform Working Directory
 .terraform/
 
@@ -1848,6 +1850,7 @@ override.tf.json
 # CLI Configuration
 .terraformrc
 terraform.rc
+
 ```
 
 अब Git `.terraform` Folder को Ignore करेगा।
