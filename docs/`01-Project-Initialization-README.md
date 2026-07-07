@@ -797,6 +797,7 @@ Production Environment में Terraform Project इसी प्रकार 
 ```
 ---
 
+```
 # 📁 Understanding Terraform Project Files (Part 5)
 
 > **Document:** `05-Understanding-Terraform-Project-Files.md`
@@ -1029,4 +1030,661 @@ mkdir modules
 > 🚀 **Project Status:** Terraform Project Ready
 
 ---
+# 📘 Understanding `versions.tf` (Part 6)
 
+> **Document:** `06-Understanding-versions.tf.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-v1.x-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Provider-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![Versioning](https://img.shields.io/badge/Version-Control-success?style=for-the-badge)
+![Best Practices](https://img.shields.io/badge/Enterprise-Best%20Practices-orange?style=for-the-badge)
+
+---
+
+# 📖 Understanding `versions.tf`
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 02 - Terraform Configuration
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम `versions.tf` File को समझेंगे।
+
+यह File Terraform Project की सबसे महत्वपूर्ण Files में से एक होती है क्योंकि इसी में हम Terraform Version और Provider Version Define करते हैं।
+
+---
+
+# 🤔 `versions.tf` क्या है?
+
+`versions.tf` Terraform को बताती है—
+
+- कौन सा Terraform Version Use करना है।
+- कौन सा Provider Use करना है।
+- Provider का कौन सा Version Install करना है।
+
+यदि यह File सही नहीं होगी तो अलग-अलग Machines पर अलग-अलग Version के कारण Errors आ सकते हैं।
+
+---
+
+# 🌍 Real World Scenario
+
+मान लीजिए—
+
+Developer A
+
+```text
+Terraform v1.8
+```
+
+Developer B
+
+```text
+Terraform v1.11
+```
+
+CI/CD Pipeline
+
+```text
+Terraform v1.9
+```
+
+यदि Version Lock नहीं होगा तो तीनों जगह अलग-अलग Behaviour हो सकता है।
+
+इसीलिए Enterprise Projects में Version Lock करना Mandatory होता है।
+
+---
+
+# 📄 Create `versions.tf`
+
+Open
+
+```text
+versions.tf
+```
+
+अब नीचे दिया गया Code लिखें।
+
+```terraform
+terraform {
+
+  required_version = ">= 1.13.0"
+
+  required_providers {
+
+    azurerm = {
+
+      source  = "hashicorp/azurerm"
+
+      version = "~> 4.0"
+
+    }
+
+  }
+
+}
+```
+
+---
+
+# 🔍 Code Explanation
+
+## terraform
+
+```terraform
+terraform {
+
+}
+```
+
+यह Terraform Project की Root Configuration Block है।
+
+---
+
+## required_version
+
+```terraform
+required_version = ">= 1.13.0"
+```
+
+इसका अर्थ—
+
+Project केवल Terraform Version **1.13.0** या उससे ऊपर पर चलेगा।
+
+---
+
+## required_providers
+
+```terraform
+required_providers {
+
+}
+```
+
+Terraform को बताता है कि कौन-कौन से Providers इस Project में उपयोग होंगे।
+
+---
+
+## azurerm
+
+```terraform
+azurerm
+```
+
+Azure Cloud का Official Terraform Provider।
+
+---
+
+## source
+
+```terraform
+source = "hashicorp/azurerm"
+```
+
+Provider Download होगा—
+
+```text
+registry.terraform.io/hashicorp/azurerm
+```
+
+---
+
+## version
+
+```terraform
+version = "~> 4.0"
+```
+
+इसका अर्थ—
+
+Terraform Azure Provider का Stable 4.x Version Use करेगा।
+
+---
+
+# 📌 क्यों `~>` Use करते हैं?
+
+यदि लिखा जाए—
+
+```terraform
+version = "4.0.0"
+```
+
+तो केवल वही Version चलेगा।
+
+लेकिन
+
+```terraform
+version = "~> 4.0"
+```
+
+तो
+
+```text
+4.0
+
+4.1
+
+4.2
+
+4.5
+
+4.9
+```
+
+सब Allowed होंगे।
+
+लेकिन
+
+```text
+5.x
+```
+
+Install नहीं होगा।
+
+यही Enterprise Best Practice है।
+
+---
+
+# 💡 Version Operators
+
+Exact Version
+
+```terraform
+version = "4.0.0"
+```
+
+Greater Than
+
+```terraform
+version = ">= 4.0"
+```
+
+Less Than
+
+```terraform
+version = "< 5.0"
+```
+
+Compatible Version
+
+```terraform
+version = "~> 4.0"
+```
+
+---
+
+# 🚀 Verify Configuration
+
+Terminal में Command चलाएँ।
+
+```bash
+terraform init
+```
+
+Expected Output
+
+```text
+Initializing the backend...
+
+Initializing provider plugins...
+
+Terraform has been successfully initialized!
+```
+
+---
+
+# 📂 `terraform init` क्या करता है?
+
+यह Command—
+
+- Provider Download करता है।
+- `.terraform` Folder Create करता है।
+- Provider Plugins Install करता है।
+- Project Initialize करता है।
+
+---
+
+# 📁 Project Structure
+
+```text
+Audix-Azure-Landing-Zone-Terraform
+│
+├── versions.tf
+├── .terraform
+├── .terraform.lock.hcl
+│
+├── provider.tf
+├── main.tf
+├── variables.tf
+├── terraform.tfvars
+└── outputs.tf
+```
+
+---
+
+# ⚠️ Important Files
+
+`terraform init` के बाद दो नई चीजें बनेंगी—
+
+```text
+.terraform/
+```
+
+और
+
+```text
+.terraform.lock.hcl
+```
+
+इनके बारे में अगले Chapters में विस्तार से सीखेंगे।
+
+---
+
+# ✅ Best Practices
+
+- हमेशा `required_version` Define करें।
+- हमेशा Provider Version Lock करें।
+- Official HashiCorp Provider ही Use करें।
+- हर नए Project में सबसे पहले `terraform init` चलाएँ।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ `versions.tf` क्या है।
+- ✅ Terraform Version Lock क्यों करते हैं।
+- ✅ Provider Version Lock क्यों करते हैं।
+- ✅ `required_providers` क्या है।
+- ✅ `terraform init` क्या करता है।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `05-Understanding-Terraform-Project-Files.md` | `README.md` | `07-Terraform-Init-and-Project-Initialization.md` |
+
+---
+
+> 🚀 **Project Status:** Terraform Version Configuration Completed
+
+---
+
+# ⚙️ Terraform Init and Project Initialization (Part 7)
+
+> **Document:** `07-Terraform-Init-and-Project-Initialization.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Initialization-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-IaC-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![CLI](https://img.shields.io/badge/CLI-Terminal-success?style=for-the-badge)
+![DevOps](https://img.shields.io/badge/DevOps-Best%20Practices-orange?style=for-the-badge)
+
+---
+
+# 📖 Terraform Init and Project Initialization
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 02 - Terraform Configuration
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम अपने Terraform Project को पहली बार Initialize करेंगे।
+
+जब भी नया Terraform Project बनाया जाता है, सबसे पहला Command हमेशा `terraform init` होता है।
+
+---
+
+# 🤔 `terraform init` क्या है?
+
+`terraform init` Terraform Project का Initialization Command है।
+
+यह Command Project को Deploy नहीं करता।
+
+यह केवल Project को Run होने के लिए तैयार करता है।
+
+---
+
+# 🌍 Real World Example
+
+मान लीजिए आपने नया Laptop लिया।
+
+Terraform Install कर लिया।
+
+GitHub से Project Clone कर लिया।
+
+अब सबसे पहला Command क्या होगा?
+
+```bash
+terraform init
+```
+
+बिना `terraform init` के Terraform Project आगे नहीं चल सकता।
+
+---
+
+# 🏗️ Step 1 - Project Folder Verify करें
+
+```powershell
+cd D:\Audix-Azure-Landing-Zone-Terraform
+```
+
+---
+
+# 🏗️ Step 2 - Current Files Verify करें
+
+PowerShell
+
+```powershell
+dir
+```
+
+Git Bash
+
+```bash
+ls
+```
+
+Expected Output
+
+```text
+README.md
+
+versions.tf
+
+provider.tf
+
+main.tf
+
+variables.tf
+
+terraform.tfvars
+
+outputs.tf
+```
+
+---
+
+# 🏗️ Step 3 - Terraform Initialize करें
+
+Command
+
+```bash
+terraform init
+```
+
+---
+
+# 🏗️ Expected Output
+
+```text
+Initializing the backend...
+
+Initializing provider plugins...
+
+Finding hashicorp/azurerm versions...
+
+Installing hashicorp/azurerm...
+
+Terraform has been successfully initialized!
+```
+
+यदि यह Message दिखाई देता है तो आपका Project Successfully Initialize हो चुका है।
+
+---
+
+# 📂 `terraform init` के दौरान क्या होता है?
+
+Terraform निम्न कार्य करता है—
+
+- Project को Initialize करता है।
+- Required Providers Download करता है।
+- Provider Plugins Install करता है।
+- Working Directory तैयार करता है।
+- Lock File Generate करता है।
+
+---
+
+# 📁 Initialization के बाद Project Structure
+
+```text
+Audix-Azure-Landing-Zone-Terraform
+│
+├── .terraform
+│
+├── .terraform.lock.hcl
+│
+├── README.md
+├── versions.tf
+├── provider.tf
+├── main.tf
+├── variables.tf
+├── terraform.tfvars
+└── outputs.tf
+```
+
+---
+
+# 📂 `.terraform` Folder क्या है?
+
+यह Folder Terraform द्वारा Automatically Create किया जाता है।
+
+इसके अंदर Download किए गए Providers Store होते हैं।
+
+उदाहरण
+
+```text
+.terraform
+│
+└── providers
+    │
+    └── registry.terraform.io
+```
+
+इस Folder को कभी भी Manually Edit नहीं करना चाहिए।
+
+---
+
+# 📄 `.terraform.lock.hcl` क्या है?
+
+यह Lock File होती है।
+
+इसमें Installed Providers की Version Information Store होती है।
+
+इससे Team के सभी Developers एक ही Provider Version Use करते हैं।
+
+---
+
+# 🔍 Verify करें कि Initialization सफल हुआ है
+
+Command
+
+```bash
+terraform version
+```
+
+फिर
+
+```bash
+terraform providers
+```
+
+Expected Output
+
+```text
+Providers required by configuration:
+
+hashicorp/azurerm
+```
+
+---
+
+# ❌ Common Errors
+
+## Error
+
+```text
+terraform: command not found
+```
+
+कारण
+
+Terraform Install नहीं है।
+
+---
+
+## Error
+
+```text
+Failed to query available provider packages
+```
+
+कारण
+
+Internet Connection या Firewall Issue।
+
+---
+
+## Error
+
+```text
+Unsupported Terraform Core Version
+```
+
+कारण
+
+Installed Terraform Version, `versions.tf` में दिए गए Version से Match नहीं करती।
+
+---
+
+# 🛠️ Useful Commands
+
+Initialize Project
+
+```bash
+terraform init
+```
+
+Reconfigure Project
+
+```bash
+terraform init -reconfigure
+```
+
+Upgrade Providers
+
+```bash
+terraform init -upgrade
+```
+
+Show Providers
+
+```bash
+terraform providers
+```
+
+Terraform Version
+
+```bash
+terraform version
+```
+
+---
+
+# 💡 Best Practices
+
+- प्रत्येक नए Project में सबसे पहले `terraform init` चलाएँ।
+- `terraform init` केवल एक बार नहीं, आवश्यकता पड़ने पर दोबारा भी चलाया जा सकता है।
+- Provider Upgrade करने के लिए `terraform init -upgrade` उपयोग करें।
+- `.terraform` Folder को Manually Modify न करें।
+- `.terraform.lock.hcl` File को GitHub में Commit करें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ `terraform init` क्या है।
+- ✅ Project Initialization कैसे होता है।
+- ✅ `.terraform` Folder का उपयोग।
+- ✅ `.terraform.lock.hcl` क्या है।
+- ✅ Common Errors और उनके कारण।
+- ✅ Useful Terraform Commands।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `06-Understanding-versions.tf.md` | `README.md` | `08-Understanding-.terraform-and-Lock-File.md` |
+
+---
+
+> 🚀 **Project Status:** Terraform Project Successfully Initialized
+
+---
