@@ -3258,3 +3258,1430 @@ git push origin v0.3.0
 > 🚀 **Project Status:** Remote Backend Configured • Version **v0.3.0**
 
 ---
+
+# 🚀 Understanding Terraform Plan, Apply and Destroy (Part 11)
+
+> **Document:** `11-Understanding-Terraform-Plan-Apply-and-Destroy.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Execution-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Infrastructure-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![DevOps](https://img.shields.io/badge/DevOps-Workflow-success?style=for-the-badge)
+![Git](https://img.shields.io/badge/Git-Best%20Practices-F05032?style=for-the-badge&logo=git)
+
+---
+
+# 📖 Understanding Terraform Plan, Apply and Destroy
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 04 - Terraform Execution Workflow
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम Terraform के तीन सबसे महत्वपूर्ण Commands सीखेंगे।
+
+- `terraform plan`
+- `terraform apply`
+- `terraform destroy`
+
+यदि ये तीन Commands अच्छे से समझ आ गईं, तो Terraform का लगभग 60% Workflow समझ में आ जाएगा।
+
+---
+
+# 🌍 Real World Workflow
+
+किसी भी Company में DevOps Engineer सीधे Infrastructure Create नहीं करता।
+
+हमेशा नीचे दिया गया Workflow Follow किया जाता है।
+
+```text
+Write Code
+
+      │
+
+      ▼
+
+terraform fmt
+
+      │
+
+      ▼
+
+terraform validate
+
+      │
+
+      ▼
+
+terraform plan
+
+      │
+
+      ▼
+
+Code Review
+
+      │
+
+      ▼
+
+terraform apply
+
+      │
+
+      ▼
+
+Verification
+
+      │
+
+      ▼
+
+Git Commit
+
+      │
+
+      ▼
+
+Git Push
+```
+
+> **🚫 Production Environment में बिना `terraform plan` देखे कभी भी `terraform apply` नहीं किया जाता।**
+
+---
+
+# 🧠 Command 1 - terraform plan
+
+Command
+
+```bash
+terraform plan
+```
+
+---
+
+## यह क्या करता है?
+
+Terraform Azure में कोई भी Resource Create नहीं करता।
+
+यह केवल Preview दिखाता है कि—
+
+- कौन सा Resource Create होगा।
+- कौन सा Resource Update होगा।
+- कौन सा Resource Delete होगा।
+
+---
+
+## Example Output
+
+```text
+Terraform will perform the following actions:
+
++ azurerm_resource_group.rg
+
+Plan: 1 to add, 0 to change, 0 to destroy.
+```
+
+मतलब—
+
+Terraform केवल बता रहा है कि एक नया Resource बनने वाला है।
+
+---
+
+# 🧠 Command 2 - terraform apply
+
+Command
+
+```bash
+terraform apply
+```
+
+Terraform Confirmation मांगेगा।
+
+```text
+Do you want to perform these actions?
+
+Enter a value:
+```
+
+Type करें
+
+```text
+yes
+```
+
+---
+
+## Example Output
+
+```text
+Apply complete!
+
+Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+अब Azure में वास्तव में Resource Create हो चुका है।
+
+---
+
+# 🧠 Command 3 - terraform destroy
+
+Command
+
+```bash
+terraform destroy
+```
+
+Confirmation
+
+```text
+Enter a value:
+```
+
+Type करें
+
+```text
+yes
+```
+
+---
+
+## Example Output
+
+```text
+Destroy complete!
+
+Resources: 1 destroyed.
+```
+
+Azure से Resource Delete हो जाएगा।
+
+---
+
+# 🧠 Plan बनाम Apply
+
+| Command | Resource Create होगा? |
+|----------|-----------------------|
+| `terraform plan` | ❌ नहीं |
+| `terraform apply` | ✅ हाँ |
+| `terraform destroy` | ❌ Create नहीं, Delete करेगा |
+
+---
+
+# 💡 Real Interview Question
+
+## Question
+
+**यदि आपने Code बदल दिया लेकिन `terraform apply` नहीं चलाया तो क्या होगा?**
+
+### Answer
+
+Terraform केवल Local Code Update करेगा।
+
+Azure Infrastructure में कोई Change नहीं होगा।
+
+जब तक `terraform apply` नहीं चलेगा, Azure में कोई Resource Create, Update या Delete नहीं होगा।
+
+---
+
+# 📄 Plan File Generate करना
+
+Production Projects में Plan File Generate की जाती है।
+
+Command
+
+```bash
+terraform plan -out=tfplan
+```
+
+अब एक Plan File बनेगी।
+
+```text
+tfplan
+```
+
+---
+
+## उसी Plan को Apply करें
+
+```bash
+terraform apply tfplan
+```
+
+इससे वही Approved Plan Deploy होगा।
+
+यही Enterprise Best Practice है।
+
+---
+
+# 📂 Useful Commands
+
+Format Code
+
+```bash
+terraform fmt
+```
+
+Validate Configuration
+
+```bash
+terraform validate
+```
+
+Preview Changes
+
+```bash
+terraform plan
+```
+
+Save Plan
+
+```bash
+terraform plan -out=tfplan
+```
+
+Deploy Infrastructure
+
+```bash
+terraform apply
+```
+
+Deploy Saved Plan
+
+```bash
+terraform apply tfplan
+```
+
+Destroy Infrastructure
+
+```bash
+terraform destroy
+```
+
+---
+
+# 🌍 Complete Terraform Workflow
+
+```text
+Developer
+
+      │
+
+      ▼
+
+terraform fmt
+
+      │
+
+      ▼
+
+terraform validate
+
+      │
+
+      ▼
+
+terraform plan
+
+      │
+
+      ▼
+
+terraform apply
+
+      │
+
+      ▼
+
+Azure Infrastructure Updated
+
+      │
+
+      ▼
+
+git status
+
+      │
+
+      ▼
+
+git add .
+
+      │
+
+      ▼
+
+git commit
+
+      │
+
+      ▼
+
+git push
+```
+
+---
+
+# ⚠️ Common Mistakes
+
+❌ बिना `terraform plan` देखे Apply करना।
+
+❌ `terraform destroy` Production Environment में चलाना।
+
+❌ `terraform validate` Skip करना।
+
+❌ Code Format (`terraform fmt`) न करना।
+
+❌ `git status` Check किए बिना Commit करना।
+
+---
+
+# ✅ Best Practices
+
+- हमेशा `terraform fmt` चलाएँ।
+- उसके बाद `terraform validate` करें।
+- फिर `terraform plan` देखें।
+- Production में `terraform plan -out=tfplan` उपयोग करें।
+- Approved Plan को ही Apply करें।
+- Apply के बाद Azure Portal में Verification करें।
+- Commit से पहले `git status` अवश्य देखें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ `terraform plan` क्या करता है।
+- ✅ `terraform apply` कैसे काम करता है।
+- ✅ `terraform destroy` कब उपयोग करते हैं।
+- ✅ Plan File क्या होती है।
+- ✅ Enterprise Deployment Workflow।
+- ✅ Industry Best Practices।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `10-Create-Storage-Account-and-Backend-Block.md` | `README.md` | `12-Understanding-Terraform-State-and-State-Commands.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git status
+
+git commit -m "Document Terraform execution workflow and deployment lifecycle"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.4.0 -m "Terraform execution workflow documented"
+
+git push origin v0.4.0
+```
+
+---
+
+> 🚀 **Project Status:** Terraform Execution Workflow Completed • Version **v0.4.0**
+
+# 📂 Understanding Terraform State and State Commands (Part 12)
+
+> **Document:** `12-Understanding-Terraform-State-and-State-Commands.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-State-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-State%20Management-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![DevOps](https://img.shields.io/badge/DevOps-Infrastructure-success?style=for-the-badge)
+![Git](https://img.shields.io/badge/Git-Workflow-F05032?style=for-the-badge&logo=git)
+
+---
+
+# 📖 Understanding Terraform State and State Commands
+
+> **Document:** `12-Understanding-Terraform-State-and-State-Commands.md`
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 05 - Terraform State Management
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम Terraform State को गहराई से समझेंगे।
+
+यह Terraform का सबसे महत्वपूर्ण Concept है।
+
+यदि आपको Terraform State समझ आ गई तो Terraform Debugging और Production Support काफी आसान हो जाएगी।
+
+---
+
+# 🤔 Terraform State क्या है?
+
+Terraform जब भी कोई Resource Create करता है तो उसकी पूरी जानकारी State File में Store करता है।
+
+State File का Default नाम होता है
+
+```text
+terraform.tfstate
+```
+
+Terraform इसी File को देखकर निर्णय लेता है—
+
+- कौन सा Resource पहले से मौजूद है।
+- कौन सा Resource Update करना है।
+- कौन सा Resource Delete करना है।
+- कौन सा Resource Import करना है।
+
+---
+
+# 🌍 Real World Example
+
+मान लीजिए आपने Terraform से एक Resource Group Create किया।
+
+Terraform उसे Azure में Create करेगा।
+
+साथ ही उसकी जानकारी State File में Save करेगा।
+
+```text
+Terraform
+
+      │
+
+      ▼
+
+Azure Resource Group
+
+      │
+
+      ▼
+
+terraform.tfstate
+```
+
+यदि State File Delete हो जाए तो Azure में Resource रहेगा लेकिन Terraform उसे पहचान नहीं पाएगा।
+
+---
+
+# 🧠 Terraform State क्यों जरूरी है?
+
+State File के बिना Terraform को यह नहीं पता चलेगा कि कौन-कौन से Resources पहले से Deploy हैं।
+
+यही कारण है कि Production Environment में State File सबसे महत्वपूर्ण Asset होती है।
+
+---
+
+# 📄 State File कहाँ होती है?
+
+यदि Local Backend Use कर रहे हैं
+
+```text
+terraform.tfstate
+```
+
+यदि Remote Backend Use कर रहे हैं
+
+```text
+Azure Storage Account
+
+↓
+
+Blob Container
+
+↓
+
+landing-zone.tfstate
+```
+
+---
+
+# 🏗️ State File में क्या-क्या Store होता है?
+
+- Resource IDs
+- Resource Names
+- Azure Region
+- Resource Dependencies
+- Outputs
+- Metadata
+
+---
+
+# 🔍 State List
+
+Command
+
+```bash
+terraform state list
+```
+
+Example
+
+```text
+azurerm_resource_group.rg
+
+azurerm_storage_account.tfstate
+```
+
+यह Command सभी Managed Resources दिखाती है।
+
+---
+
+# 🔍 State Show
+
+Command
+
+```bash
+terraform state show azurerm_resource_group.rg
+```
+
+Output
+
+```text
+id
+
+location
+
+name
+
+tags
+```
+
+यह किसी एक Resource की पूरी जानकारी दिखाता है।
+
+---
+
+# 🔍 Terraform Show
+
+Command
+
+```bash
+terraform show
+```
+
+यह वर्तमान State File की पूरी Information दिखाता है।
+
+---
+
+# 🔍 State Pull
+
+यदि Remote Backend Use कर रहे हैं
+
+```bash
+terraform state pull
+```
+
+यह Azure Storage से Current State Download करके Terminal में दिखाता है।
+
+---
+
+# 🔍 State Move
+
+Command
+
+```bash
+terraform state mv
+```
+
+इसका उपयोग State के अंदर Resource का Address बदलने के लिए किया जाता है।
+
+Production Refactoring में बहुत उपयोगी Command है।
+
+---
+
+# 🔍 State Remove
+
+Command
+
+```bash
+terraform state rm
+```
+
+यह Resource को केवल Terraform State से हटाता है।
+
+Azure से Resource Delete नहीं होता।
+
+---
+
+# 🔍 State Replace Provider
+
+Command
+
+```bash
+terraform state replace-provider
+```
+
+Provider Migration के समय उपयोग किया जाता है।
+
+---
+
+# 📊 Important State Commands
+
+| Command | Purpose |
+|----------|----------|
+| `terraform state list` | सभी Managed Resources देखें |
+| `terraform state show` | किसी Resource की Details देखें |
+| `terraform show` | पूरी State देखें |
+| `terraform state pull` | Remote State Download करें |
+| `terraform state mv` | Resource Rename / Move करें |
+| `terraform state rm` | State से Resource Remove करें |
+
+---
+
+# 🌍 Enterprise Workflow
+
+```text
+Terraform Code
+
+        │
+
+        ▼
+
+terraform plan
+
+        │
+
+        ▼
+
+terraform apply
+
+        │
+
+        ▼
+
+Azure Resources
+
+        │
+
+        ▼
+
+Terraform State Updated
+
+        │
+
+        ▼
+
+Azure Storage Backend
+```
+
+---
+
+# ⚠️ Common Mistakes
+
+❌ State File Delete करना
+
+❌ State File Manually Edit करना
+
+❌ Remote Backend Disable करना
+
+❌ State File GitHub पर Upload करना
+
+❌ Multiple Developers द्वारा Local Backend Use करना
+
+---
+
+# 💡 Interview Questions
+
+## Question
+
+Terraform State क्या होती है?
+
+**Answer**
+
+Terraform State वह File है जिसमें Terraform सभी Managed Infrastructure Resources की वर्तमान स्थिति (Current Infrastructure State) Store करता है।
+
+---
+
+## Question
+
+यदि State File Delete हो जाए तो क्या होगा?
+
+**Answer**
+
+Azure Resources Delete नहीं होंगे।
+
+लेकिन Terraform उनका Management खो देगा।
+
+---
+
+## Question
+
+Production में State कहाँ Store करनी चाहिए?
+
+**Answer**
+
+Azure Storage Account Remote Backend में।
+
+---
+
+# ✅ Best Practices
+
+- State File कभी Manually Edit न करें।
+- हमेशा Remote Backend Use करें।
+- State File का Backup रखें।
+- Sensitive Information को Secure रखें।
+- State Commands केवल आवश्यकता होने पर ही चलाएँ।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Terraform State क्या है।
+- ✅ State File का महत्व।
+- ✅ State Commands।
+- ✅ Remote Backend का उपयोग।
+- ✅ Enterprise State Management।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `11-Understanding-Terraform-Plan-Apply-and-Destroy.md` | `README.md` | `13-Understanding-terraform-fmt-validate-and-workflow.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git status
+
+git commit -m "Add Terraform state management documentation"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.5.0 -m "Terraform state management completed"
+
+git push origin v0.5.0
+```
+
+---
+
+> 🚀 **Project Status:** Terraform State Management Completed • Version **v0.5.0**
+
+---
+
+# ⚙️ Terraform Workflow (`fmt`, `validate` & Best Practices) (Part 13)
+
+> **Document:** `13-Understanding-terraform-fmt-validate-and-workflow.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Workflow-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-Landing%20Zone-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![DevOps](https://img.shields.io/badge/DevOps-Best%20Practices-success?style=for-the-badge)
+
+---
+
+# 📖 Terraform Workflow
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 05 - Standard Terraform Workflow
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम Terraform का Daily Workflow सीखेंगे।
+
+यह वही Workflow है जिसे लगभग हर DevOps Engineer Production Environment में Follow करता है।
+
+---
+
+# 📚 अब तक हमने क्या बनाया?
+
+✅ Resource Group
+
+➡️ Azure Storage Account
+
+➡️ Blob Container
+
+➡️ Remote Backend
+
+➡️ Terraform State
+
+अब हमारा Foundation तैयार हो चुका है।
+
+अब अगले Chapter से हम Actual Landing Zone Infrastructure Build करना शुरू करेंगे।
+
+---
+
+# 🔄 Terraform Workflow
+
+```text
+Write Code
+    │
+    ▼
+terraform fmt
+    │
+    ▼
+terraform validate
+    │
+    ▼
+terraform plan
+    │
+    ▼
+terraform apply
+    │
+    ▼
+Verify in Azure Portal
+    │
+    ▼
+git status → git add . → git commit → git push
+```
+
+---
+
+# 🛠️ terraform fmt
+
+Command
+
+```bash
+terraform fmt
+```
+
+### Purpose
+
+Terraform Code को Automatically Format करता है।
+
+---
+
+# 🛠️ terraform validate
+
+Command
+
+```bash
+terraform validate
+```
+
+### Purpose
+
+Terraform Configuration सही है या नहीं, यह Check करता है।
+
+---
+
+# 🛠️ terraform plan
+
+Command
+
+```bash
+terraform plan
+```
+
+### Purpose
+
+Azure में क्या Change होने वाला है उसका Preview दिखाता है।
+
+---
+
+# 🛠️ terraform apply
+
+Command
+
+```bash
+terraform apply
+```
+
+### Purpose
+
+Terraform Code को Azure में Deploy करता है।
+
+---
+
+# 🛠️ git status
+
+Command
+
+```bash
+git status
+```
+
+### Purpose
+
+बताता है कि कौन-सी Files Modified, New या Untracked हैं।
+
+Commit करने से पहले यह Command हमेशा चलाएँ।
+
+---
+
+# 🌍 Daily DevOps Workflow
+
+```text
+VS Code
+   │
+   ▼
+Write Terraform Code
+   │
+   ▼
+fmt → validate → plan → apply
+   │
+   ▼
+Azure Verification
+   │
+   ▼
+git status
+   │
+   ▼
+git add .
+   │
+   ▼
+git commit
+   │
+   ▼
+git push
+```
+
+---
+
+# 💡 Quick Commands
+
+```bash
+terraform fmt
+
+terraform validate
+
+terraform plan
+
+terraform apply
+
+git status
+
+git add .
+
+git commit -m "Your Commit Message"
+
+git push
+```
+
+---
+
+# ✅ Best Practices
+
+- `terraform fmt` हमेशा पहले चलाएँ।
+- `terraform validate` से Syntax Check करें।
+- `terraform plan` देखकर ही Apply करें।
+- Deploy के बाद Azure Portal Verify करें।
+- Commit से पहले `git status` अवश्य देखें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Standard Terraform Workflow
+- ✅ `terraform fmt`
+- ✅ `terraform validate`
+- ✅ `terraform plan`
+- ✅ `terraform apply`
+- ✅ `git status`
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `12-Understanding-Terraform-State-and-State-Commands.md` | `README.md` | `14-Create-Azure-Virtual-Network.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git commit -m "Document standard Terraform development workflow"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.6.0 -m "Terraform workflow documentation completed"
+
+git push origin v0.6.0
+```
+
+---
+
+> 🚀 **Project Status:** Terraform Foundation Completed • Next Phase: Azure Virtual Network
+
+---
+
+# 🌐 Create Azure Virtual Network (Part 14)
+
+> **Document:** `14-Create-Azure-Virtual-Network.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Virtual%20Network-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-VNet-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white)
+![Networking](https://img.shields.io/badge/Networking-Landing%20Zone-success?style=for-the-badge)
+![DevOps](https://img.shields.io/badge/Enterprise-Best%20Practices-orange?style=for-the-badge)
+
+---
+
+# 🌐 Create Azure Virtual Network
+
+> **Project Name:** **Audix Azure Landing Zone using Terraform**
+
+> **Phase:** 06 - Networking
+
+---
+
+# 🎯 Objective
+
+अब तक हमने Terraform की Foundation तैयार कर ली है।
+
+अब हम Azure Landing Zone का पहला Networking Resource बनाएंगे।
+
+इस Chapter में हम सीखेंगे—
+
+- Virtual Network (VNet) क्या है?
+- VNet की आवश्यकता क्यों होती है?
+- Address Space क्या होता है?
+- Terraform से Azure Virtual Network Create करना
+
+---
+
+# 📚 अब तक हमारा Infrastructure
+
+```text
+Azure Subscription
+        │
+        ▼
+Resource Group
+        │
+        ▼
+Storage Account
+        │
+        ▼
+Blob Container
+        │
+        ▼
+Terraform Remote Backend
+```
+
+अब इसमें Networking जोड़ेंगे।
+
+---
+
+# 🤔 Virtual Network (VNet) क्या है?
+
+Virtual Network (VNet) Azure का Private Network होता है।
+
+Azure में बनने वाले सभी Resources इसी Network के अंदर Communicate करते हैं।
+
+यदि VNet नहीं होगा तो—
+
+- Virtual Machine नहीं बन सकती।
+- Subnet नहीं बन सकता।
+- Bastion काम नहीं करेगा।
+- Private Communication संभव नहीं होगी।
+
+---
+
+# 🌍 Real World Example
+
+मान लीजिए आपने एक Office बनाया।
+
+अब उस Office में—
+
+- Meeting Room
+- HR Department
+- Server Room
+- Finance Department
+
+सबको जोड़ने के लिए Internal Network चाहिए।
+
+Azure में वही Internal Network **Virtual Network (VNet)** कहलाता है।
+
+---
+
+# 🏗️ Landing Zone Network Architecture
+
+```text
+Internet
+    │
+    ▼
+Azure Subscription
+    │
+    ▼
+Resource Group
+    │
+    ▼
+Virtual Network (10.0.0.0/16)
+    │
+    ├──────────────┬──────────────┬──────────────┐
+    ▼              ▼              ▼
+Netflix       StreamFlix   AzureBastionSubnet
+10.0.1.0/24   10.0.2.0/24     10.0.3.0/26
+```
+
+> अभी इस Chapter में केवल **Virtual Network** बनाएंगे।
+
+---
+
+# 📛 Naming Convention
+
+| Resource | Name |
+|----------|------|
+| Virtual Network | `vnet-dev-eastus-audix-001` |
+
+---
+
+# 📄 Open File
+
+```text
+main.tf
+```
+
+---
+
+# ✍️ नीचे दिया गया Code Add करें
+
+```terraform
+resource "azurerm_virtual_network" "vnet" {
+
+  name                = "vnet-dev-eastus-audix-001"
+
+  location            = azurerm_resource_group.rg.location
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+  address_space = [
+    "10.0.0.0/16"
+  ]
+
+}
+```
+
+---
+
+# 🔍 Code Explanation
+
+## Resource Type
+
+```terraform
+azurerm_virtual_network
+```
+
+Azure Virtual Network Create करता है।
+
+---
+
+## Local Name
+
+```terraform
+vnet
+```
+
+Terraform का Internal Reference Name।
+
+---
+
+## Name
+
+```terraform
+name = "vnet-dev-eastus-audix-001"
+```
+
+Azure Portal में दिखाई देने वाला Name।
+
+---
+
+## Location
+
+```terraform
+location = azurerm_resource_group.rg.location
+```
+
+Resource Group की Location Automatically Use करेगा।
+
+---
+
+## Resource Group
+
+```terraform
+resource_group_name = azurerm_resource_group.rg.name
+```
+
+Virtual Network किस Resource Group में बनेगा।
+
+---
+
+## Address Space
+
+```terraform
+address_space = [
+    "10.0.0.0/16"
+]
+```
+
+पूरे Network का IP Range।
+
+इसी Address Space के अंदर आगे Subnets बनाए जाएंगे।
+
+---
+
+# 💡 CIDR Explanation
+
+```text
+10.0.0.0/16
+```
+
+मतलब—
+
+- Network Start : 10.0.0.0
+- Network End : 10.0.255.255
+
+यही पूरा Address Space हमारे Landing Zone के लिए Reserved रहेगा।
+
+---
+
+# 🚀 Terraform Workflow
+
+Format
+
+```bash
+terraform fmt
+```
+
+Validate
+
+```bash
+terraform validate
+```
+
+Preview
+
+```bash
+terraform plan
+```
+
+Deploy
+
+```bash
+terraform apply
+```
+
+---
+
+# 🌐 Azure Portal Verification
+
+Azure Portal
+
+↓
+
+Resource Groups
+
+↓
+
+rg-dev-eastus-audix-001
+
+↓
+
+Virtual Network
+
+Expected Name
+
+```text
+vnet-dev-eastus-audix-001
+```
+
+---
+
+# 📊 Current Landing Zone
+
+```text
+Azure Subscription
+        │
+        ▼
+Resource Group
+        │
+        ▼
+Virtual Network
+        │
+        ▼
+10.0.0.0/16
+```
+
+---
+
+# 📌 Best Practices
+
+- VNet का Address Space भविष्य को ध्यान में रखकर रखें।
+- Production में Address Space बाद में बदलना कठिन होता है।
+- Resource Name हमेशा Naming Convention के अनुसार रखें।
+- Location Hardcode करने के बजाय Resource Group से Reference लें।
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Virtual Network क्या है।
+- ✅ VNet क्यों आवश्यक है।
+- ✅ Address Space क्या होता है।
+- ✅ Azure VNet Create करना।
+- ✅ Terraform से Networking शुरू करना।
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `13-Understanding-Terraform-Workflow.md` | `README.md` | `15-Understanding-CIDR-and-Create-Subnets.md` |
+
+---
+
+## 📝 Git Commit
+
+```bash
+git status
+
+git add .
+
+git commit -m "Create Azure Virtual Network for landing zone"
+
+git push origin main
+```
+
+---
+
+## 🏷️ Git Tag
+
+```bash
+git tag -a v0.7.0 -m "Azure Virtual Network created"
+
+git push origin v0.7.0
+```
+
+---
+
+> 🚀 **Project Status:** Azure Virtual Network Successfully Deployed • Version **v0.7.0**
+
+
