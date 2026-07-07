@@ -235,7 +235,7 @@ resource "azurerm_subnet" "subnet" {
 
   # each.value Map की Right Side Return करता है।
   # GatewaySubnet      → 10.0.0.0/27
-  # AzureBastionSubnet → 10.0.0.32/26
+  # AzureBastionSubnet → 10.0.0.64/26
   # Management         → 10.0.1.0/24
   # StreamFlix         → 10.0.2.0/24
 
@@ -247,5 +247,51 @@ resource "azurerm_subnet" "subnet" {
   # इसे Implicit Dependency कहते हैं और यही Best Practice है।
 
 }
+
+
+resource "azurerm_network_security_group" "nsg" {
+
+# यह Azure Network Security Group (NSG) Create करेगा।
+# NSG Azure Firewall की तरह काम नहीं करता।
+# यह Layer-4 (TCP/UDP) पर Inbound और Outbound Traffic को Allow या Deny करता है।
+# आगे VM-01 और VM-02 की Security इसी NSG से नियंत्रित होगी।
+
+  name = "nsg-dev-southeastasia-audix-001"
+
+# Enterprise Naming Convention
+# nsg = Network Security Group
+# dev = Environment
+# southeastasia = Azure Region
+# audix = Company Name
+# 001 = Resource Number
+
+  location = azurerm_resource_group.rg.location
+
+# NSG उसी Azure Region में बनेगा जहाँ Resource Group है।
+# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# NSG इसी Resource Group के अंदर Create होगा।
+# Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# depends_on = [azurerm_resource_group.rg]
+
+# यह Explicit Dependency का उदाहरण है।
+# यहाँ इसकी आवश्यकता नहीं है क्योंकि हमने Resource Group का Reference दिया है।
+# Terraform स्वयं समझ जाता है कि पहले Resource Group बनेगा, फिर NSG।
+# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+
+}
+
 
 

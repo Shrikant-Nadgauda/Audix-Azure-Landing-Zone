@@ -30,7 +30,7 @@ for_each का मतलब है "Map में जितनी Entries ह�
 each.key = Resource का नाम
 each.value = उस Resource की Value (CIDR Block)
 
-
+---
 
 भाई Error बिल्कुल सही है। 👍 Azure CIDR Validation कर रहा है।
 
