@@ -9094,6 +9094,1318 @@ git push origin main
 ----
 
 
+# 28.1.3 - Create Animal Care Foundation Website
+
+> **Objective**
+>
+> इस Lab में हम एक Professional NGO Website तैयार करेंगे जिसका नाम **Animal Care Foundation** होगा।
+>
+> इस Website को बाद में GitHub पर Push करेंगे और फिर Azure VM-02 पर Nginx Virtual Host के माध्यम से Host करेंगे।
+
+---
+
+# Architecture
+
+```text
+Windows Laptop
+
+        │
+
+        ▼
+
+VS Code
+
+        │
+
+        ▼
+
+Animal-Care-Foundation
+
+        │
+
+        ▼
+
+GitHub Repository
+
+        │
+
+        ▼
+
+Azure VM-02
+
+        │
+
+        ▼
+
+Nginx Virtual Host
+
+        │
+
+        ▼
+
+animal.local
+```
+
+---
+
+# Step 1 - Go to Projects Folder
+
+```powershell
+cd D:\
+mkdir Projects -Force
+cd Projects
+```
+
+Verify
+
+```powershell
+pwd
+```
+
+Expected
+
+```text
+D:\Projects
+```
+
+---
+
+# Step 2 - Create Project Folder
+
+```powershell
+mkdir Animal-Care-Foundation
+
+cd Animal-Care-Foundation
+```
+
+Verify
+
+```powershell
+pwd
+```
+
+Expected
+
+```text
+D:\Projects\Animal-Care-Foundation
+```
+
+---
+
+# Step 3 - Create Complete Folder Structure
+
+PowerShell
+
+```powershell
+mkdir css,js,images,assets
+ni index.html,style.css,script.js,README.md -ItemType File
+```
+
+---
+
+# Step 4 - Verify Folder Structure
+
+```powershell
+tree /f
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+│
+├── index.html
+├── style.css
+├── script.js
+├── README.md
+│
+├── assets
+├── css
+├── images
+└── js
+```
+
+---
+
+# Step 5 - Open VS Code
+
+```powershell
+code .
+```
+
+---
+
+# Step 6 - Update index.html
+
+Replace everything with
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Animal Care Foundation</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>🐾 Animal Care Foundation</h1>
+
+<p>Every Life Matters</p>
+
+</header>
+
+<nav>
+
+<a href="#">Home</a>
+
+<a href="#">About</a>
+
+<a href="#">Adoption</a>
+
+<a href="#">Volunteer</a>
+
+<a href="#">Donate</a>
+
+<a href="#">Contact</a>
+
+</nav>
+
+<section class="hero">
+
+<h2>Protect Every Animal</h2>
+
+<p>
+
+We rescue abandoned animals, provide medical care,
+
+food, shelter and help them find loving homes.
+
+</p>
+
+<button>Become a Volunteer</button>
+
+</section>
+
+<section class="cards">
+
+<div class="card">
+
+<h3>🐶 Rescue</h3>
+
+<p>Saving injured and abandoned animals.</p>
+
+</div>
+
+<div class="card">
+
+<h3>🏥 Medical Care</h3>
+
+<p>Vaccination, treatment and rehabilitation.</p>
+
+</div>
+
+<div class="card">
+
+<h3>❤️ Adoption</h3>
+
+<p>Connecting rescued animals with caring families.</p>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>
+
+© 2026 Animal Care Foundation
+
+</p>
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
+```
+
+---
+
+# Step 7 - Update style.css
+
+Replace everything
+
+```css
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#f5fff6;
+}
+
+header{
+background:#1b5e20;
+color:white;
+padding:30px;
+text-align:center;
+}
+
+nav{
+background:#2e7d32;
+padding:15px;
+text-align:center;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin:15px;
+font-weight:bold;
+}
+
+.hero{
+padding:70px;
+text-align:center;
+}
+
+.hero h2{
+font-size:42px;
+color:#1b5e20;
+margin-bottom:20px;
+}
+
+.hero p{
+width:70%;
+margin:auto;
+line-height:1.8;
+}
+
+button{
+margin-top:25px;
+padding:15px 35px;
+background:#1b5e20;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:6px;
+font-size:16px;
+}
+
+.cards{
+display:flex;
+justify-content:center;
+gap:25px;
+margin:60px;
+flex-wrap:wrap;
+}
+
+.card{
+width:300px;
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,.15);
+text-align:center;
+}
+
+.card h3{
+margin-bottom:15px;
+color:#2e7d32;
+}
+
+footer{
+margin-top:50px;
+background:#1b5e20;
+color:white;
+padding:25px;
+text-align:center;
+}
+```
+
+---
+
+# Step 8 - Update script.js
+
+```javascript
+console.log("Animal Care Foundation Loaded Successfully");
+
+alert("Welcome to Animal Care Foundation");
+```
+
+---
+
+# Step 9 - Update README.md
+
+```md
+# Animal Care Foundation
+
+## Project
+
+Professional NGO Website
+
+## Technologies
+
+- HTML5
+- CSS3
+- JavaScript
+- Git
+- GitHub
+- Azure VM
+- Ubuntu Linux
+- Nginx
+
+## Developed By
+
+Shrikant Nadgauda
+
+GitHub
+
+https://github.com/Shrikant-Nadgauda
+```
+
+---
+
+# Step 10 - Test Website
+
+Double Click
+
+```
+index.html
+```
+
+Expected
+
+```text
+Animal Care Foundation Homepage Opens Successfully
+```
+
+---
+
+# Step 11 - Verify Files
+
+```powershell
+tree /f
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+│
+├── index.html
+├── style.css
+├── script.js
+├── README.md
+│
+├── assets
+├── css
+├── images
+└── js
+```
+
+---
+
+# Lab Summary
+
+इस Lab में हमने
+
+✅ Project Folder बनाया
+
+✅ Folder Structure तैयार किया
+
+✅ Professional NGO Homepage बनाई
+
+✅ CSS जोड़ी
+
+✅ JavaScript जोड़ी
+
+✅ README बनाया
+
+✅ Website Local Machine पर Run की
+
+---
+
+# Next Lab
+
+```text
+28.1.4 - Create Anmol Jivan Foundation Website
+```
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.1.3 - Create Animal Care Foundation website"
+
+git push origin main
+```
+
+---
+
+
+# 28.1.4 - Create Anmol Jivan Foundation Website
+
+> **Objective**
+>
+> इस Lab में हम **Anmol Jivan Foundation** की Professional NGO Website बनाएंगे।
+>
+> यह Website गरीब बच्चों, अनाथ बच्चों, शिक्षा, भोजन, स्वास्थ्य और समाज सेवा पर आधारित होगी।
+>
+> आगे यही Website Azure VM-02 पर Host होगी।
+
+---
+
+# Architecture
+
+```text
+Windows Laptop
+
+        │
+
+        ▼
+
+VS Code
+
+        │
+
+        ▼
+
+Anmol-Jivan-Foundation
+
+        │
+
+        ▼
+
+GitHub Repository
+
+        │
+
+        ▼
+
+Azure VM-02
+
+        │
+
+        ▼
+
+Nginx
+
+        │
+
+        ▼
+
+anmol.local
+```
+
+---
+
+# Step 1 - Go to Projects Folder
+
+```powershell
+cd D:\Projects
+```
+
+Verify
+
+```powershell
+pwd
+```
+
+Expected
+
+```text
+D:\Projects
+```
+
+---
+
+# Step 2 - Create Project Folder
+
+```powershell
+mkdir Anmol-Jivan-Foundation
+
+cd Anmol-Jivan-Foundation
+```
+
+---
+
+# Step 3 - Create Folder Structure
+
+```powershell
+mkdir css,js,images,assets
+ni index.html,style.css,script.js,README.md -ItemType File
+```
+
+---
+
+# Step 4 - Verify Structure
+
+```powershell
+tree /f
+```
+
+Expected
+
+```text
+Anmol-Jivan-Foundation
+│
+├── index.html
+├── style.css
+├── script.js
+├── README.md
+│
+├── assets
+├── css
+├── images
+└── js
+```
+
+---
+
+# Step 5 - Open VS Code
+
+```powershell
+code .
+```
+
+---
+
+# Step 6 - Update index.html
+
+Replace everything
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Anmol Jivan Foundation</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>❤️ Anmol Jivan Foundation</h1>
+
+<p>Together We Can Change Lives</p>
+
+</header>
+
+<nav>
+
+<a href="#">Home</a>
+
+<a href="#">About</a>
+
+<a href="#">Education</a>
+
+<a href="#">Volunteer</a>
+
+<a href="#">Donate</a>
+
+<a href="#">Contact</a>
+
+</nav>
+
+<section class="hero">
+
+<h2>Give Hope, Build Future</h2>
+
+<p>
+
+We support orphan children, provide education,
+food, healthcare and create opportunities for
+a better tomorrow.
+
+</p>
+
+<button>Support Our Mission</button>
+
+</section>
+
+<section class="cards">
+
+<div class="card">
+
+<h3>🎓 Education</h3>
+
+<p>Helping children continue their education.</p>
+
+</div>
+
+<div class="card">
+
+<h3>🍛 Food Program</h3>
+
+<p>Providing healthy meals to needy families.</p>
+
+</div>
+
+<div class="card">
+
+<h3>🏥 Healthcare</h3>
+
+<p>Medical support for poor children and families.</p>
+
+</div>
+
+<div class="card">
+
+<h3>🤝 Volunteer</h3>
+
+<p>Join our mission and become a volunteer.</p>
+
+</div>
+
+</section>
+
+<footer>
+
+<p>
+
+© 2026 Anmol Jivan Foundation
+
+</p>
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
+```
+
+---
+
+# Step 7 - Update style.css
+
+Replace everything
+
+```css
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#fffdf8;
+}
+
+header{
+background:#d32f2f;
+color:white;
+padding:30px;
+text-align:center;
+}
+
+nav{
+background:#f57c00;
+padding:15px;
+text-align:center;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+margin:15px;
+font-weight:bold;
+}
+
+.hero{
+padding:70px;
+text-align:center;
+}
+
+.hero h2{
+font-size:42px;
+color:#d32f2f;
+margin-bottom:20px;
+}
+
+.hero p{
+width:70%;
+margin:auto;
+line-height:1.8;
+}
+
+button{
+margin-top:25px;
+padding:15px 35px;
+background:#d32f2f;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:6px;
+font-size:16px;
+}
+
+.cards{
+display:flex;
+justify-content:center;
+flex-wrap:wrap;
+gap:25px;
+margin:60px;
+}
+
+.card{
+width:280px;
+padding:25px;
+background:white;
+border-radius:10px;
+box-shadow:0 0 12px rgba(0,0,0,.15);
+text-align:center;
+}
+
+.card h3{
+margin-bottom:15px;
+color:#d32f2f;
+}
+
+footer{
+margin-top:50px;
+background:#d32f2f;
+color:white;
+padding:25px;
+text-align:center;
+}
+```
+
+---
+
+# Step 8 - Update script.js
+
+```javascript
+console.log("Anmol Jivan Foundation Loaded Successfully");
+
+alert("Welcome to Anmol Jivan Foundation");
+```
+
+---
+
+# Step 9 - Update README.md
+
+````md
+# ❤️ Anmol Jivan Foundation
+
+## Mission
+
+Helping Poor Children, Orphans and Needy Families.
+
+## Technologies
+
+- HTML5
+- CSS3
+- JavaScript
+- Git
+- GitHub
+- Ubuntu Linux
+- Azure Virtual Machine
+- Nginx
+
+## Developed By
+
+Shrikant Nadgauda
+
+GitHub
+
+https://github.com/Shrikant-Nadgauda
+
+
+-----
+
+
+# 28.1.5 - Create GitHub Repositories and Push All Three Websites
+
+> **Objective**
+>
+> इस Lab में हम अपनी तीनों NGO Websites को GitHub पर Upload करेंगे।
+>
+> इसके बाद यही Repositories Azure VM-02 पर Clone की जाएँगी और Nginx द्वारा Host की जाएँगी।
+
+---
+
+# Websites
+
+```text
+✔ Animal Care Foundation
+
+✔ Save Trees Foundation
+
+✔ Anmol Jivan Foundation
+```
+
+GitHub Profile
+
+```text
+https://github.com/Shrikant-Nadgauda
+```
+
+---
+
+# Architecture
+
+```text
+Windows Laptop
+
+        │
+
+        ▼
+
+VS Code Projects
+
+        │
+
+        ▼
+
+Git
+
+        │
+
+        ▼
+
+GitHub
+
+        │
+
+        ▼
+
+Azure VM-02
+
+        │
+
+        ▼
+
+Git Clone
+
+        │
+
+        ▼
+
+Nginx
+```
+
+---
+
+# Step 1 - Open GitHub
+
+```
+https://github.com/Shrikant-Nadgauda
+```
+
+Login
+
+---
+
+# Step 2 - Create Repository
+
+Click
+
+```
+New Repository
+```
+
+---
+
+Repository Name
+
+```
+Animal-Care-Foundation
+```
+
+Visibility
+
+```
+Public
+```
+
+Do NOT Select
+
+```
+README
+
+.gitignore
+
+License
+```
+
+Click
+
+```
+Create Repository
+```
+
+---
+
+Repeat
+
+Repository Name
+
+```
+Save-Trees-Foundation
+```
+
+Create
+
+---
+
+Again
+
+Repository Name
+
+```
+Anmol-Jivan-Foundation
+```
+
+Create
+
+---
+
+Expected
+
+```text
+Animal-Care-Foundation
+
+Save-Trees-Foundation
+
+Anmol-Jivan-Foundation
+```
+
+---
+
+# Step 3 - Open Animal Care Project
+
+PowerShell
+
+```powershell
+cd D:\Projects\Animal-Care-Foundation
+```
+
+---
+
+# Step 4 - Initialize Git
+
+```bash
+git init
+
+git add .
+
+git commit -m "Initial commit - Animal Care Foundation"
+```
+
+---
+
+# Step 5 - Rename Branch
+
+```bash
+git branch -M main
+```
+
+---
+
+# Step 6 - Add Remote
+
+```bash
+git remote add origin https://github.com/Shrikant-Nadgauda/Animal-Care-Foundation.git
+```
+
+Verify
+
+```bash
+git remote -v
+```
+
+Expected
+
+```text
+origin
+
+https://github.com/Shrikant-Nadgauda/Animal-Care-Foundation.git
+```
+
+---
+
+# Step 7 - Push
+
+```bash
+git push -u origin main
+```
+
+Expected
+
+```text
+Branch 'main' set up to track 'origin/main'
+```
+
+---
+
+# Step 8 - Save Trees Foundation
+
+```powershell
+cd D:\Projects\Save-Trees-Foundation
+```
+
+---
+
+```bash
+git init
+
+git add .
+
+git commit -m "Initial commit - Save Trees Foundation"
+
+git branch -M main
+
+git remote add origin https://github.com/Shrikant-Nadgauda/Save-Trees-Foundation.git
+
+git push -u origin main
+```
+
+---
+
+# Step 9 - Anmol Jivan Foundation
+
+```powershell
+cd D:\Projects\Anmol-Jivan-Foundation
+```
+
+---
+
+```bash
+git init
+
+git add .
+
+git commit -m "Initial commit - Anmol Jivan Foundation"
+
+git branch -M main
+
+git remote add origin https://github.com/Shrikant-Nadgauda/Anmol-Jivan-Foundation.git
+
+git push -u origin main
+```
+
+---
+
+# Step 10 - Verify GitHub
+
+Open
+
+```
+https://github.com/Shrikant-Nadgauda
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+
+Save-Trees-Foundation
+
+Anmol-Jivan-Foundation
+```
+
+All Repositories should contain
+
+```text
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+# Step 11 - Verify Git Status
+
+Run inside each project
+
+```bash
+git status
+```
+
+Expected
+
+```text
+On branch main
+
+Your branch is up to date.
+
+nothing to commit, working tree clean
+```
+
+---
+
+# Common Errors
+
+## Repository Already Exists
+
+```text
+remote origin already exists
+```
+
+Fix
+
+```bash
+git remote remove origin
+
+git remote add origin https://github.com/Shrikant-Nadgauda/<repository-name>.git
+```
+
+---
+
+## Branch Error
+
+```text
+src refspec main does not match any
+```
+
+Fix
+
+```bash
+git add .
+
+git commit -m "Initial commit"
+
+git branch -M main
+```
+
+---
+
+## Authentication Failed
+
+GitHub Password नहीं चलेगा।
+
+Use
+
+```
+Personal Access Token (PAT)
+```
+
+या
+
+```
+SSH Authentication
+```
+
+---
+
+## Repository Not Found
+
+Verify Repository Name
+
+```text
+Animal-Care-Foundation
+
+Save-Trees-Foundation
+
+Anmol-Jivan-Foundation
+```
+
+---
+
+# Final Architecture
+
+```text
+GitHub
+
+│
+
+├─────────────── Animal-Care-Foundation
+
+│
+
+├─────────────── Save-Trees-Foundation
+
+│
+
+└─────────────── Anmol-Jivan-Foundation
+```
+
+---
+
+# Lab Summary
+
+इस Lab में हमने
+
+✅ तीन GitHub Repositories बनाई
+
+✅ Git Initialize किया
+
+✅ Initial Commit किया
+
+✅ Remote Configure किया
+
+✅ Code Push किया
+
+✅ GitHub Verify किया
+
+---
+
+# Next Lab
+
+```text
+29 - Clone All Three Websites on Azure VM-02
+```
+
+इस Lab में हम
+
+- SSH से VM-02 Login करेंगे
+- Git Install Verify करेंगे
+- तीनों Repositories Clone करेंगे
+- /var/www में Copy करेंगे
+- Nginx Virtual Hosts के लिए Environment तैयार करेंगे
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.1.5 - Create GitHub repositories and push all NGO websites"
+
+git push origin main
+```
+
+
+-----
+
+
 # 32 - Configure Nginx Virtual Hosts
 
 > **Objective**
