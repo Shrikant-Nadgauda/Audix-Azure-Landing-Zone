@@ -1499,7 +1499,7 @@ Animal Care Foundation Website
 
 | ⬅️ Previous | 🏠 Home | ➡️ Next |
 |------------|---------|----------|
-| `22-Host-First-Website-on-Nginx.md` | `README.md` | `24-Host-Multiple-Websites-on-Single-VM.md` |
+| `22-Host-First-Website-on-Nginx.md` | `README.md` | `24-Configure-Cloudflare-Domain-for-Public-IP.md` |
 
 ---
 
@@ -1507,3 +1507,436 @@ Animal Care Foundation Website
 
 ---
 
+# 🌐 Configure Cloudflare Domain for Azure Virtual Machine
+
+> **Document:** `24-Configure-Cloudflare-Domain-for-Public-IP.md`
+
+![Cloudflare](https://img.shields.io/badge/Cloudflare-DNS-F38020?style=for-the-badge&logo=cloudflare)
+![Azure](https://img.shields.io/badge/Azure-Public%20IP-0078D4?style=for-the-badge&logo=microsoftazure)
+![DNS](https://img.shields.io/badge/DNS-A%20Record-blue?style=for-the-badge)
+![Nginx](https://img.shields.io/badge/Nginx-Website-009639?style=for-the-badge&logo=nginx)
+
+---
+
+# 📖 Introduction
+
+अब तक हमने
+
+- ✅ Azure Infrastructure Deploy किया
+- ✅ Ubuntu VM Create की
+- ✅ Nginx Install किया
+- ✅ Animal Care Website Host की
+
+लेकिन अभी Website केवल Public IP से Open हो रही है।
+
+```text
+http://20.xx.xx.xx
+```
+
+Production Environment में कोई भी Website Public IP से Access नहीं होती।
+
+हमेशा Domain Name उपयोग किया जाता है।
+
+उदाहरण
+
+```text
+https://animal.audix.in
+```
+
+इस Chapter में हम अपनी Azure VM की Public IP को Cloudflare Domain से Connect करेंगे।
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे
+
+- Cloudflare Login
+- Domain Select करना
+- Azure Public IP Copy करना
+- DNS A Record Create करना
+- Proxy Mode समझना
+- DNS Propagation
+- Browser से Domain Verify करना
+
+---
+
+# 🏗️ Current Architecture
+
+```text
+Internet
+
+      │
+
+      ▼
+
+Cloudflare DNS
+
+      │
+
+      ▼
+
+Azure Public IP
+
+      │
+
+      ▼
+
+Ubuntu VM
+
+      │
+
+      ▼
+
+Nginx
+
+      │
+
+      ▼
+
+Animal Care Website
+```
+
+---
+
+# 📁 इस Chapter में Code कहाँ लिखेंगे?
+
+इस Chapter में Terraform Code नहीं लिखना है।
+
+यह पूरा Configuration
+
+```text
+Cloudflare Dashboard
+```
+
+में किया जाएगा।
+
+---
+
+# 📌 Step 1 - Azure Portal Open करें
+
+Azure Portal Login करें।
+
+Open करें
+
+```text
+Virtual Machines
+
+↓
+
+vm-dev-southeastasia-audix-001
+```
+
+Overview में जाएँ।
+
+Copy करें
+
+```text
+Public IP Address
+```
+
+Example
+
+```text
+20.xx.xx.xx
+```
+
+इसी IP को Cloudflare में Add करेंगे।
+
+---
+
+# 📌 Step 2 - Cloudflare Login करें
+
+Open करें
+
+```text
+https://dash.cloudflare.com
+```
+
+अपना Account Login करें।
+
+---
+
+# 📌 Step 3 - Domain Select करें
+
+Dashboard में अपना Domain Select करें।
+
+Example
+
+```text
+audixdemo.in
+```
+
+या
+
+```text
+yourdomain.com
+```
+
+---
+
+# 📌 Step 4 - DNS Tab Open करें
+
+Left Side Menu
+
+```text
+DNS
+
+↓
+
+Records
+```
+
+---
+
+# 📌 Step 5 - नया A Record Create करें
+
+Click करें
+
+```text
+Add Record
+```
+
+---
+
+Record Type
+
+```text
+A
+```
+
+---
+
+Host Name
+
+```text
+animal
+```
+
+---
+
+IPv4 Address
+
+```text
+20.xx.xx.xx
+```
+
+यह Azure VM की Public IP होगी।
+
+---
+
+TTL
+
+```text
+Auto
+```
+
+---
+
+Proxy Status
+
+```text
+DNS Only
+```
+
+अभी शुरुआत में DNS Only रखें।
+
+SSL और Proxy बाद में Enable करेंगे।
+
+---
+
+Click करें
+
+```text
+Save
+```
+
+---
+
+# 📌 Step 6 - Verify DNS Record
+
+अब Record कुछ ऐसा दिखाई देगा
+
+```text
+Type
+
+A
+
+Name
+
+animal
+
+Content
+
+20.xx.xx.xx
+
+Proxy
+
+DNS Only
+```
+
+---
+
+# 📌 Step 7 - DNS Propagation
+
+Cloudflare लगभग तुरंत Update कर देता है।
+
+लेकिन Internet पर पूरी तरह Update होने में कुछ मिनट लग सकते हैं।
+
+---
+
+# 📌 Step 8 - Windows CMD से Verify करें
+
+Command
+
+```cmd
+nslookup animal.yourdomain.com
+```
+
+Expected
+
+```text
+20.xx.xx.xx
+```
+
+---
+
+# 📌 Step 9 - Ping Test
+
+```cmd
+ping animal.yourdomain.com
+```
+
+यदि ICMP Allow है तो IP दिखाई देगी।
+
+---
+
+# 📌 Step 10 - Browser Test
+
+Browser में जाएँ
+
+```text
+http://animal.yourdomain.com
+```
+
+अब आपकी
+
+```text
+Animal Care Foundation
+```
+
+Website Open होनी चाहिए।
+
+---
+
+# 📌 Step 11 - यदि Website Open नहीं हो रही
+
+सबसे पहले Check करें
+
+Azure Public IP
+
+↓
+
+Cloudflare DNS Record
+
+↓
+
+Nginx Running
+
+↓
+
+NSG Rule 80 Allow
+
+↓
+
+Browser Cache Clear
+
+---
+
+# 📌 Step 12 - Architecture
+
+```text
+Browser
+
+      │
+
+      ▼
+
+animal.yourdomain.com
+
+      │
+
+      ▼
+
+Cloudflare DNS
+
+      │
+
+      ▼
+
+Azure Public IP
+
+      │
+
+      ▼
+
+Ubuntu VM
+
+      │
+
+      ▼
+
+Nginx
+
+      │
+
+      ▼
+
+Animal Care Website
+```
+
+---
+
+# 📌 Step 13 - Verify Nginx
+
+SSH करें
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+active (running)
+```
+
+---
+
+# 📌 Step 14 - आपने क्या सीखा?
+
+✅ Azure Public IP Copy करना
+
+✅ Cloudflare Login करना
+
+✅ DNS A Record Create करना
+
+✅ Domain को Public IP से Connect करना
+
+✅ Browser से Website Verify करना
+
+✅ Basic DNS Mapping समझना
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `23-Git-Clone-and-Deploy-StreamFlix.md` | `README.md` | `25-Access-Website-from-Browser-and-Feel-Like-a-DevOps-Engineer.md` |
+
+---
+
+> 🚀 **Project Status:** Cloudflare Domain Successfully Mapped to Azure Virtual Machine.
+
+---
