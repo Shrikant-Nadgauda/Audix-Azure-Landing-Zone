@@ -1,33 +1,3 @@
-# Step 9 - Update README.md
-
-````md
-# ❤️ Anmol Jivan Foundation
-
-## Mission
-
-Helping Poor Children, Orphans and Needy Families.
-
-## Technologies
-
-- HTML5
-- CSS3
-- JavaScript
-- Git
-- GitHub
-- Ubuntu Linux
-- Azure Virtual Machine
-- Nginx
-
-## Developed By
-
-Shrikant Nadgauda
-
-GitHub
-
-https://github.com/Shrikant-Nadgauda
-
-```
-----
 
 # 28.1.5 - Create GitHub Repositories and Push All Three Websites
 
