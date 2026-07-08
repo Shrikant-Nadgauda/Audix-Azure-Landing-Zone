@@ -735,3 +735,166 @@ resource "azurerm_linux_virtual_machine" "vm01" {
 
 }
 
+
+
+
+resource "azurerm_public_ip" "vm02_pip" {
+
+# VM-02 को Internet से Access करने के लिए Public IP बनाई जा रही है।
+
+  name                = "pip-vm02-dev-southeastasia-audix-001"
+
+# Azure Portal में दिखाई देने वाला Public IP का नाम।
+
+  location            = azurerm_resource_group.rg.location
+
+# Resource Group की Location ही उपयोग होगी।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# यह Public IP हमारे Resource Group के अंदर बनेगी।
+
+  allocation_method   = "Static"
+
+# Static Public IP हमेशा वही रहती है।
+
+  sku                 = "Standard"
+
+# Standard SKU Production Environment के लिए Recommended है।
+
+}
+
+
+
+resource "azurerm_network_interface" "vm02_nic" {
+
+# VM-02 के लिए नई Network Interface (NIC) बनाई जा रही है।
+
+  name                = "nic-vm02-dev-southeastasia-audix-001"
+
+# Azure Portal में दिखाई देने वाला NIC का नाम।
+
+  location            = azurerm_resource_group.rg.location
+
+# NIC उसी Region में बनेगी जहाँ Resource Group है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# NIC उसी Resource Group में बनेगी।
+
+  ip_configuration {
+
+# NIC की IP Configuration Define की जा रही है।
+
+    name                          = "internal"
+
+# IP Configuration का Logical Name।
+
+    subnet_id                     = azurerm_subnet.subnet["subnet-vm02"].id
+
+# VM-02 को VM-02 वाले Subnet में Connect किया जा रहा है।
+
+    private_ip_address_allocation = "Dynamic"
+
+# Azure Automatically Private IP Assign करेगा।
+
+    public_ip_address_id          = azurerm_public_ip.vm02_pip.id
+
+# अभी बनाई गई Public IP इसी NIC से Attach होगी।
+
+  }
+
+}
+
+
+
+
+resource "azurerm_linux_virtual_machine" "vm02" {
+
+# दूसरी Ubuntu Linux Virtual Machine बनाई जा रही है।
+
+  name                = "vm02"
+
+# Azure Portal में VM का नाम।
+
+  location            = azurerm_resource_group.rg.location
+
+# VM उसी Region में बनेगी।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# VM उसी Resource Group में बनेगी।
+
+  size                = "Standard_D2s_v3"
+
+# VM का Size।
+
+  admin_username      = "azureuser"
+
+# Linux Login User।
+
+  network_interface_ids = [
+
+    azurerm_network_interface.vm02_nic.id
+
+# VM-02 के साथ VM-02 वाली NIC Attach की जा रही है।
+
+  ]
+
+  disable_password_authentication = true
+
+# Password Login Disable रहेगा, केवल SSH Key से Login होगा।
+
+  admin_ssh_key {
+
+# SSH Public Key Configure की जा रही है।
+
+    username   = "azureuser"
+
+# SSH User।
+
+    public_key = file("~/.ssh/id_rsa.pub")
+
+# Local Machine की Public Key पढ़ी जाएगी।
+# यदि तुम Azure Generated Key उपयोग कर रहे हो तो उसी Key का Path देना।
+
+  }
+
+  os_disk {
+
+# Operating System Disk Configuration।
+
+    caching              = "ReadWrite"
+
+# Read और Write दोनों के लिए Cache Enable रहेगा।
+
+    storage_account_type = "Premium_LRS"
+
+# Premium SSD Disk उपयोग होगी।
+
+  }
+
+  source_image_reference {
+
+# Ubuntu Image Define की जा रही है।
+
+    publisher = "Canonical"
+
+# Ubuntu का Publisher।
+
+    offer     = "ubuntu-24_04-lts"
+
+# Ubuntu 24.04 LTS।
+
+    sku       = "server"
+
+# Server Edition।
+
+    version   = "latest"
+
+# हमेशा Latest Stable Version Deploy होगी।
+
+  }
+
+}
+

@@ -1447,6 +1447,160 @@ Browser
 
 > 🚀 **Project Status:** StreamFlix Application Successfully Deployed from GitHub Repository to Azure Linux Virtual Machine.
 
+---
+
+---
+
+# 🚨 Common Errors and Troubleshooting
+
+## ❌ Error 1 - Permission Denied while Cloning
+
+यदि आप `/var/www/html` Directory में Repository Clone करेंगे
+
+```bash
+cd /var/www/html
+
+git clone https://github.com/devopsinsiders/StreamFlix.git
+```
+
+तो Error आएगा
+
+```text
+fatal: could not create work tree dir 'StreamFlix': Permission denied
+```
+
+### कारण
+
+`/var/www/html` Directory Root User की होती है।
+
+Normal User (`azureuser`) यहाँ Folder Create नहीं कर सकता।
+
+---
+
+## ❌ Error 2 - Cloning inside /home
+
+यदि आप
+
+```bash
+cd /home
+
+git clone https://github.com/devopsinsiders/StreamFlix.git
+```
+
+चलाते हैं
+
+तो वही Error मिलेगा
+
+```text
+fatal: could not create work tree dir 'StreamFlix': Permission denied
+```
+
+### कारण
+
+`/home` System Directory है।
+
+आपको अपनी Home Directory में जाना होगा।
+
+---
+
+## ✅ Correct Way
+
+पहले अपनी Home Directory में जाएँ
+
+```bash
+cd ~
+
+pwd
+```
+
+Expected
+
+```text
+/home/azureuser
+```
+
+अब Repository Clone करें
+
+```bash
+git clone https://github.com/devopsinsiders/StreamFlix.git
+```
+
+Repository Successfully Download हो जाएगी।
+
+---
+
+## ✅ Verify Repository
+
+```bash
+ls -la ~/StreamFlix
+```
+
+Expected Files
+
+```text
+index.html
+
+assets/
+
+favicon.ico
+
+README.md
+```
+
+---
+
+## ✅ Copy Website Files
+
+```bash
+sudo rm -rf /var/www/html/*
+
+sudo cp -r ~/StreamFlix/* /var/www/html/
+```
+
+Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+अब Browser में जाएँ
+
+```text
+http://<PUBLIC-IP>
+```
+
+StreamFlix Website Successfully Open हो जाएगी.
+
+---
+
+# 💡 Best Practice
+
+Production Environment में कभी भी Git Repository को सीधे
+
+```text
+/var/www/html
+```
+
+में Clone नहीं किया जाता।
+
+हमेशा
+
+```text
+/home/<username>
+```
+
+में Repository Clone की जाती है।
+
+Testing के बाद Website Files को
+
+```text
+/var/www/html
+```
+
+में Copy किया जाता है।
+
+यही Industry Standard Deployment Process है।
+
 
 
 ---
