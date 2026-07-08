@@ -9899,9 +9899,7 @@ console.log("Anmol Jivan Foundation Loaded Successfully");
 
 alert("Welcome to Anmol Jivan Foundation");
 ```
-
 ---
-
 # Step 9 - Update README.md
 
 ````md
@@ -9928,7 +9926,9 @@ Shrikant Nadgauda
 
 GitHub
 
-https://github.com/Shrikant-Nadgauda```
+https://github.com/Shrikant-Nadgauda
+```
+
 ----
 
 # 33 - Configure Multiple Domains
