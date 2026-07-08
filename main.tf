@@ -587,3 +587,33 @@ resource "azurerm_network_interface" "nic_vm01" {
 }
 
 
+
+resource "azurerm_network_interface_security_group_association" "nic_nsg" {
+
+# यह Resource Network Interface (NIC) और Network Security Group (NSG)
+# को आपस में Connect करेगा।
+# जब तक NSG Associate नहीं होती,
+# तब तक NSG के Rules VM पर लागू नहीं होते।
+
+  network_interface_id = azurerm_network_interface.nic_vm01.id
+
+# यह हमारी VM-01 की NIC है।
+# NSG इसी NIC पर Apply होगी।
+
+  network_security_group_id = azurerm_network_security_group.nsg.id
+
+# यह वही NSG है जिसमें हमने
+# SSH (22)
+# HTTP (80)
+# HTTPS (443)
+# Rules बनाए हैं।
+
+# यहाँ हमने NIC और NSG दोनों का Reference दिया है।
+# Terraform स्वयं समझ जाता है कि
+# पहले NIC और NSG बनेंगे,
+# उसके बाद Association होगी।
+# इसे Implicit Dependency कहते हैं।
+# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+
+}
+
