@@ -176,6 +176,27 @@ Running
 
 ---
 
+अब Public IP हटाने के बाद Architecture ऐसा दिखेगा:
+
+                    Internet
+                        │
+                        ▼
+              Azure Load Balancer
+                        │
+          ┌─────────────┴─────────────┐
+          │                           │
+          ▼                           ▼
+        VM-01                      VM-02
+   (Private IP)               (Private IP)
+          ▲                           ▲
+          └─────────────┬─────────────┘
+                        │
+                  Azure Virtual Network
+                        │
+                  Azure Bastion
+                        │
+                 Administrator (SSH/RDP)
+
 # 📚 Chapter Navigation
 
 | ⬅️ Previous | 🏠 Home | ➡️ Next |
@@ -185,5 +206,395 @@ Running
 ---
 
 > 🚀 **Project Status:** Ready to Deploy Azure Bastion
+
+---
+
+# 🚀 28 - Access Azure Virtual Machines Using Azure Bastion
+
+**Document:** `28-Access-Azure-VMs-Using-Azure-Bastion.md`
+
+---
+
+# Azure Terraform Security
+
+---
+
+# 📖 Introduction
+
+पिछले Chapter में हमने Azure Bastion Successfully Deploy किया।
+
+अब इस Chapter में हम Azure Bastion का उपयोग करके अपनी Virtual Machines को Secure तरीके से Access करेंगे।
+
+अब SSH के लिए Public IP की आवश्यकता नहीं होगी।
+
+Azure Bastion Browser आधारित Secure SSH Connection प्रदान करता है।
+
+इसका अर्थ है कि Administrator सीधे Azure Portal से Virtual Machine में Login कर सकता है।
+
+यह Production Environment की Recommended Security Practice है।
+
+---
+
+# 🎯 Objective
+
+इस Lab में हम सीखेंगे
+
+- Azure Bastion से VM-01 Connect करना
+- Azure Bastion से VM-02 Connect करना
+- Browser Based SSH
+- Native Client Support
+- MobaXterm द्वारा SSH
+- Connection Verification
+
+---
+
+# 🏗️ Current Architecture
+
+```text
+                    Internet
+                        │
+                        ▼
+                Azure Bastion
+                        │
+        ┌───────────────┴───────────────┐
+        │                               │
+        ▼                               ▼
+     VM-01                         VM-02
+ (Public IP)                   (Public IP)
+```
+
+---
+
+# 📌 Bastion Connection Methods
+
+Azure Bastion कई प्रकार से VM Access प्रदान करता है।
+
+### Method 1
+
+Azure Portal Browser SSH
+
+सबसे आसान तरीका।
+
+कोई Software Install करने की आवश्यकता नहीं।
+
+---
+
+### Method 2
+
+Native Client SSH
+
+Windows PowerShell
+
+Linux Terminal
+
+Mac Terminal
+
+---
+
+### Method 3
+
+MobaXterm
+
+GUI Based SSH Client
+
+सबसे Convenient तरीका।
+
+---
+
+# 🖥️ Method 1 - Azure Portal Browser SSH
+
+Azure Portal
+
+↓
+
+Virtual Machine
+
+↓
+
+Connect
+
+↓
+
+Bastion
+
+↓
+
+Authentication Type
+
+↓
+
+SSH Private Key
+
+↓
+
+Username
+
+```
+azureuser
+```
+
+↓
+
+Private Key
+
+```
+id_rsa
+```
+
+↓
+
+Connect
+
+---
+
+Expected
+
+VM Terminal Open हो जाएगी।
+
+---
+
+# 🖥️ Method 2 - Native SSH
+
+यदि Bastion Native Client Enabled है
+
+PowerShell
+
+```powershell
+az network bastion ssh `
+--name bastion-dev-southeastasia-audix-001 `
+--resource-group rg-dev-southeastasia-audix-001 `
+--target-resource-id <VM-RESOURCE-ID> `
+--auth-type ssh-key `
+--username azureuser `
+--ssh-key ~/.ssh/id_rsa
+```
+
+---
+
+# 🖥️ Method 3 - MobaXterm
+
+Open MobaXterm
+
+↓
+
+Session
+
+↓
+
+SSH
+
+↓
+
+Remote Host
+
+```
+VM Private IP
+```
+
+↓
+
+Username
+
+```
+azureuser
+```
+
+↓
+
+Advanced SSH
+
+↓
+
+Private Key
+
+```
+C:\Users\ADMIN\.ssh\id_rsa
+```
+
+↓
+
+Connect
+
+---
+
+# 📌 Verify Current User
+
+```bash
+whoami
+```
+
+Expected
+
+```
+azureuser
+```
+
+---
+
+# 📌 Verify Hostname
+
+```bash
+hostname
+```
+
+Expected
+
+VM-01
+
+```
+vm01
+```
+
+या
+
+VM-02
+
+```
+vm02
+```
+
+---
+
+# 📌 Verify Private IP
+
+```bash
+hostname -I
+```
+
+Example
+
+```
+10.0.2.4
+```
+
+---
+
+# 📌 Verify Internet
+
+```bash
+ping google.com
+```
+
+---
+
+# 📌 Verify Web Server
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```
+active (running)
+```
+
+---
+
+# 📌 Verify Git
+
+```bash
+git --version
+```
+
+---
+
+# 📌 Verify Current Directory
+
+```bash
+pwd
+```
+
+Expected
+
+```
+/home/azureuser
+```
+
+---
+
+# 📌 Verify Websites
+
+```bash
+ls /var/www
+```
+
+Expected
+
+```
+animal
+
+trees
+
+anmol
+```
+
+---
+
+# 📌 Verification Checklist
+
+✅ Bastion Connected Successfully
+
+✅ Browser SSH Working
+
+✅ Native SSH Working (Optional)
+
+✅ MobaXterm Working
+
+✅ VM-01 Accessible
+
+✅ VM-02 Accessible
+
+---
+
+# 💡 Best Practices
+
+✔ Use Bastion for Administrative Access
+
+✔ Never Expose SSH Directly to Internet
+
+✔ Use SSH Keys
+
+✔ Disable Password Authentication
+
+✔ Remove Public IP After Verification
+
+---
+
+# 🚨 Common Mistakes
+
+❌ Wrong Private Key
+
+❌ Wrong Username
+
+❌ Using Public IP Instead of Private IP
+
+❌ NSG Blocking Bastion Traffic
+
+❌ AzureBastionSubnet Misconfigured
+
+---
+
+# 📚 What You Learned
+
+✔ Azure Bastion Login
+
+✔ Browser Based SSH
+
+✔ Native Client SSH
+
+✔ MobaXterm Integration
+
+✔ Secure Administrative Access
+
+---
+
+# 🚀 Next Chapter
+
+```
+29 - Remove Public IP from VM-01
+```
+
+अब हम VM-01 की Public IP Remove करेंगे और Verify करेंगे कि केवल Azure Bastion से ही Access संभव है।
 
 ---
