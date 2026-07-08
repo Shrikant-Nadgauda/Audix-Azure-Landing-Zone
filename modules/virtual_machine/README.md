@@ -711,3 +711,378 @@ http://Public-IP
 
 ---
 
+# 🌐 Host First Website on Nginx
+
+> **Document:** `22-Host-First-Website-on-Nginx.md`
+
+![Nginx](https://img.shields.io/badge/Nginx-Web%20Server-009639?style=for-the-badge&logo=nginx)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04_LTS-E95420?style=for-the-badge&logo=ubuntu)
+![HTML](https://img.shields.io/badge/HTML-Website-E34F26?style=for-the-badge&logo=html5)
+![Linux](https://img.shields.io/badge/Linux-Web%20Hosting-FCC624?style=for-the-badge&logo=linux)
+
+---
+
+# 📖 Introduction
+
+पिछले Chapter में हमने
+
+- Azure Virtual Machine Deploy की
+- SSH द्वारा Login किया
+- Nginx Install किया
+
+अब समय है अपनी पहली Website Host करने का।
+
+इस Chapter में हम समझेंगे कि Nginx Website कहाँ Store करता है, Default Page कैसे Replace करते हैं और Browser में अपनी पहली Website कैसे Open करते हैं।
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे
+
+- Nginx Website कहाँ Store करता है
+- Default Website कैसे हटाएँ
+- पहली HTML Website Create करना
+- Browser में Website Access करना
+- Website Update करना
+
+---
+
+# 🏗️ Architecture
+
+```text
+Browser
+
+    │
+
+    ▼
+
+Public IP
+
+    │
+
+    ▼
+
+Nginx Web Server
+
+    │
+
+    ▼
+
+/var/www/html
+
+    │
+
+    ▼
+
+index.html
+```
+
+---
+
+# 📌 Step 1 - Nginx Default Website Location
+
+SSH से VM में Login करें
+
+```bash
+cd /var/www/html
+```
+
+Current Files देखें
+
+```bash
+ls -la
+```
+
+Expected Output
+
+```text
+index.nginx-debian.html
+```
+
+यही Nginx की Default Website है।
+
+---
+
+# 📌 Step 2 - Default Website Backup
+
+Default Page Delete करने के बजाय Backup रखें।
+
+```bash
+sudo mv index.nginx-debian.html index.nginx-debian.html.backup
+```
+
+अब Folder Check करें
+
+```bash
+ls
+```
+
+---
+
+# 📌 Step 3 - New Website Create करें
+
+```bash
+sudo nano index.html
+```
+
+---
+
+# 📌 Step 4 - HTML Code Paste करें
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Audix Azure Landing Zone</title>
+
+<style>
+
+body{
+
+background:#0d1117;
+color:white;
+font-family:Arial;
+text-align:center;
+padding-top:120px;
+
+}
+
+h1{
+
+font-size:55px;
+
+}
+
+p{
+
+font-size:22px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🚀 Welcome to Azure Landing Zone</h1>
+
+<p>Congratulations!</p>
+
+<p>Your first website is running successfully on Nginx.</p>
+
+<p>Hosted using Terraform + Azure + Ubuntu + Nginx</p>
+
+</body>
+
+</html>
+```
+
+---
+
+# 📌 Step 5 - Save File
+
+Nano Editor में
+
+```text
+CTRL + O
+
+Enter
+
+CTRL + X
+```
+
+---
+
+# 📌 Step 6 - Verify File
+
+```bash
+ls -l
+```
+
+Output
+
+```text
+index.html
+```
+
+---
+
+# 📌 Step 7 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+Status Verify करें
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active (running)
+```
+
+---
+
+# 📌 Step 8 - Browser Test
+
+Browser Open करें
+
+```text
+http://<PUBLIC_IP>
+```
+
+Example
+
+```text
+http://20.xx.xx.xx
+```
+
+अब आपकी पहली Website दिखाई देगी।
+
+---
+
+# 📌 Step 9 - Website Update
+
+Website Modify करें
+
+```bash
+sudo nano /var/www/html/index.html
+```
+
+कुछ Text Change करें।
+
+Save करें।
+
+Browser Refresh करें।
+
+कोई Restart आवश्यक नहीं है।
+
+---
+
+# 📌 Step 10 - Website Files
+
+```bash
+cd /var/www/html
+
+ls
+```
+
+Example
+
+```text
+index.html
+```
+
+यदि भविष्य में Images जोड़नी हों
+
+```text
+/var/www/html/images
+```
+
+यदि CSS जोड़नी हो
+
+```text
+/var/www/html/css
+```
+
+यदि JavaScript जोड़नी हो
+
+```text
+/var/www/html/js
+```
+
+---
+
+# 📌 Step 11 - Complete Request Flow
+
+```text
+Browser
+
+     │
+
+     ▼
+
+Public IP
+
+     │
+
+     ▼
+
+Azure VM
+
+     │
+
+     ▼
+
+Nginx
+
+     │
+
+     ▼
+
+/var/www/html
+
+     │
+
+     ▼
+
+index.html
+
+     │
+
+     ▼
+
+Website Display
+```
+
+---
+
+# 📌 Directory Structure
+
+```text
+/var/www/html
+
+│
+
+├── index.html
+
+├── css/
+
+├── js/
+
+└── images/
+```
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Nginx Default Website Location
+- ✅ Default Website Backup
+- ✅ HTML Website Create करना
+- ✅ Website Host करना
+- ✅ Browser से Website Open करना
+- ✅ Website Update करना
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `21-SSH-Login-and-Install-Nginx.md` | `README.md` | `23-Understanding-Nginx-Directory-Structure.md` |
+
+---
+
+> 🚀 **Project Status:** First Website Successfully Hosted on Azure Linux Virtual Machine using Nginx.
+
+---
+
