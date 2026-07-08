@@ -4347,3 +4347,3159 @@ active (running)
 
 
 ---
+
+# 28.1 Troubleshooting SSH Authentication Issue (Part-01)
+
+---
+
+# 🎯 Scenario
+
+हमने Terraform की सहायता से दूसरी Linux Virtual Machine (VM-02) Create की।
+
+VM Successfully Create हो गई।
+
+Azure Portal में VM Running थी।
+
+Public IP भी Assigned थी।
+
+लेकिन जब MobaXterm से SSH करने का प्रयास किया तो Login नहीं हुआ।
+
+Error आया:
+
+```text
+login as: azureuser
+
+No supported authentication methods available
+(server sent: publickey)
+```
+
+---
+
+# इसका मतलब क्या है?
+
+इस Error का सीधा अर्थ है:
+
+- VM तक Network पहुँच रहा है।
+- Port 22 Open है।
+- SSH Service चल रही है।
+- लेकिन VM Password Accept नहीं कर रही।
+- VM केवल Public Key Authentication Accept कर रही है।
+
+यानी Client सही Private Key नहीं भेज रहा या VM में सही Public Key नहीं है।
+
+---
+
+# Step-1
+## सबसे पहले Terraform Configuration Check की
+
+VM-02 का Linux VM Resource देखा।
+
+```hcl
+admin_username = "azureuser"
+
+disable_password_authentication = true
+
+admin_ssh_key {
+
+    username = "azureuser"
+
+    public_key = file("~/.ssh/id_rsa.pub")
+
+}
+```
+
+---
+
+# इसका मतलब
+
+Password Authentication पूरी तरह Disable है।
+
+```
+❌ Password Login नहीं चलेगा
+
+✅ केवल SSH Key से Login होगा
+```
+
+---
+
+# सबसे पहले क्या Verify करना चाहिए?
+
+Terraform File में यह Command चलाएँ
+
+```powershell
+Select-String -Path .\main.tf -Pattern "disable_password_authentication|admin_ssh_key|admin_password|vm02"
+```
+
+---
+
+# इससे क्या पता चलता है?
+
+यह Command पूरे main.tf में Search करती है कि
+
+- Password Enable है या नहीं
+- SSH Key Configure है या नहीं
+- VM-01 और VM-02 में Authentication अलग है या नहीं
+
+---
+
+# हमारे Project में Result
+
+VM-01
+
+```text
+disable_password_authentication = false
+
+admin_password = "P@ssw0rd@123456"
+```
+
+इसका मतलब
+
+```
+VM-01
+
+Username : azureuser
+
+Password : Available
+```
+
+---
+
+VM-02
+
+```text
+disable_password_authentication = true
+
+admin_ssh_key {
+
+}
+```
+
+इसका मतलब
+
+```
+VM-02
+
+Username : azureuser
+
+Password : Disabled
+
+केवल SSH Key Login
+```
+
+---
+
+# अगला Verification
+
+अब Check किया कि कौन-सी Public Key VM में भेजी जा रही है।
+
+Command
+
+```powershell
+Select-String -Path .\main.tf -Pattern "public_key"
+```
+
+Output
+
+```text
+public_key = file("~/.ssh/id_rsa.pub")
+```
+
+---
+
+# इसका मतलब
+
+Terraform कोई नई Key Generate नहीं कर रहा।
+
+यह Local Laptop की Public Key Read कर रहा है।
+
+```
+Laptop
+
+id_rsa
+        │
+        │ Private Key
+        │
+
+id_rsa.pub
+        │
+        │ Public Key
+        │
+        ▼
+
+Terraform
+
+        │
+
+Azure VM
+```
+
+---
+
+# इसका मतलब
+
+VM में केवल
+
+```
+id_rsa.pub
+```
+
+Copy होती है।
+
+Login करते समय
+
+```
+id_rsa
+```
+
+Private Key Use करनी होती है।
+
+---
+
+# अब पहला शक किन चीज़ों पर गया?
+
+✅ MobaXterm में Private Key Select नहीं हुई।
+
+✅ गलत Public Key VM में चली गई।
+
+✅ Username गलत Configure हुआ।
+
+✅ NSG में Port 22 Block है।
+
+✅ Terraform में admin_ssh_key गलत Configure हुआ।
+
+---
+
+# Part-01 Summary
+
+इस Chapter में हमने केवल Terraform Configuration Verify की।
+
+अभी तक हमने SSH Login Attempt नहीं किया।
+
+पहले हमने यह Confirm किया कि
+
+✔ Password Disabled है।
+
+✔ SSH Key Enabled है।
+
+✔ सही Public Key Configure हुई है।
+
+✔ VM Password Accept नहीं करेगी।
+
+---
+
+# आगे क्या सीखेंगे?
+
+Part-02 में
+
+- Local SSH Keys Verify करेंगे।
+- Laptop की Public Key Check करेंगे।
+- Azure VM की authorized_keys Verify करेंगे।
+- MobaXterm Configuration Check करेंगे।
+- SSH Login क्यों Fail हो रहा था उसका Root Cause ढूँढेंगे।
+
+----
+
+# 28.2 Troubleshooting SSH Authentication Issue (Part-02)
+
+---
+
+# 🎯 Scenario
+
+Part-01 में हमने Verify किया कि
+
+- VM-02 Password Authentication पर नहीं चल रही।
+- केवल SSH Key Authentication Enabled है।
+- Terraform सही Public Key VM में भेज रहा है।
+
+अब अगला सवाल था...
+
+```
+क्या Laptop वास्तव में VM तक पहुँच भी रहा है?
+```
+
+यदि Network ही Fail है,
+तो SSH Key कभी Verify ही नहीं होगी।
+
+इसलिए सबसे पहले Network Test किया गया।
+
+---
+
+# Step-01
+## Port 22 Connectivity Test
+
+PowerShell में Command चलाई।
+
+```powershell
+Test-NetConnection 20.212.32.210 -Port 22
+```
+
+---
+
+# यह Command क्या करती है?
+
+यह Windows की Built-in Network Testing Command है।
+
+इससे पता चलता है कि
+
+```
+Laptop
+      │
+      │
+      ▼
+Azure VM
+```
+
+तक Port 22 खुला है या नहीं।
+
+---
+
+# अगर Output ऐसा आए
+
+```text
+TcpTestSucceeded : True
+```
+
+मतलब
+
+```
+Laptop
+
+        │
+
+        ▼
+
+Port-22
+
+        │
+
+        ▼
+
+VM
+
+Connection Successful
+```
+
+यानी
+
+Network बिल्कुल ठीक है।
+
+अब अगला Step SSH Authentication होगा।
+
+---
+
+# अगर Output ऐसा आए
+
+```text
+TcpTestSucceeded : False
+```
+
+मतलब
+
+Laptop VM तक पहुँच ही नहीं पा रहा।
+
+SSH शुरू होने से पहले ही Connection Fail हो गया।
+
+---
+
+# ऐसी स्थिति में किन चीज़ों को Check करना चाहिए?
+
+---
+
+# 1. Public IP Verify करें
+
+Azure Portal
+
+```
+VM-02
+
+↓
+
+Overview
+```
+
+Check करें
+
+```
+Public IP
+```
+
+यदि Public IP
+
+```
+None
+```
+
+दिख रही है
+
+तो इसका मतलब
+
+VM Direct Internet से Accessible नहीं है।
+
+---
+
+# 2. NSG Rule Check करें
+
+Azure Portal
+
+```
+VM-02
+
+↓
+
+Networking
+
+↓
+
+Inbound Rules
+```
+
+यह Rule होना चाहिए
+
+```
+Protocol
+
+TCP
+
+Port
+
+22
+
+Action
+
+Allow
+```
+
+---
+
+# यदि Port 22 Block होगा
+
+तो
+
+```
+SSH Connection
+
+Failed
+```
+
+---
+
+# 3. Public IP NIC पर Attached है या नहीं
+
+Networking में
+
+NIC Open करें।
+
+Check करें
+
+```
+Associated Public IP
+```
+
+यदि
+
+```
+None
+```
+
+है
+
+तो Terraform Apply के बाद Public IP Remove हो चुकी है।
+
+---
+
+# 4. Terraform Apply के बाद क्या किया?
+
+हमने Project में एक Chapter बनाया था
+
+```
+Remove Public IP
+```
+
+उसमें
+
+```hcl
+public_ip_address_id
+```
+
+Comment किया गया था।
+
+यदि उसके बाद
+
+```
+terraform apply
+```
+
+चलाया गया
+
+तो Public IP NIC से Detach हो जाएगी।
+
+---
+
+# ऐसी स्थिति में
+
+Laptop
+
+↓
+
+Internet
+
+↓
+
+VM
+
+Connection Impossible
+
+---
+
+# 5. Bastion से Login होता है?
+
+यदि
+
+Azure Bastion Deploy है
+
+तो
+
+```
+VM
+
+↓
+
+Connect
+
+↓
+
+Bastion
+```
+
+यदि Bastion से Login हो जाता है
+
+तो
+
+VM बिल्कुल Healthy है।
+
+समस्या केवल Public SSH की है।
+
+---
+
+# अगला Step
+
+यदि Network बिल्कुल ठीक है
+
+तो अब हमें SSH Authentication Verify करनी होगी।
+
+यानी
+
+- Laptop कौन-सी Key भेज रहा है।
+- VM कौन-सी Key Accept कर रही है।
+- दोनों Match कर रही हैं या नहीं।
+
+यह हम अगले Chapter में सीखेंगे।
+
+---
+
+# इस Chapter में क्या सीखा?
+
+✔ Network पहले Verify करना चाहिए।
+
+✔ TcpTestSucceeded हमें Network की वास्तविक स्थिति बताता है।
+
+✔ SSH Fail होने का मतलब हमेशा SSH Key नहीं होता।
+
+✔ Public IP और NSG सबसे पहले Check करने चाहिए।
+
+✔ Bastion Network Troubleshooting का बहुत अच्छा तरीका है।
+
+---
+
+# अगले Chapter में
+
+28.3
+
+SSH Public Key Validation
+
+हम सीखेंगे
+
+- Local SSH Keys
+- id_rsa
+- id_rsa.pub
+- authorized_keys
+- Azure VM में कौन-सी Key Install हुई
+- Laptop और Azure VM की Keys Compare कैसे करें
+
+
+-----
+
+
+# 28.3 - SSH Authentication Deep Dive (id_rsa, id_rsa.pub & authorized_keys)
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम समझेंगे:
+
+- SSH Key Pair क्या होता है?
+- id_rsa और id_rsa.pub में अंतर
+- authorized_keys क्या है?
+- Terraform Public Key कैसे भेजता है?
+- Azure VM Login कैसे Verify करती है?
+- Azure Run Command से Verification कैसे करें?
+- SSH Authentication Troubleshooting कैसे करें?
+
+---
+
+# Real World Scenario
+
+हमने VM-02 Create की।
+
+Terraform Code में लिखा था:
+
+```hcl
+admin_ssh_key {
+
+  username = "azureuser"
+
+  public_key = file("~/.ssh/id_rsa.pub")
+
+}
+```
+
+Terraform Successfully Apply हो गया।
+
+लेकिन SSH Login करते समय Error आया:
+
+```text
+No supported authentication methods available (server sent: publickey)
+```
+
+यहीं से Troubleshooting शुरू हुई।
+
+---
+
+# Step-1
+## Local SSH Keys Verify करना
+
+PowerShell
+
+```powershell
+Test-Path $HOME\.ssh\id_rsa
+```
+
+Output
+
+```text
+True
+```
+
+मतलब
+
+Private Key मौजूद है।
+
+---
+
+PowerShell
+
+```powershell
+Test-Path $HOME\.ssh\id_rsa.pub
+```
+
+Output
+
+```text
+True
+```
+
+मतलब
+
+Public Key भी मौजूद है।
+
+---
+
+पूरी SSH Directory देखें
+
+```powershell
+Get-ChildItem $HOME\.ssh
+```
+
+Example Output
+
+```text
+id_rsa
+id_rsa.pub
+known_hosts
+config
+```
+
+---
+
+# SSH Key Pair क्या होता है?
+
+जब SSH Key Generate होती है
+
+तो हमेशा दो Files बनती हैं।
+
+```
+C:\Users\ADMIN\.ssh
+
+│
+
+├── id_rsa
+
+└── id_rsa.pub
+```
+
+---
+
+## id_rsa
+
+```
+Private Key
+```
+
+यह Secret होती है।
+
+इसे कभी किसी को नहीं देना चाहिए।
+
+इसी से Login होता है।
+
+---
+
+## id_rsa.pub
+
+```
+Public Key
+```
+
+यह VM के अंदर Copy होती है।
+
+इसे Share किया जा सकता है।
+
+---
+
+# Terraform क्या करता है?
+
+Terraform यह Line पढ़ता है
+
+```hcl
+public_key = file("~/.ssh/id_rsa.pub")
+```
+
+इसका मतलब
+
+```
+Laptop
+
+id_rsa.pub
+
+      │
+
+Terraform
+
+      │
+
+Azure VM
+
+authorized_keys
+```
+
+Terraform केवल Public Key भेजता है।
+
+Private Key कभी Azure में Upload नहीं होती।
+
+---
+
+# Step-2
+## Terraform कौन-सी Public Key पढ़ रहा है?
+
+PowerShell
+
+```powershell
+Select-String -Path .\main.tf -Pattern "public_key"
+```
+
+Output
+
+```text
+public_key = file("~/.ssh/id_rsa.pub")
+```
+
+मतलब
+
+Terraform Local Laptop की Public Key Read कर रहा है।
+
+---
+
+# Step-3
+## Azure VM में Public Key Verify करना
+
+Azure Portal
+
+```
+VM-02
+
+↓
+
+Support + Troubleshooting
+
+↓
+
+Run Command
+
+↓
+
+RunShellScript
+```
+
+Command
+
+```bash
+ls -la /home/azureuser/.ssh
+```
+
+Output
+
+```text
+authorized_keys
+```
+
+मतलब
+
+SSH Directory मौजूद है।
+
+---
+
+अब Public Key देखें
+
+```bash
+cat /home/azureuser/.ssh/authorized_keys
+```
+
+Output
+
+```text
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ....
+```
+
+---
+
+# Step-4
+## Local Laptop की Public Key देखें
+
+PowerShell
+
+```powershell
+type $HOME\.ssh\id_rsa.pub
+```
+
+Output
+
+```text
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ....
+```
+
+---
+
+# Step-5
+## Public Key Compare करना
+
+अब Compare किया
+
+```
+Laptop
+
+id_rsa.pub
+
+        ==
+
+VM
+
+authorized_keys
+```
+
+Result
+
+```
+100% Match
+```
+
+इसका मतलब
+
+Terraform ने सही Public Key VM में Install की।
+
+---
+
+# SSH Login वास्तव में कैसे होता है?
+
+पूरा Authentication Process
+
+```
+                    Laptop
+
+            id_rsa (Private Key)
+
+                    │
+
+                    │
+
+                    ▼
+
+           SSH Client Request
+
+                    │
+
+                    ▼
+
+        Azure Linux Virtual Machine
+
+                    │
+
+                    ▼
+
+authorized_keys
+
+                    │
+
+      Public Key Match करती है?
+
+          │                     │
+
+         Yes                   No
+
+          │                     │
+
+          ▼                     ▼
+
+ Login Success         Authentication Failed
+```
+
+---
+
+# सबसे महत्वपूर्ण Concept
+
+Azure VM कभी Private Key नहीं रखती।
+
+Azure VM केवल Public Key Store करती है।
+
+```
+Azure VM
+
+authorized_keys
+
+↓
+
+Public Keys
+```
+
+Login करते समय
+
+SSH Client
+
+Private Key भेजता है।
+
+VM उसे Verify करती है।
+
+---
+
+# Authentication कैसे Verify होती है?
+
+```
+Laptop
+
+Private Key
+
+↓
+
+Digital Signature
+
+↓
+
+Azure VM
+
+↓
+
+authorized_keys
+
+↓
+
+Public Key
+
+↓
+
+Match?
+
+↓
+
+Login
+```
+
+यदि Match नहीं हुई
+
+तो
+
+```text
+Permission denied (publickey)
+```
+
+या
+
+```text
+No supported authentication methods available
+```
+
+---
+
+# Azure Run Command क्यों उपयोग किया?
+
+क्योंकि
+
+SSH Login नहीं हो रही थी।
+
+लेकिन Azure Run Command
+
+SSH के बिना भी VM के अंदर Commands Execute कर सकती है।
+
+इससे
+
+- authorized_keys
+- SSH Config
+- Logs
+
+सब Verify किए जा सकते हैं।
+
+---
+
+# SSH Configuration Verify करना
+
+Run Command
+
+```bash
+grep "^PubkeyAuthentication" /etc/ssh/sshd_config
+```
+
+Output
+
+```text
+PubkeyAuthentication yes
+```
+
+मतलब
+
+SSH Key Authentication Enabled है।
+
+---
+
+Command
+
+```bash
+grep "^PasswordAuthentication" /etc/ssh/sshd_config
+```
+
+Output
+
+```text
+PasswordAuthentication no
+```
+
+मतलब
+
+Password Login Disabled है।
+
+---
+
+# SSH Logs Check करना
+
+```bash
+journalctl -u ssh --no-pager -n 30
+```
+
+Example
+
+```text
+Disconnected from authenticating user azureuser
+
+No supported authentication methods available
+```
+
+मतलब
+
+Server चल रहा था।
+
+लेकिन Authentication Fail हो रही थी।
+
+---
+
+# authorized_keys Permission Verify करना
+
+```bash
+ls -l /home/azureuser/.ssh/authorized_keys
+```
+
+Output
+
+```text
+-rw-------
+```
+
+मतलब
+
+Permission सही है।
+
+---
+
+# इस Troubleshooting में हमने क्या Verify किया?
+
+✅ Terraform सही Public Key भेज रहा है।
+
+✅ Azure VM में Public Key मौजूद है।
+
+✅ SSH Service Running है।
+
+✅ Password Authentication Disabled है।
+
+✅ Public Key Authentication Enabled है।
+
+✅ authorized_keys Permission सही है।
+
+---
+
+# Final Root Cause
+
+Infrastructure में कोई समस्या नहीं थी।
+
+समस्या Client Side पर थी।
+
+MobaXterm / SSH Client सही Private Key उपयोग नहीं कर रहा था।
+
+---
+
+# Final Solution
+
+SSH Session में
+
+```
+Username
+
+azureuser
+```
+
+Private Key
+
+```
+C:\Users\ADMIN\.ssh\id_rsa
+```
+
+Select की गई।
+
+⚠️
+
+कभी भी
+
+```
+id_rsa.pub
+```
+
+Select नहीं करनी है।
+
+हमेशा
+
+```
+id_rsa
+```
+
+Select करनी है।
+
+---
+
+# Complete SSH Authentication Flow
+
+```
+                Laptop
+
+        id_rsa (Private Key)
+
+               │
+
+               ▼
+
+SSH Client Generates Digital Signature
+
+               │
+
+               ▼
+
+Azure Linux VM
+
+               │
+
+               ▼
+
+authorized_keys
+
+               │
+
+Public Key Match?
+
+      │                    │
+
+     Yes                  No
+
+      │                    │
+
+      ▼                    ▼
+
+SSH Login Success     Authentication Failed
+```
+
+---
+
+# Key Takeaways
+
+- SSH हमेशा Key Pair पर आधारित होती है।
+- Terraform केवल Public Key Azure VM में Copy करता है।
+- Private Key हमेशा Local Machine पर रहती है।
+- Azure VM केवल authorized_keys में Public Keys Store करती है।
+- Login हमेशा Matching Private Key से होता है।
+- Azure Run Command बिना SSH Login के भी Debugging के लिए उपयोगी है।
+- Troubleshooting हमेशा Step-by-Step करनी चाहिए, Guess नहीं करना चाहिए।
+
+---
+
+# Git Commit
+
+```bash
+git add .
+
+git commit -m "docs: add SSH authentication deep dive and troubleshooting guide"
+```
+---
+
+# 28.4 - Connect VM-02 Using SSH & Prepare Web Server
+
+> **Objective**
+>
+> इस Lab में हम VM-02 पर SSH Login करेंगे, Nginx Install करेंगे, Firewall Verify करेंगे और VM को Multiple Website Hosting के लिए तैयार करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- VM-02 पर SSH Login करना
+- MobaXterm से Multiple SSH Sessions खोलना
+- Ubuntu Server Update करना
+- Nginx Install करना
+- Nginx Service Verify करना
+- Port 80 Check करना
+- Browser से Default Website Access करना
+- VM को आगे Multiple Website Hosting के लिए तैयार करना
+
+---
+
+# 🏗 Current Architecture
+
+```text
+                    Internet
+                        │
+                        │
+                  Public IP (VM-02)
+                        │
+                        ▼
+                 Ubuntu Linux VM-02
+                        │
+                 SSH Port 22
+                        │
+                    MobaXterm
+```
+
+---
+
+# Step 1 - Open MobaXterm
+
+अपने Laptop पर
+
+**MobaXterm Open करें।**
+
+---
+
+# Step 2 - Create New SSH Session
+
+Click
+
+```
+Session
+```
+
+↓
+
+```
+SSH
+```
+
+---
+
+# Step 3 - Enter VM Details
+
+Fill the following details:
+
+| Setting | Value |
+|----------|-------|
+| Remote Host | VM-02 Public IP |
+| Port | 22 |
+| Username | azureuser |
+
+---
+
+# Step 4 - Select SSH Private Key
+
+Click
+
+```
+Advanced SSH Settings
+```
+
+Enable
+
+```
+Use Private Key
+```
+
+Select
+
+```
+C:\Users\ADMIN\.ssh\id_rsa
+```
+
+> **Important**
+>
+> हमेशा Private Key (`id_rsa`) Select करें।
+>
+> `id_rsa.pub` कभी Select नहीं करना है।
+
+---
+
+# Step 5 - Connect
+
+Click
+
+```
+OK
+```
+
+यदि सब सही है तो Login दिखाई देगा।
+
+```text
+azureuser@vm02:~$
+```
+
+---
+
+# Step 6 - Verify Logged In User
+
+Run
+
+```bash
+whoami
+```
+
+Expected Output
+
+```text
+azureuser
+```
+
+---
+
+# Step 7 - Check Hostname
+
+```bash
+hostname
+```
+
+Example
+
+```text
+vm02
+```
+
+---
+
+# Step 8 - Verify IP Address
+
+```bash
+hostname -I
+```
+
+Example
+
+```text
+10.0.2.4
+```
+
+यही VM का Private IP है।
+
+---
+
+# Step 9 - Update Ubuntu
+
+```bash
+sudo apt update
+```
+
+फिर
+
+```bash
+sudo apt upgrade -y
+```
+
+---
+
+# Why?
+
+इससे Operating System के Packages Latest Version पर Update हो जाते हैं।
+
+---
+
+# Step 10 - Install Nginx
+
+```bash
+sudo apt install nginx -y
+```
+
+---
+
+# Step 11 - Verify Nginx
+
+```bash
+nginx -v
+```
+
+Example
+
+```text
+nginx version: nginx/1.24.x
+```
+
+---
+
+# Step 12 - Check Service Status
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+यदि Exit करना हो
+
+```
+q
+```
+
+---
+
+# Step 13 - Enable Nginx at Boot
+
+```bash
+sudo systemctl enable nginx
+```
+
+---
+
+# Step 14 - Verify Listening Port
+
+```bash
+sudo ss -tulnp | grep 80
+```
+
+Expected
+
+```text
+LISTEN
+```
+
+इसका अर्थ
+
+Nginx Port 80 पर Requests Accept कर रहा है।
+
+---
+
+# Step 15 - Verify Firewall Rules
+
+Ubuntu Firewall Status
+
+```bash
+sudo ufw status
+```
+
+यदि
+
+```text
+inactive
+```
+
+दिखे
+
+तो कोई समस्या नहीं।
+
+Azure NSG Firewall पहले से Traffic Control कर रहा है।
+
+---
+
+# Step 16 - Check Web Directory
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+index.nginx-debian.html
+```
+
+---
+
+# Step 17 - Open Default Website
+
+Browser में जाएँ
+
+```
+http://<VM-02-PUBLIC-IP>
+```
+
+Example
+
+```
+http://20.xxx.xxx.xxx
+```
+
+Expected Page
+
+```
+Welcome to nginx!
+```
+
+---
+
+# Step 18 - Verify Nginx Process
+
+```bash
+ps -ef | grep nginx
+```
+
+Expected
+
+Master Process
+
+Worker Process
+
+दोनों दिखाई देंगे।
+
+---
+
+# Step 19 - Verify Web Root
+
+```bash
+pwd
+```
+
+```bash
+cd /var/www/html
+```
+
+```bash
+pwd
+```
+
+Expected
+
+```text
+/var/www/html
+```
+
+यही हमारी Website Files की Default Location है।
+
+---
+
+# Step 20 - Create Project Folder
+
+```bash
+mkdir -p ~/projects
+```
+
+Check
+
+```bash
+ls
+```
+
+---
+
+# Why?
+
+आगे Git Repository यहीं Clone करेंगे।
+
+---
+
+# Final Verification Checklist
+
+| Check | Status |
+|--------|--------|
+| SSH Login | ✅ |
+| Ubuntu Updated | ✅ |
+| Nginx Installed | ✅ |
+| Nginx Running | ✅ |
+| Port 80 Listening | ✅ |
+| Browser Working | ✅ |
+| Web Root Verified | ✅ |
+| Project Folder Created | ✅ |
+
+---
+
+# Architecture After This Lab
+
+```text
+                    Internet
+                        │
+                        │
+                  Public IP
+                        │
+                        ▼
+                 Ubuntu Linux VM-02
+                        │
+          ┌────────────────────────┐
+          │        Nginx           │
+          └────────────────────────┘
+                        │
+               /var/www/html
+                        │
+                 Default Website
+```
+
+---
+
+# What We Learned
+
+- SSH Login using MobaXterm
+- SSH Private Key Authentication
+- Ubuntu Package Update
+- Nginx Installation
+- Nginx Service Management
+- Port Verification
+- Default Website Testing
+- Web Root Directory
+- Preparing VM for Website Hosting
+
+---
+
+# Next Lab
+
+```
+31-Multiple-Websites-on-VM02.md
+```
+
+हम VM-02 पर Multiple Websites Deploy करेंगे और Nginx को Production Web Server की तरह उपयोग करेंगे।
+
+---
+
+# Git Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.4 - Connect VM-02 Using SSH and Prepare Web Server"
+
+git push origin main
+```
+
+---
+
+# Congratulations 🎉
+
+अब आपकी **VM-02 पूरी तरह Website Hosting के लिए तैयार है।**
+
+अगले Lab में हम इस Server पर Multiple Websites Deploy करेंगे और इसे एक Enterprise Web Hosting Server में बदलेंगे।
+
+
+---
+
+# 28.5 - Deploy First Website on VM-02 (Animal Care Foundation)
+
+> **Objective**
+>
+> इस Lab में हम VM-02 पर अपनी पहली Production Website Deploy करेंगे।  
+> Website को Nginx के Default Web Directory में Host करेंगे और Browser से Verify करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- Nginx Default Web Root समझना
+- पुरानी Website Remove करना
+- Git Repository Clone करना
+- Website Files Copy करना
+- File Permissions समझना
+- Browser से Website Verify करना
+
+---
+
+# Current Architecture
+
+```text
+                 Internet
+                     │
+                     ▼
+              VM-02 Public IP
+                     │
+                     ▼
+                Ubuntu Linux
+                     │
+                     ▼
+                  Nginx
+                     │
+                     ▼
+              /var/www/html
+                     │
+          Default Nginx Website
+```
+
+आज इसे Replace करेंगे।
+
+---
+
+# Step 1 - Login to VM-02
+
+MobaXterm से VM-02 Login करें।
+
+Expected Prompt
+
+```bash
+azureuser@vm02:~$
+```
+
+---
+
+# Step 2 - Verify Current Website
+
+```bash
+ls /var/www/html
+```
+
+Expected Output
+
+```text
+index.nginx-debian.html
+```
+
+यह Ubuntu की Default Website है।
+
+---
+
+# Step 3 - Remove Default Website
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+Verify
+
+```bash
+ls /var/www/html
+```
+
+Expected Output
+
+```text
+(empty)
+```
+
+अब Web Root खाली है।
+
+---
+
+# Step 4 - Move to Home Directory
+
+```bash
+cd ~
+```
+
+Verify
+
+```bash
+pwd
+```
+
+Expected
+
+```text
+/home/azureuser
+```
+
+---
+
+# Step 5 - Clone Website Repository
+
+```bash
+git clone https://github.com/devopsinsiders/Animal-Care-Foundation.git
+```
+
+> यदि Repository उपलब्ध नहीं है, तो अपनी Website Repository का URL उपयोग करें।
+
+---
+
+# Step 6 - Verify Repository
+
+```bash
+ls
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+```
+
+---
+
+# Step 7 - Verify Website Files
+
+```bash
+cd Animal-Care-Foundation
+```
+
+```bash
+ls
+```
+
+Expected
+
+```text
+index.html
+assets
+css
+js
+images
+README.md
+```
+
+---
+
+# Step 8 - Copy Website Files
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+# Step 9 - Verify Files
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+index.html
+assets
+css
+js
+images
+```
+
+---
+
+# Step 10 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+# Step 11 - Verify Service
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+Exit
+
+```
+q
+```
+
+---
+
+# Step 12 - Browser Testing
+
+Open Browser
+
+```
+http://<VM-02-Public-IP>
+```
+
+Example
+
+```
+http://20.xxx.xxx.xxx
+```
+
+अब आपकी Website दिखाई देनी चाहिए।
+
+---
+
+# Step 13 - Verify Homepage
+
+Check
+
+- Images Loading
+- CSS Working
+- Icons Visible
+- Navigation Working
+- Footer Visible
+
+यदि सब सही है
+
+Deployment सफल है।
+
+---
+
+# Directory Structure
+
+```text
+/var/www/html
+
+│
+
+├── index.html
+
+├── assets/
+
+├── css/
+
+├── js/
+
+├── images/
+```
+
+---
+
+# Understanding the Deployment
+
+```text
+GitHub Repository
+        │
+        ▼
+git clone
+        │
+        ▼
+Linux Home Directory
+        │
+        ▼
+Copy Files
+        │
+        ▼
+/var/www/html
+        │
+        ▼
+Nginx
+        │
+        ▼
+Browser
+```
+
+---
+
+# Verification Commands
+
+Current Directory
+
+```bash
+pwd
+```
+
+Website Files
+
+```bash
+ls -la /var/www/html
+```
+
+Nginx Version
+
+```bash
+nginx -v
+```
+
+Service Status
+
+```bash
+sudo systemctl status nginx
+```
+
+Port Listening
+
+```bash
+sudo ss -tulnp | grep 80
+```
+
+---
+
+# Common Errors
+
+## Error
+
+```text
+Permission denied
+```
+
+Solution
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+## Error
+
+```text
+404 Not Found
+```
+
+Reason
+
+Website Files Copy नहीं हुई।
+
+---
+
+## Error
+
+```text
+403 Forbidden
+```
+
+Reason
+
+File Permissions गलत हैं।
+
+Fix
+
+```bash
+sudo chmod -R 755 /var/www/html
+```
+
+---
+
+## Error
+
+```text
+Welcome to nginx!
+```
+
+Reason
+
+पुरानी Website अभी भी मौजूद है।
+
+Solution
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+फिर
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+# Final Verification Checklist
+
+| Task | Status |
+|------|--------|
+| SSH Login | ✅ |
+| Default Website Removed | ✅ |
+| Repository Cloned | ✅ |
+| Files Copied | ✅ |
+| Nginx Restarted | ✅ |
+| Website Accessible | ✅ |
+
+---
+
+# Architecture After Deployment
+
+```text
+Internet
+    │
+    ▼
+Public IP
+    │
+    ▼
+Ubuntu VM-02
+    │
+    ▼
+Nginx
+    │
+    ▼
+Animal Care Foundation Website
+```
+
+---
+
+# What We Learned
+
+- Git Clone
+- Linux File Management
+- Nginx Deployment
+- Web Root
+- Website Publishing
+- Browser Testing
+- Troubleshooting Deployment Issues
+
+---
+
+# Next Lab
+
+```
+31-Multiple-Websites-on-VM02.md
+```
+
+अब हम इसी VM पर **एक से अधिक Websites Host** करेंगे और Nginx को Enterprise Web Server की तरह Configure करेंगे।
+
+---
+
+# Git Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.5 - Deploy First Website on VM-02"
+
+git push origin main
+```
+
+---
+
+# Congratulations 🎉
+
+अब आपकी पहली Production Website सफलतापूर्वक VM-02 पर Deploy हो चुकी है।
+
+अगले Lab में हम इसी Server पर Multiple Websites Host करेंगे और Enterprise Level Web Hosting सीखेंगे।
+
+
+----
+
+# 28.6 - Deploy Second Website on VM-02 (StreamFlix)
+
+> **Objective**
+>
+> इस Lab में हम VM-02 पर दूसरी Website (StreamFlix) Deploy करेंगे।  
+> अभी दोनों Websites को एक साथ Host नहीं करेंगे। पहले दूसरी Website Deploy करके Verify करेंगे।
+>
+> अगले Chapter (31) में Nginx Virtual Hosts की मदद से Multiple Websites Host करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- दूसरी Website Clone करना
+- Existing Website का Backup लेना
+- StreamFlix Website Deploy करना
+- Nginx Reload करना
+- Browser से Website Verify करना
+- अगले Chapter के लिए Multiple Website Structure तैयार करना
+
+---
+
+# Current Architecture
+
+```text
+Internet
+    │
+    ▼
+VM-02
+    │
+    ▼
+Nginx
+    │
+    ▼
+Animal Care Foundation Website
+```
+
+अब इसे अस्थायी रूप से Replace करेंगे।
+
+---
+
+# Step 1 - Login to VM-02
+
+MobaXterm से Login करें।
+
+```bash
+azureuser@vm02:~$
+```
+
+---
+
+# Step 2 - Go to Home Directory
+
+```bash
+cd ~
+```
+
+Verify
+
+```bash
+pwd
+```
+
+Expected
+
+```text
+/home/azureuser
+```
+
+---
+
+# Step 3 - Clone StreamFlix Repository
+
+```bash
+git clone https://github.com/devopsinsiders/StreamFlix.git
+```
+
+Expected
+
+```text
+Cloning into 'StreamFlix'...
+```
+
+---
+
+# Step 4 - Verify Repository
+
+```bash
+ls
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+
+StreamFlix
+```
+
+अब दोनों Projects मौजूद हैं।
+
+---
+
+# Step 5 - Verify StreamFlix Files
+
+```bash
+cd StreamFlix
+```
+
+```bash
+ls
+```
+
+Expected Output
+
+```text
+index.html
+assets
+favicon.ico
+manifest.json
+README.md
+robots.txt
+```
+
+---
+
+# Step 6 - Backup Existing Website
+
+पहले Existing Website का Backup बनाएँ।
+
+```bash
+sudo mv /var/www/html /var/www/html-animal-backup
+```
+
+नई Web Root बनाएँ।
+
+```bash
+sudo mkdir /var/www/html
+```
+
+---
+
+# Step 7 - Copy StreamFlix Files
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+# Step 8 - Verify Files
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+index.html
+assets
+favicon.ico
+manifest.json
+```
+
+---
+
+# Step 9 - Set Permissions
+
+```bash
+sudo chmod -R 755 /var/www/html
+```
+
+---
+
+# Step 10 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+# Step 11 - Verify Service
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+Exit
+
+```
+q
+```
+
+---
+
+# Step 12 - Browser Testing
+
+Open Browser
+
+```
+http://<VM02-Public-IP>
+```
+
+Expected
+
+StreamFlix Homepage दिखाई देगी।
+
+---
+
+# Step 13 - Verify Website
+
+Check
+
+- Images
+- CSS
+- JavaScript
+- Banner
+- Navigation
+- Movie Cards
+
+यदि सब दिखाई दे रहा है
+
+Deployment सफल है।
+
+---
+
+# Current Directory Structure
+
+```text
+/home/azureuser
+
+│
+
+├── Animal-Care-Foundation
+
+│
+
+└── StreamFlix
+```
+
+---
+
+# Current Web Root
+
+```text
+/var/www/html
+
+│
+
+├── index.html
+
+├── assets
+
+├── favicon.ico
+
+├── manifest.json
+```
+
+---
+
+# Why Did We Replace the Website?
+
+अभी हमारा उद्देश्य केवल यह Verify करना है कि
+
+- Git Clone
+- File Copy
+- Nginx Deployment
+
+सही तरीके से काम कर रहे हैं।
+
+अगले Chapter में हम दोनों Websites को एक साथ Host करेंगे।
+
+---
+
+# Architecture
+
+```text
+GitHub
+
+    │
+
+    ▼
+
+StreamFlix Repository
+
+    │
+
+git clone
+
+    │
+
+    ▼
+
+Ubuntu VM
+
+    │
+
+Copy Files
+
+    │
+
+    ▼
+
+/var/www/html
+
+    │
+
+    ▼
+
+Nginx
+
+    │
+
+    ▼
+
+Browser
+```
+
+---
+
+# Verification Commands
+
+Current Directory
+
+```bash
+pwd
+```
+
+List Files
+
+```bash
+ls -la
+```
+
+Web Root
+
+```bash
+ls -la /var/www/html
+```
+
+Nginx Status
+
+```bash
+sudo systemctl status nginx
+```
+
+Listening Port
+
+```bash
+sudo ss -tulnp | grep 80
+```
+
+---
+
+# Common Errors
+
+## Permission Denied
+
+```text
+Permission denied
+```
+
+Solution
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+## Git Clone Failed
+
+```text
+fatal: could not create work tree
+```
+
+Reason
+
+Repository `/var/www/html` में Clone करने की कोशिश की।
+
+Correct
+
+```bash
+cd ~
+
+git clone https://github.com/devopsinsiders/StreamFlix.git
+```
+
+---
+
+## Welcome to nginx Page
+
+Reason
+
+Files Replace नहीं हुईं।
+
+Solution
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+फिर
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+## CSS Not Loading
+
+Reason
+
+assets Folder Copy नहीं हुआ।
+
+Verify
+
+```bash
+ls /var/www/html/assets
+```
+
+---
+
+# Final Verification Checklist
+
+| Task | Status |
+|------|--------|
+| SSH Login | ✅ |
+| StreamFlix Clone | ✅ |
+| Existing Website Backup | ✅ |
+| Files Copied | ✅ |
+| Nginx Restarted | ✅ |
+| Browser Working | ✅ |
+
+---
+
+# What We Learned
+
+- Git Clone
+- Website Backup
+- Replace Existing Website
+- Deploy Static Website
+- Nginx Deployment
+- Browser Testing
+- Basic Rollback Concept
+
+---
+
+# Next Lab
+
+```
+31-Multiple-Websites-on-VM02.md
+```
+
+अब हम दोनों Websites (**Animal Care Foundation** और **StreamFlix**) को एक ही Nginx Server पर **Virtual Hosts** की मदद से एक साथ Host करेंगे।
+
+---
+
+# Git Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.6 - Deploy StreamFlix Website on VM-02"
+
+git push origin main
+```
+
+---
+
+# Congratulations 🎉
+
+अब आपने VM-02 पर दूसरी Website भी सफलतापूर्वक Deploy कर ली है।
+
+अगले Lab में हम Enterprise तरीके से एक ही Server पर Multiple Websites Host करेंगे।
+
+---
+
+# 28.7 - Rollback to Animal Care Foundation Website & Prepare for Multiple Website Hosting
+
+> **Objective**
+>
+> इस Lab में हम StreamFlix Website का परीक्षण पूरा होने के बाद अपनी पहली Website (Animal Care Foundation) को Restore करेंगे।
+>
+> साथ ही VM-02 को अगले Chapter (**31 - Multiple Websites on VM-02**) के लिए तैयार करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- Rollback क्या होता है
+- Website Backup Restore करना
+- Production Rollback Process
+- Nginx Restart करना
+- Website Verification
+- Multiple Website Hosting की तैयारी करना
+
+---
+
+# Why Rollback?
+
+हमने पिछले Lab में
+
+```
+Animal Care Foundation
+```
+
+को Replace करके
+
+```
+StreamFlix
+```
+
+Deploy किया था।
+
+अब Production में वापस पहली Website Restore करेंगे।
+
+---
+
+# Current Architecture
+
+```text
+Internet
+     │
+     ▼
+VM-02
+     │
+     ▼
+Nginx
+     │
+     ▼
+StreamFlix Website
+```
+
+अब इसे Restore करेंगे।
+
+---
+
+# Step 1 - Login to VM-02
+
+```bash
+ssh azureuser@<VM02-Public-IP>
+```
+
+या
+
+MobaXterm से Login करें।
+
+---
+
+# Step 2 - Verify Current Website
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+index.html
+assets
+favicon.ico
+manifest.json
+```
+
+यह StreamFlix Website है।
+
+---
+
+# Step 3 - Remove Current Website
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+Verify
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+(empty)
+```
+
+---
+
+# Step 4 - Restore Animal Website
+
+यदि Backup बनाया था
+
+```bash
+sudo cp -r /var/www/html-animal-backup/* /var/www/html/
+```
+
+यदि Backup नहीं बनाया था
+
+तो
+
+```bash
+cd ~
+
+cd Animal-Care-Foundation
+
+sudo cp -r * /var/www/html/
+```
+
+---
+
+# Step 5 - Verify Files
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+index.html
+assets
+css
+js
+images
+```
+
+---
+
+# Step 6 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+# Step 7 - Verify Service
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+Exit
+
+```
+q
+```
+
+---
+
+# Step 8 - Browser Testing
+
+Open
+
+```
+http://<VM02-Public-IP>
+```
+
+अब
+
+Animal Care Foundation Website
+
+दिखनी चाहिए।
+
+---
+
+# Step 9 - Verify Website
+
+Check
+
+- Images
+- CSS
+- Hero Section
+- Donate Button
+- Contact Section
+- Footer
+
+सब सही होना चाहिए।
+
+---
+
+# Step 10 - Verify Both Projects
+
+```bash
+cd ~
+
+ls
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+
+StreamFlix
+```
+
+दोनों Projects Server पर मौजूद हैं।
+
+---
+
+# Final Directory Structure
+
+```text
+/home/azureuser
+
+│
+
+├── Animal-Care-Foundation/
+
+│
+
+└── StreamFlix/
+```
+
+---
+
+# Current Web Root
+
+```text
+/var/www/html
+
+│
+
+├── index.html
+
+├── assets/
+
+├── css/
+
+├── js/
+
+└── images/
+```
+
+---
+
+# Understanding Rollback
+
+Production Environment में यदि
+
+नई Website
+
+Problem करती है
+
+तो
+
+पुरानी Stable Website
+
+Restore कर दी जाती है।
+
+इसे
+
+```
+Rollback
+```
+
+कहते हैं।
+
+---
+
+# Production Rollback Flow
+
+```text
+Deploy New Website
+
+        │
+
+        ▼
+
+Testing
+
+        │
+
+        ▼
+
+Problem Found
+
+        │
+
+        ▼
+
+Rollback
+
+        │
+
+        ▼
+
+Previous Stable Website
+```
+
+---
+
+# Verification Commands
+
+Current Directory
+
+```bash
+pwd
+```
+
+Website Files
+
+```bash
+ls -la /var/www/html
+```
+
+Check Nginx
+
+```bash
+sudo systemctl status nginx
+```
+
+Restart
+
+```bash
+sudo systemctl restart nginx
+```
+
+Listening Port
+
+```bash
+sudo ss -tulnp | grep 80
+```
+
+---
+
+# Common Errors
+
+## Website Not Loading
+
+Restart
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+## CSS Missing
+
+Verify
+
+```bash
+ls /var/www/html/assets
+```
+
+---
+
+## Blank Page
+
+Verify
+
+```bash
+ls /var/www/html/index.html
+```
+
+---
+
+## Permission Error
+
+```bash
+sudo chmod -R 755 /var/www/html
+```
+
+---
+
+# Final Verification Checklist
+
+| Task | Status |
+|------|--------|
+| StreamFlix Removed | ✅ |
+| Animal Website Restored | ✅ |
+| Nginx Restarted | ✅ |
+| Browser Working | ✅ |
+| Projects Available | ✅ |
+
+---
+
+# Architecture After Rollback
+
+```text
+Internet
+
+      │
+
+      ▼
+
+Public IP
+
+      │
+
+      ▼
+
+Ubuntu VM-02
+
+      │
+
+      ▼
+
+Nginx
+
+      │
+
+      ▼
+
+Animal Care Foundation Website
+```
+
+---
+
+# What We Learned
+
+- Rollback
+- Backup Restore
+- Production Recovery
+- Nginx Restart
+- Website Verification
+- Preparing Server for Multiple Website Hosting
+
+---
+
+# What's Next?
+
+## 🚀 Chapter 31
+
+```
+31-Multiple-Websites-on-VM02.md
+```
+
+अब तक हमने
+
+- एक Website Deploy की
+- दूसरी Website Deploy की
+- Rollback किया
+
+अब अगला Step है:
+
+✅ एक ही VM पर दोनों Websites को एक साथ चलाना।
+
+यहीं से हम सीखेंगे:
+
+- Nginx Virtual Hosts
+- sites-available
+- sites-enabled
+- server_name
+- Multiple Domains
+- Production Web Hosting
+
+---
+
+# Git Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.7 - Rollback Website and Prepare for Multiple Website Hosting"
+
+git push origin main
+```
+
+---
+
+# 🎉 Congratulations
+
+अब VM-02 Production Ready है।
+
+आपने सफलतापूर्वक:
+
+- Website Deploy की
+- Website Replace की
+- Rollback किया
+- Production Recovery सीखी
+
+अब अगले Chapter में हम **एक ही Nginx Server पर Multiple Websites Host** करेंगे, जो Linux System Administrator और DevOps Engineer दोनों के लिए एक महत्वपूर्ण Skill है।
+
+---
+
