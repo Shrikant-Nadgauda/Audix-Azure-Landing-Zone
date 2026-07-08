@@ -10406,6 +10406,503 @@ git push origin main
 -----
 
 
+# 29 - Clone All Three Websites on Azure VM-02
+
+> **Objective**
+>
+> इस Lab में हम GitHub पर बनी तीनों NGO Websites को Azure VM-02 पर Clone करेंगे।
+>
+> इसके बाद सभी Websites `/var/www/` के अंदर Copy होंगी और अगले Lab में Nginx Virtual Hosts से Host की जाएँगी।
+
+---
+
+# Current Architecture
+
+```text
+GitHub
+
+│
+
+├────────────── Animal-Care-Foundation
+
+├────────────── Save-Trees-Foundation
+
+└────────────── Anmol-Jivan-Foundation
+
+        │
+
+        ▼
+
+Azure VM-02
+
+        │
+
+        ▼
+
+/var/www
+
+        │
+
+        ▼
+
+Nginx
+```
+
+---
+
+# Prerequisites
+
+VM-02 Running
+
+GitHub Repository Ready
+
+SSH Working
+
+Git Installed
+
+---
+
+# Step 1 - Login to VM-02
+
+```bash
+ssh azureuser@<VM02_Public_IP>
+```
+
+Example
+
+```bash
+ssh azureuser@20.212.xxx.xxx
+```
+
+Expected
+
+```text
+azureuser@vm02:~$
+```
+
+---
+
+# Step 2 - Verify Current Directory
+
+```bash
+pwd
+```
+
+Expected
+
+```text
+/home/azureuser
+```
+
+---
+
+# Step 3 - Verify Git Installation
+
+```bash
+git --version
+```
+
+Expected
+
+```text
+git version 2.x.x
+```
+
+---
+
+# Step 4 - Install Git (If Required)
+
+Ubuntu
+
+```bash
+sudo apt update
+
+sudo apt install git -y
+```
+
+Verify
+
+```bash
+git --version
+```
+
+---
+
+# Step 5 - Clone Animal Care Foundation
+
+```bash
+git clone https://github.com/Shrikant-Nadgauda/Animal-Care-Foundation.git
+```
+
+---
+
+# Step 6 - Clone Save Trees Foundation
+
+```bash
+git clone https://github.com/Shrikant-Nadgauda/Save-Trees-Foundation.git
+```
+
+---
+
+# Step 7 - Clone Anmol Jivan Foundation
+
+```bash
+git clone https://github.com/Shrikant-Nadgauda/Anmol-Jivan-Foundation.git
+```
+
+---
+
+# Step 8 - Verify Cloned Repositories
+
+```bash
+ls
+```
+
+Expected
+
+```text
+Animal-Care-Foundation
+
+Save-Trees-Foundation
+
+Anmol-Jivan-Foundation
+```
+
+---
+
+# Step 9 - Verify Project Files
+
+Animal Care
+
+```bash
+ls Animal-Care-Foundation
+```
+
+Expected
+
+```text
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+Save Trees
+
+```bash
+ls Save-Trees-Foundation
+```
+
+Expected
+
+```text
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+Anmol Jivan
+
+```bash
+ls Anmol-Jivan-Foundation
+```
+
+Expected
+
+```text
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+# Step 10 - Verify Existing Web Directories
+
+```bash
+ls /var/www
+```
+
+Expected
+
+```text
+animal
+
+trees
+
+anmol
+
+html
+```
+
+---
+
+# Step 11 - Copy Animal Care Website
+
+```bash
+sudo cp -r ~/Animal-Care-Foundation/* /var/www/animal/
+```
+
+Verify
+
+```bash
+ls /var/www/animal
+```
+
+Expected
+
+```text
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+# Step 12 - Copy Save Trees Website
+
+```bash
+sudo cp -r ~/Save-Trees-Foundation/* /var/www/trees/
+```
+
+Verify
+
+```bash
+ls /var/www/trees
+```
+
+---
+
+# Step 13 - Copy Anmol Jivan Website
+
+```bash
+sudo cp -r ~/Anmol-Jivan-Foundation/* /var/www/anmol/
+```
+
+Verify
+
+```bash
+ls /var/www/anmol
+```
+
+---
+
+# Step 14 - Verify Complete Web Structure
+
+```bash
+tree /var/www
+```
+
+Expected
+
+```text
+/var/www
+
+├── animal
+
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+
+├── trees
+
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+
+├── anmol
+
+│   ├── index.html
+│   ├── style.css
+│   ├── script.js
+
+└── html
+```
+
+---
+
+# Step 15 - Set Correct Permissions
+
+```bash
+sudo chown -R www-data:www-data /var/www
+
+sudo chmod -R 755 /var/www
+```
+
+---
+
+# Step 16 - Verify Permissions
+
+```bash
+ls -l /var/www
+```
+
+Expected
+
+```text
+drwxr-xr-x animal
+
+drwxr-xr-x trees
+
+drwxr-xr-x anmol
+```
+
+---
+
+# Common Errors
+
+## Repository Not Found
+
+```text
+Repository not found
+```
+
+Solution
+
+```text
+Verify Repository Name
+
+Verify GitHub Username
+
+Verify Repository Visibility
+```
+
+---
+
+## Permission Denied
+
+```text
+Permission denied
+```
+
+Solution
+
+```bash
+sudo cp -r ...
+```
+
+---
+
+## Git Not Installed
+
+```text
+git: command not found
+```
+
+Solution
+
+```bash
+sudo apt update
+
+sudo apt install git -y
+```
+
+---
+
+## Directory Already Exists
+
+```text
+destination path already exists
+```
+
+Solution
+
+```bash
+rm -rf Animal-Care-Foundation
+
+git clone <repository-url>
+```
+
+---
+
+# Lab Summary
+
+इस Lab में हमने
+
+✅ VM-02 पर Login किया
+
+✅ Git Verify किया
+
+✅ तीनों GitHub Repositories Clone की
+
+✅ Websites को `/var/www` में Copy किया
+
+✅ Permissions Configure की
+
+✅ Web Root तैयार किया
+
+---
+
+# Current Progress
+
+```text
+Laptop
+      │
+      ▼
+GitHub
+      │
+      ▼
+Azure VM-02
+      │
+      ▼
+/var/www
+      │
+      ▼
+Ready for Nginx
+```
+
+---
+
+# Next Lab
+
+```text
+32 - Configure Nginx Virtual Hosts
+```
+
+इस Lab में हम
+
+- animal.local
+- trees.local
+- anmol.local
+
+के लिए अलग-अलग Nginx Server Blocks बनाएँगे।
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 29 - Clone all NGO websites on Azure VM-02"
+
+git push origin main
+```
+
+
+
+-----
+
+
 # 32 - Configure Nginx Virtual Hosts
 
 > **Objective**
