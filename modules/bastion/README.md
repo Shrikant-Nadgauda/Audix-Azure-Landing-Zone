@@ -1739,3 +1739,403 @@ Guess करके Password या SSH Key Select न करें।
 अब हम Password Authentication नहीं, बल्कि SSH Key Authentication वाली VM-02 में Azure Bastion के माध्यम से Login करेंगे।
 
 ---
+
+# 🚀 29 - Access VM-02 Using Azure Bastion (SSH Key Authentication)
+
+**Document:** `29-Access-VM02-Using-Azure-Bastion-SSH-Key.md`
+
+---
+
+# 📖 Introduction
+
+पिछले Lab में हमने Azure Bastion का उपयोग करके VM-01 में Password Authentication के माध्यम से Login किया।
+
+अब हम VM-02 में Login करेंगे।
+
+लेकिन इस बार Authentication Method अलग होगी।
+
+VM-02 Password Authentication पर नहीं बनी है।
+
+यह SSH Key Authentication का उपयोग करती है।
+
+Production Environment में Linux Virtual Machines के लिए यही Recommended Method है।
+
+---
+
+# 🎯 Objective
+
+इस Lab में हम सीखेंगे
+
+- VM-02 Authentication Type Verify करना
+- Terraform Code से Login Method पहचानना
+- Azure Bastion में SSH Private Key का उपयोग
+- Successful Login
+- Common Authentication Errors
+- Production Best Practices
+
+---
+
+# Current Architecture
+
+```text
+                 Internet
+                      │
+                      ▼
+              Azure Portal
+                      │
+                      ▼
+               Azure Bastion
+                      │
+          ┌───────────┴───────────┐
+          │                       │
+          ▼                       ▼
+      VM-01                   VM-02
+   Password Login         SSH Key Login
+```
+
+---
+
+# Step 1 - Verify Terraform Configuration
+
+सबसे पहले Terraform Code Verify करें।
+
+```terraform
+resource "azurerm_linux_virtual_machine" "vm02" {
+
+    admin_username = "azureuser"
+
+    disable_password_authentication = true
+
+    admin_ssh_key {
+
+        username = "azureuser"
+
+        public_key = file("~/.ssh/id_rsa.pub")
+
+    }
+
+}
+```
+
+---
+
+# Understanding the Configuration
+
+```terraform
+disable_password_authentication = true
+```
+
+मतलब
+
+```
+Password Login Disabled
+```
+
+---
+
+```terraform
+admin_ssh_key {
+
+    public_key = file("~/.ssh/id_rsa.pub")
+
+}
+```
+
+मतलब
+
+Terraform ने Laptop की Public Key पढ़कर VM में Install कर दी।
+
+---
+
+# SSH Key Flow
+
+```text
+Laptop
+
+│
+
+├── id_rsa
+│      │
+│      │ Private Key
+│      ▼
+
+Azure Bastion
+
+│
+
+▼
+
+VM-02
+
+│
+
+└── authorized_keys
+
+        ▲
+
+        │
+
+id_rsa.pub
+```
+
+---
+
+# Important Concept
+
+VM के अंदर
+
+```
+Private Key
+```
+
+कभी Store नहीं होती।
+
+VM में केवल
+
+```
+Public Key
+```
+
+Install होती है।
+
+Login हमेशा
+
+```
+Private Key
+```
+
+से किया जाता है।
+
+---
+
+# Step 2 - Open Azure Portal
+
+Azure Portal
+
+↓
+
+Virtual Machines
+
+↓
+
+VM-02
+
+↓
+
+Connect
+
+↓
+
+Bastion
+
+---
+
+# Step 3 - Authentication Type
+
+Authentication
+
+```
+SSH Private Key
+```
+
+---
+
+Username
+
+```
+azureuser
+```
+
+---
+
+Private Key
+
+Upload
+
+```
+id_rsa
+```
+
+⚠️
+
+```
+id_rsa.pub
+```
+
+Select नहीं करनी है।
+
+---
+
+# Why?
+
+```
+id_rsa.pub
+
+↓
+
+Public Key
+
+↓
+
+VM के अंदर रहती है
+```
+
+```
+id_rsa
+
+↓
+
+Private Key
+
+↓
+
+Client से भेजी जाती है
+```
+
+---
+
+# Authentication Process
+
+```text
+Laptop
+
+Private Key
+
+      │
+
+      ▼
+
+Azure Bastion
+
+      │
+
+      ▼
+
+VM-02
+
+      │
+
+      ▼
+
+authorized_keys
+
+      │
+
+Compare Keys
+
+      │
+
+      ▼
+
+Login Success
+```
+
+---
+
+# Successful Login
+
+Login होने के बाद
+
+Terminal Open हो जाएगी।
+
+---
+
+# Verify Login
+
+```bash
+hostname
+```
+
+Expected
+
+```
+vm02
+```
+
+---
+
+```bash
+whoami
+```
+
+Expected
+
+```
+azureuser
+```
+
+---
+
+```bash
+pwd
+```
+
+Expected
+
+```
+/home/azureuser
+```
+
+---
+
+# Common Mistakes
+
+❌ Password Select करना
+
+---
+
+❌ id_rsa.pub Upload करना
+
+---
+
+❌ Wrong Username
+
+---
+
+❌ Different Private Key Select करना
+
+---
+
+❌ SSH Key Delete कर देना
+
+---
+
+# Best Practices
+
+- Password Authentication Disable रखें।
+- केवल SSH Key Authentication उपयोग करें।
+- Private Key सुरक्षित रखें।
+- Public Key कभी Delete न करें।
+- Private Key GitHub पर Upload न करें।
+
+---
+
+# Verification Checklist
+
+- ✅ VM Running
+- ✅ Azure Bastion Running
+- ✅ Username Correct
+- ✅ SSH Private Key Selected
+- ✅ Login Successful
+
+---
+
+# What You Learned
+
+- SSH Key Authentication
+- Azure Bastion Login
+- Public Key vs Private Key
+- Authentication Flow
+- Production Best Practices
+
+---
+
+# Next Lab
+
+```
+30 - Remove Public IP from VM-01
+```
+
+अब जब Azure Bastion Successfully काम कर रहा है, तो हम VM-01 की Public IP Remove करेंगे और Secure Architecture की ओर बढ़ेंगे।
+
+---
