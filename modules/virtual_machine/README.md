@@ -2459,3 +2459,255 @@ active (running)
 > 🚀 **Project Status:** Cloudflare Domain Successfully Mapped to Azure Virtual Machine.
 
 ---
+
+# 🖥️ Deploy Second Linux Virtual Machine (VM-02)
+
+> **Document:** `26-Deploy-Second-Linux-Virtual-Machine-VM02.md`
+
+![Azure](https://img.shields.io/badge/Azure-Virtual%20Machine-0078D4?style=for-the-badge&logo=microsoftazure)
+![Terraform](https://img.shields.io/badge/Terraform-Infrastructure-7B42BC?style=for-the-badge&logo=terraform)
+![Linux](https://img.shields.io/badge/Linux-Ubuntu-E95420?style=for-the-badge&logo=ubuntu)
+![Nginx](https://img.shields.io/badge/Nginx-Web%20Server-009639?style=for-the-badge&logo=nginx)
+
+---
+
+# 📖 Introduction
+
+अब तक हमने
+
+- ✅ Resource Group बनाया
+- ✅ Storage Account बनाया
+- ✅ Terraform Backend तैयार किया
+- ✅ Virtual Network बनाया
+- ✅ Subnets बनाए
+- ✅ Network Security Group बनाया
+- ✅ Public IP बनाया
+- ✅ Network Interface बनाई
+- ✅ Virtual Machine (VM-01) Deploy की
+- ✅ Nginx Install किया
+- ✅ StreamFlix और Animal Care Website Deploy की
+- ✅ Cloudflare Domain Configure किया
+
+अब Enterprise Environment की ओर बढ़ते हैं।
+
+इस Chapter में हम दूसरी Linux Virtual Machine (VM-02) बनाएँगे।
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे
+
+- दूसरी Virtual Machine Deploy करना
+- दूसरी NIC Attach करना
+- दूसरे Subnet का उपयोग करना
+- Public IP Assign करना
+- SSH Login करना
+- VM-02 Verify करना
+
+---
+
+# 🏗️ Architecture
+
+```text
+                 Virtual Network
+
+                 10.0.0.0/16
+
+                       │
+
+        ┌──────────────┴──────────────┐
+
+        │                             │
+
+ VM-01 Subnet                  VM-02 Subnet
+
+        │                             │
+
+        ▼                             ▼
+
+   Ubuntu VM-01                 Ubuntu VM-02
+
+        │                             │
+
+     Public IP                  Public IP
+```
+
+---
+
+# 📌 VM-02 Configuration
+
+| Setting | Value |
+|----------|-------|
+| VM Name | vm02 |
+| Region | Southeast Asia |
+| Image | Ubuntu Server 24.04 LTS |
+| Size | Standard D2s_v3 |
+| Authentication | SSH Key |
+| Username | azureuser |
+| Virtual Network | vnet-dev-southeastasia-audix-001 |
+| Subnet | subnet-vm02 |
+| Public IP | pip-vm02-dev-southeastasia-audix-001 |
+
+---
+
+# 📌 Terraform Files
+
+इस Chapter में हम मुख्य रूप से
+
+```text
+main.tf
+```
+
+में नया VM Resource जोड़ेंगे।
+
+बाद में Module Architecture में यही Code
+
+```text
+modules/
+└── virtual_machine/
+```
+
+में Move करेंगे।
+
+---
+
+# 📌 Deployment Flow
+
+```text
+Terraform Apply
+
+        │
+
+        ▼
+
+Create Public IP
+
+        │
+
+        ▼
+
+Create NIC
+
+        │
+
+        ▼
+
+Create Ubuntu VM
+
+        │
+
+        ▼
+
+SSH Login
+
+        │
+
+        ▼
+
+Verify Deployment
+```
+
+---
+
+# 📌 Verification
+
+Deployment Complete होने के बाद Verify करें
+
+Azure Portal
+
+```text
+Virtual Machines
+```
+
+Expected
+
+```text
+vm01
+
+vm02
+```
+
+दोनों Virtual Machines Running होनी चाहिए।
+
+---
+
+# 📌 SSH Login
+
+```bash
+ssh azureuser@<VM02_PUBLIC_IP>
+```
+
+---
+
+# 📌 Verify Hostname
+
+```bash
+hostname
+```
+
+Expected
+
+```text
+vm02
+```
+
+---
+
+# 📌 Verify Private IP
+
+```bash
+ip addr
+```
+
+---
+
+# 📌 Verify Internet Connectivity
+
+```bash
+ping google.com
+```
+
+Expected
+
+```text
+64 bytes from ...
+```
+
+---
+
+# 📌 Verify OS Version
+
+```bash
+cat /etc/os-release
+```
+
+Expected
+
+```text
+Ubuntu Server 24.04 LTS
+```
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ दूसरी Linux VM Deploy करना
+- ✅ दूसरे Subnet का उपयोग करना
+- ✅ दूसरी NIC और Public IP Attach करना
+- ✅ SSH द्वारा Login करना
+- ✅ VM Deployment Verify करना
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `25-Configure-Cloudflare-Domain-for-Public-IP.md` | `README.md` | `27-Create-Azure-Bastion-and-Secure-VM-Access.md` |
+
+---
+
+> 🚀 **Project Status:** Second Linux Virtual Machine (VM-02) Successfully Deployed.
+
+---

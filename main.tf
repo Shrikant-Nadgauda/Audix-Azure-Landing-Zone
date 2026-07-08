@@ -251,29 +251,29 @@ resource "azurerm_subnet" "subnet" {
 
 resource "azurerm_network_security_group" "nsg" {
 
-# यह Azure Network Security Group (NSG) Create करेगा।
-# NSG Azure Firewall की तरह काम नहीं करता।
-# यह Layer-4 (TCP/UDP) पर Inbound और Outbound Traffic को Allow या Deny करता है।
-# आगे VM-01 और VM-02 की Security इसी NSG से नियंत्रित होगी।
+  # यह Azure Network Security Group (NSG) Create करेगा।
+  # NSG Azure Firewall की तरह काम नहीं करता।
+  # यह Layer-4 (TCP/UDP) पर Inbound और Outbound Traffic को Allow या Deny करता है।
+  # आगे VM-01 और VM-02 की Security इसी NSG से नियंत्रित होगी।
 
   name = "nsg-dev-southeastasia-audix-001"
 
-# Enterprise Naming Convention
-# nsg = Network Security Group
-# dev = Environment
-# southeastasia = Azure Region
-# audix = Company Name
-# 001 = Resource Number
+  # Enterprise Naming Convention
+  # nsg = Network Security Group
+  # dev = Environment
+  # southeastasia = Azure Region
+  # audix = Company Name
+  # 001 = Resource Number
 
   location = azurerm_resource_group.rg.location
 
-# NSG उसी Azure Region में बनेगा जहाँ Resource Group है।
-# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+  # NSG उसी Azure Region में बनेगा जहाँ Resource Group है।
+  # Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# NSG इसी Resource Group के अंदर Create होगा।
-# Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
+  # NSG इसी Resource Group के अंदर Create होगा।
+  # Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
 
   tags = {
 
@@ -284,12 +284,12 @@ resource "azurerm_network_security_group" "nsg" {
 
   }
 
-# depends_on = [azurerm_resource_group.rg]
+  # depends_on = [azurerm_resource_group.rg]
 
-# यह Explicit Dependency का उदाहरण है।
-# यहाँ इसकी आवश्यकता नहीं है क्योंकि हमने Resource Group का Reference दिया है।
-# Terraform स्वयं समझ जाता है कि पहले Resource Group बनेगा, फिर NSG।
-# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+  # यह Explicit Dependency का उदाहरण है।
+  # यहाँ इसकी आवश्यकता नहीं है क्योंकि हमने Resource Group का Reference दिया है।
+  # Terraform स्वयं समझ जाता है कि पहले Resource Group बनेगा, फिर NSG।
+  # इसे Implicit Dependency कहते हैं और यही Best Practice है।
 
 }
 
@@ -297,57 +297,57 @@ resource "azurerm_network_security_group" "nsg" {
 
 resource "azurerm_network_security_rule" "allow_ssh" {
 
-# यह Rule SSH Traffic (Port 22) Allow करेगा।
-# इसी Rule की सहायता से हम VM-01 में SSH Login कर पाएँगे।
+  # यह Rule SSH Traffic (Port 22) Allow करेगा।
+  # इसी Rule की सहायता से हम VM-01 में SSH Login कर पाएँगे।
 
   name = "Allow-SSH"
 
-# Rule का नाम।
+  # Rule का नाम।
 
   priority = 100
 
-# Priority जितनी छोटी होगी, Rule उतना पहले Execute होगा।
-# Azure NSG Rules 100 से 4096 तक Priority स्वीकार करते हैं।
+  # Priority जितनी छोटी होगी, Rule उतना पहले Execute होगा।
+  # Azure NSG Rules 100 से 4096 तक Priority स्वीकार करते हैं।
 
   direction = "Inbound"
 
-# Internet से VM की तरफ आने वाले Traffic के लिए यह Rule लागू होगा।
+  # Internet से VM की तरफ आने वाले Traffic के लिए यह Rule लागू होगा।
 
   access = "Allow"
 
-# Traffic Allow किया जाएगा।
-# यदि Deny लिखेंगे तो Traffic Block हो जाएगा।
+  # Traffic Allow किया जाएगा।
+  # यदि Deny लिखेंगे तो Traffic Block हो जाएगा।
 
   protocol = "Tcp"
 
-# SSH केवल TCP Protocol का उपयोग करता है।
+  # SSH केवल TCP Protocol का उपयोग करता है।
 
   source_port_range = "*"
 
-# Client किसी भी Source Port से Connect हो सकता है।
+  # Client किसी भी Source Port से Connect हो सकता है।
 
   destination_port_range = "22"
 
-# VM पर Port 22 Open किया जा रहा है।
+  # VM पर Port 22 Open किया जा रहा है।
 
   source_address_prefix = "*"
 
-# किसी भी Source IP से SSH Allow होगा।
-# Production में यहाँ अपनी Public IP देना Best Practice है।
+  # किसी भी Source IP से SSH Allow होगा।
+  # Production में यहाँ अपनी Public IP देना Best Practice है।
 
   destination_address_prefix = "*"
 
-# यह Rule NSG से जुड़े सभी Resources पर लागू होगा।
+  # यह Rule NSG से जुड़े सभी Resources पर लागू होगा।
 
-  resource_group_name         = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
 
-# Rule इसी Resource Group में बनेगा।
+  # Rule इसी Resource Group में बनेगा।
 
   network_security_group_name = azurerm_network_security_group.nsg.name
 
-# यह Rule हमारे NSG के अंदर Add होगा।
-# NSG का Reference होने के कारण Terraform पहले NSG बनाएगा फिर Rule।
-# इसे Implicit Dependency कहते हैं।
+  # यह Rule हमारे NSG के अंदर Add होगा।
+  # NSG का Reference होने के कारण Terraform पहले NSG बनाएगा फिर Rule।
+  # इसे Implicit Dependency कहते हैं।
 
 }
 
@@ -355,14 +355,14 @@ resource "azurerm_network_security_rule" "allow_ssh" {
 
 resource "azurerm_network_security_rule" "allow_http" {
 
-# यह Rule HTTP Traffic (Port 80) Allow करेगा।
-# आगे Nginx Website इसी Port पर चलेगी।
+  # यह Rule HTTP Traffic (Port 80) Allow करेगा।
+  # आगे Nginx Website इसी Port पर चलेगी।
 
   name = "Allow-HTTP"
 
   priority = 110
 
-# प्रत्येक Rule की Priority Unique होनी चाहिए।
+  # प्रत्येक Rule की Priority Unique होनी चाहिए।
 
   direction = "Inbound"
 
@@ -374,13 +374,13 @@ resource "azurerm_network_security_rule" "allow_http" {
 
   destination_port_range = "80"
 
-# HTTP Port
+  # HTTP Port
 
   source_address_prefix = "*"
 
   destination_address_prefix = "*"
 
-  resource_group_name         = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   network_security_group_name = azurerm_network_security_group.nsg.name
 
@@ -390,8 +390,8 @@ resource "azurerm_network_security_rule" "allow_http" {
 
 resource "azurerm_network_security_rule" "allow_https" {
 
-# यह Rule HTTPS Traffic (Port 443) Allow करेगा।
-# भविष्य में SSL Certificate लगाने के बाद Website इसी Port पर खुलेगी।
+  # यह Rule HTTPS Traffic (Port 443) Allow करेगा।
+  # भविष्य में SSL Certificate लगाने के बाद Website इसी Port पर खुलेगी।
 
   name = "Allow-HTTPS"
 
@@ -407,13 +407,13 @@ resource "azurerm_network_security_rule" "allow_https" {
 
   destination_port_range = "443"
 
-# HTTPS Port
+  # HTTPS Port
 
   source_address_prefix = "*"
 
   destination_address_prefix = "*"
 
-  resource_group_name         = azurerm_resource_group.rg.name
+  resource_group_name = azurerm_resource_group.rg.name
 
   network_security_group_name = azurerm_network_security_group.nsg.name
 
@@ -423,65 +423,65 @@ resource "azurerm_network_security_rule" "allow_https" {
 
 resource "azurerm_public_ip" "pip_vm01" {
 
-# यह Azure Public IP Address Create करेगा।
-# Public IP की सहायता से Internet से Azure Resources तक पहुँच बनाई जाती है।
-# अभी यह Public IP VM-01 के साथ Attach होगी ताकि हम SSH द्वारा Login कर सकें।
-# बाद में इसी Public IP का उपयोग Nginx Website Access करने के लिए भी करेंगे।
+  # यह Azure Public IP Address Create करेगा।
+  # Public IP की सहायता से Internet से Azure Resources तक पहुँच बनाई जाती है।
+  # अभी यह Public IP VM-01 के साथ Attach होगी ताकि हम SSH द्वारा Login कर सकें।
+  # बाद में इसी Public IP का उपयोग Nginx Website Access करने के लिए भी करेंगे।
 
   name = "pip-dev-southeastasia-audix-001"
 
-# Enterprise Naming Convention
-# pip = Public IP
-# dev = Environment
-# southeastasia = Azure Region
-# audix = Company Name
-# 001 = Resource Number
+  # Enterprise Naming Convention
+  # pip = Public IP
+  # dev = Environment
+  # southeastasia = Azure Region
+  # audix = Company Name
+  # 001 = Resource Number
 
   location = azurerm_resource_group.rg.location
 
-# Public IP उसी Azure Region में Create होगी जहाँ हमारा Resource Group है।
-# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+  # Public IP उसी Azure Region में Create होगी जहाँ हमारा Resource Group है।
+  # Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# Public IP इसी Resource Group के अंदर Create होगी।
-# Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
+  # Public IP इसी Resource Group के अंदर Create होगी।
+  # Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
 
   allocation_method = "Static"
 
-# Public IP दो प्रकार की होती है।
-#
-# Static
-# VM Restart होने पर भी Public IP नहीं बदलती।
-# Production Environment में यही उपयोग की जाती है।
-#
-# Dynamic
-# VM Restart या Recreate होने पर IP बदल सकती है।
-# Learning और Temporary Environment के लिए उपयोग होती है।
-#
-# हमारी Website, DNS और Cloudflare इसी IP पर Point करेंगे।
-# इसलिए Static Public IP आवश्यक है।
+  # Public IP दो प्रकार की होती है।
+  #
+  # Static
+  # VM Restart होने पर भी Public IP नहीं बदलती।
+  # Production Environment में यही उपयोग की जाती है।
+  #
+  # Dynamic
+  # VM Restart या Recreate होने पर IP बदल सकती है।
+  # Learning और Temporary Environment के लिए उपयोग होती है।
+  #
+  # हमारी Website, DNS और Cloudflare इसी IP पर Point करेंगे।
+  # इसलिए Static Public IP आवश्यक है।
 
   sku = "Standard"
 
-# Azure में मुख्यतः दो प्रकार की Public IP SKU होती हैं।
-#
-# Basic
-# पुरानी Generation
-# धीरे-धीरे Deprecate हो रही है।
-#
-# Standard
-# अधिक Secure
-# Zone Redundant Support
-# Enterprise Projects में Recommended
-#
-# इसलिए हमेशा Standard SKU का उपयोग करेंगे।
+  # Azure में मुख्यतः दो प्रकार की Public IP SKU होती हैं।
+  #
+  # Basic
+  # पुरानी Generation
+  # धीरे-धीरे Deprecate हो रही है।
+  #
+  # Standard
+  # अधिक Secure
+  # Zone Redundant Support
+  # Enterprise Projects में Recommended
+  #
+  # इसलिए हमेशा Standard SKU का उपयोग करेंगे।
 
   idle_timeout_in_minutes = 4
 
-# यदि 4 मिनट तक कोई Network Activity नहीं होती,
-# तो Idle Connection Close हो जाएगी।
-# आवश्यकता अनुसार इसे 4 से 30 मिनट तक बढ़ाया जा सकता है।
+  # यदि 4 मिनट तक कोई Network Activity नहीं होती,
+  # तो Idle Connection Close हो जाएगी।
+  # आवश्यकता अनुसार इसे 4 से 30 मिनट तक बढ़ाया जा सकता है।
 
   tags = {
 
@@ -492,12 +492,12 @@ resource "azurerm_public_ip" "pip_vm01" {
 
   }
 
-# depends_on = [azurerm_resource_group.rg]
+  # depends_on = [azurerm_resource_group.rg]
 
-# यहाँ Explicit Dependency की आवश्यकता नहीं है।
-# Resource Group का Reference होने के कारण Terraform स्वयं समझ जाता है
-# कि पहले Resource Group Create होगा फिर Public IP।
-# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+  # यहाँ Explicit Dependency की आवश्यकता नहीं है।
+  # Resource Group का Reference होने के कारण Terraform स्वयं समझ जाता है
+  # कि पहले Resource Group Create होगा फिर Public IP।
+  # इसे Implicit Dependency कहते हैं और यही Best Practice है।
 
 }
 
@@ -507,64 +507,64 @@ resource "azurerm_public_ip" "pip_vm01" {
 
 resource "azurerm_network_interface" "nic_vm01" {
 
-# यह Azure Network Interface (NIC) Create करेगा।
-# NIC Virtual Machine का Network Card होता है।
-# VM सीधे VNet या Subnet से Connect नहीं होती।
-# VM हमेशा NIC के माध्यम से Network से जुड़ती है।
+  # यह Azure Network Interface (NIC) Create करेगा।
+  # NIC Virtual Machine का Network Card होता है।
+  # VM सीधे VNet या Subnet से Connect नहीं होती।
+  # VM हमेशा NIC के माध्यम से Network से जुड़ती है।
 
   name = "nic-dev-southeastasia-audix-001"
 
-# Enterprise Naming Convention
-# nic = Network Interface
-# dev = Environment
-# southeastasia = Azure Region
-# audix = Company Name
-# 001 = Resource Number
+  # Enterprise Naming Convention
+  # nic = Network Interface
+  # dev = Environment
+  # southeastasia = Azure Region
+  # audix = Company Name
+  # 001 = Resource Number
 
   location = azurerm_resource_group.rg.location
 
-# NIC उसी Region में बनेगी जहाँ Resource Group है।
+  # NIC उसी Region में बनेगी जहाँ Resource Group है।
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# NIC इसी Resource Group के अंदर Create होगी।
+  # NIC इसी Resource Group के अंदर Create होगी।
 
   ip_configuration {
 
-# एक NIC के अंदर एक या अधिक IP Configuration हो सकती हैं।
-# अभी हम केवल एक Primary IP Configuration बना रहे हैं।
+    # एक NIC के अंदर एक या अधिक IP Configuration हो सकती हैं।
+    # अभी हम केवल एक Primary IP Configuration बना रहे हैं।
 
     name = "internal"
 
-# IP Configuration का Logical Name।
+    # IP Configuration का Logical Name।
 
     subnet_id = azurerm_subnet.subnet["Management"].id
 
-# NIC Management Subnet से Connect होगी।
-# VM-01 इसी Subnet में Create होगी।
+    # NIC Management Subnet से Connect होगी।
+    # VM-01 इसी Subnet में Create होगी।
 
     private_ip_address_allocation = "Dynamic"
 
-# Azure इस NIC को स्वतः एक Private IP देगा।
-# उदाहरण:
-# 10.0.1.4
-# 10.0.1.5
-# 10.0.1.6
+    # Azure इस NIC को स्वतः एक Private IP देगा।
+    # उदाहरण:
+    # 10.0.1.4
+    # 10.0.1.5
+    # 10.0.1.6
 
-# यदि Fixed Private IP चाहिए तो "Static" उपयोग किया जाता है।
+    # यदि Fixed Private IP चाहिए तो "Static" उपयोग किया जाता है।
 
     public_ip_address_id = azurerm_public_ip.pip_vm01.id
 
-# हमने जो Public IP पहले बनाई थी,
-# वही इस NIC के साथ Attach होगी।
-# Internet से आने वाला Traffic पहले Public IP पर आएगा,
-# फिर NIC पर आएगा,
-# और अंत में VM तक पहुँचेगा।
+    # हमने जो Public IP पहले बनाई थी,
+    # वही इस NIC के साथ Attach होगी।
+    # Internet से आने वाला Traffic पहले Public IP पर आएगा,
+    # फिर NIC पर आएगा,
+    # और अंत में VM तक पहुँचेगा।
 
     primary = true
 
-# यदि एक NIC में Multiple IP Configurations हों,
-# तो यह Primary IP Configuration होगी।
+    # यदि एक NIC में Multiple IP Configurations हों,
+    # तो यह Primary IP Configuration होगी।
 
   }
 
@@ -577,12 +577,12 @@ resource "azurerm_network_interface" "nic_vm01" {
 
   }
 
-# यहाँ Explicit Dependency की आवश्यकता नहीं है।
-# हमने Subnet और Public IP दोनों का Reference दिया है।
-# Terraform स्वयं समझ जाता है कि
-# पहले Subnet और Public IP बनेंगे,
-# उसके बाद NIC Create होगी।
-# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+  # यहाँ Explicit Dependency की आवश्यकता नहीं है।
+  # हमने Subnet और Public IP दोनों का Reference दिया है।
+  # Terraform स्वयं समझ जाता है कि
+  # पहले Subnet और Public IP बनेंगे,
+  # उसके बाद NIC Create होगी।
+  # इसे Implicit Dependency कहते हैं और यही Best Practice है।
 
 }
 
@@ -590,30 +590,30 @@ resource "azurerm_network_interface" "nic_vm01" {
 
 resource "azurerm_network_interface_security_group_association" "nic_nsg" {
 
-# यह Resource Network Interface (NIC) और Network Security Group (NSG)
-# को आपस में Connect करेगा।
-# जब तक NSG Associate नहीं होती,
-# तब तक NSG के Rules VM पर लागू नहीं होते।
+  # यह Resource Network Interface (NIC) और Network Security Group (NSG)
+  # को आपस में Connect करेगा।
+  # जब तक NSG Associate नहीं होती,
+  # तब तक NSG के Rules VM पर लागू नहीं होते।
 
   network_interface_id = azurerm_network_interface.nic_vm01.id
 
-# यह हमारी VM-01 की NIC है।
-# NSG इसी NIC पर Apply होगी।
+  # यह हमारी VM-01 की NIC है।
+  # NSG इसी NIC पर Apply होगी।
 
   network_security_group_id = azurerm_network_security_group.nsg.id
 
-# यह वही NSG है जिसमें हमने
-# SSH (22)
-# HTTP (80)
-# HTTPS (443)
-# Rules बनाए हैं।
+  # यह वही NSG है जिसमें हमने
+  # SSH (22)
+  # HTTP (80)
+  # HTTPS (443)
+  # Rules बनाए हैं।
 
-# यहाँ हमने NIC और NSG दोनों का Reference दिया है।
-# Terraform स्वयं समझ जाता है कि
-# पहले NIC और NSG बनेंगे,
-# उसके बाद Association होगी।
-# इसे Implicit Dependency कहते हैं।
-# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+  # यहाँ हमने NIC और NSG दोनों का Reference दिया है।
+  # Terraform स्वयं समझ जाता है कि
+  # पहले NIC और NSG बनेंगे,
+  # उसके बाद Association होगी।
+  # इसे Implicit Dependency कहते हैं।
+  # यहाँ Explicit Dependency की आवश्यकता नहीं है।
 
 }
 
@@ -621,52 +621,52 @@ resource "azurerm_network_interface_security_group_association" "nic_nsg" {
 
 resource "azurerm_linux_virtual_machine" "vm01" {
 
-# यह Azure में Ubuntu Linux Virtual Machine Create करेगा।
-# VM Azure Cloud में हमारा Virtual Server होता है।
-# आगे इसी VM पर SSH करेंगे, Nginx Install करेंगे और पहली Website Host करेंगे।
+  # यह Azure में Ubuntu Linux Virtual Machine Create करेगा।
+  # VM Azure Cloud में हमारा Virtual Server होता है।
+  # आगे इसी VM पर SSH करेंगे, Nginx Install करेंगे और पहली Website Host करेंगे।
 
   name = "vm-dev-southeastasia-audix-001"
 
-# Enterprise Naming Convention
-# vm = Virtual Machine
-# dev = Environment
-# southeastasia = Azure Region
-# audix = Company Name
-# 001 = Resource Number
+  # Enterprise Naming Convention
+  # vm = Virtual Machine
+  # dev = Environment
+  # southeastasia = Azure Region
+  # audix = Company Name
+  # 001 = Resource Number
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# VM इसी Resource Group के अंदर Create होगी।
-# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+  # VM इसी Resource Group के अंदर Create होगी।
+  # Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
 
   location = azurerm_resource_group.rg.location
 
-# VM उसी Azure Region में Create होगी जहाँ बाकी Infrastructure बना है।
+  # VM उसी Azure Region में Create होगी जहाँ बाकी Infrastructure बना है।
 
   size = "Standard_D2s_v3"
 
-# VM का Hardware Size।
-# Azure for Students Subscription में यह Size उपलब्ध है।
-# इसमें 2 vCPU और 8 GB RAM मिलती है।
-# आगे Nginx, Docker और छोटे Applications आराम से चल जाएंगे।
+  # VM का Hardware Size।
+  # Azure for Students Subscription में यह Size उपलब्ध है।
+  # इसमें 2 vCPU और 8 GB RAM मिलती है।
+  # आगे Nginx, Docker और छोटे Applications आराम से चल जाएंगे।
 
   admin_username = "azureuser"
 
-# Linux VM का Login User।
-# SSH करते समय यही Username उपयोग होगा।
+  # Linux VM का Login User।
+  # SSH करते समय यही Username उपयोग होगा।
 
   disable_password_authentication = false
 
-# Password Authentication Enable की गई है।
-# Production में इसे false नहीं रखते।
-# वहाँ केवल SSH Key Authentication उपयोग की जाती है।
-# Learning Purpose के लिए Password Enable रखा है।
+  # Password Authentication Enable की गई है।
+  # Production में इसे false नहीं रखते।
+  # वहाँ केवल SSH Key Authentication उपयोग की जाती है।
+  # Learning Purpose के लिए Password Enable रखा है।
 
   admin_password = "P@ssw0rd@123456"
 
-# VM Login Password।
-# Production Environment में Password Hardcode नहीं किया जाता।
-# वहाँ Azure Key Vault या Variables का उपयोग किया जाता है।
+  # VM Login Password।
+  # Production Environment में Password Hardcode नहीं किया जाता।
+  # वहाँ Azure Key Vault या Variables का उपयोग किया जाता है।
 
   network_interface_ids = [
 
@@ -674,50 +674,50 @@ resource "azurerm_linux_virtual_machine" "vm01" {
 
   ]
 
-# VM सीधे Network से Connect नहीं होती।
-# VM हमेशा NIC के माध्यम से Network से जुड़ती है।
-# यही NIC पहले से Management Subnet और Public IP से Connected है।
+  # VM सीधे Network से Connect नहीं होती।
+  # VM हमेशा NIC के माध्यम से Network से जुड़ती है।
+  # यही NIC पहले से Management Subnet और Public IP से Connected है।
 
   os_disk {
 
     caching = "ReadWrite"
 
-# Disk Cache Mode।
-# सामान्य Linux VM के लिए ReadWrite Recommended है।
+    # Disk Cache Mode।
+    # सामान्य Linux VM के लिए ReadWrite Recommended है।
 
     storage_account_type = "Premium_LRS"
 
-# Premium SSD Disk।
-# Fast Performance देती है।
-# Student Subscription में यदि उपलब्ध न हो तो StandardSSD_LRS या Standard_LRS उपयोग कर सकते हो।
+    # Premium SSD Disk।
+    # Fast Performance देती है।
+    # Student Subscription में यदि उपलब्ध न हो तो StandardSSD_LRS या Standard_LRS उपयोग कर सकते हो।
 
   }
 
   source_image_reference {
 
-# यहाँ VM का Operating System Select किया जाता है।
+    # यहाँ VM का Operating System Select किया जाता है।
 
     publisher = "Canonical"
 
-# Ubuntu Publisher
+    # Ubuntu Publisher
 
     offer = "ubuntu-24_04-lts"
 
-# Ubuntu Server 24.04 LTS
+    # Ubuntu Server 24.04 LTS
 
     sku = "server"
 
-# Server Edition
+    # Server Edition
 
     version = "latest"
 
-# हमेशा Latest Stable Image Download होगी।
+    # हमेशा Latest Stable Image Download होगी।
 
   }
 
   computer_name = "vm01"
 
-# Linux Hostname
+  # Linux Hostname
 
   tags = {
 
@@ -728,10 +728,10 @@ resource "azurerm_linux_virtual_machine" "vm01" {
 
   }
 
-# यहाँ Explicit Dependency की आवश्यकता नहीं है।
-# NIC का Reference होने के कारण Terraform स्वयं समझ जाता है कि
-# पहले NIC Create होगी, उसके बाद VM बनेगी।
-# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+  # यहाँ Explicit Dependency की आवश्यकता नहीं है।
+  # NIC का Reference होने के कारण Terraform स्वयं समझ जाता है कि
+  # पहले NIC Create होगी, उसके बाद VM बनेगी।
+  # इसे Implicit Dependency कहते हैं और यही Best Practice है।
 
 }
 
@@ -740,27 +740,27 @@ resource "azurerm_linux_virtual_machine" "vm01" {
 
 resource "azurerm_public_ip" "vm02_pip" {
 
-# VM-02 को Internet से Access करने के लिए Public IP बनाई जा रही है।
+  # VM-02 को Internet से Access करने के लिए Public IP बनाई जा रही है।
 
-  name                = "pip-vm02-dev-southeastasia-audix-001"
+  name = "pip-vm02-dev-southeastasia-audix-001"
 
-# Azure Portal में दिखाई देने वाला Public IP का नाम।
+  # Azure Portal में दिखाई देने वाला Public IP का नाम।
 
-  location            = azurerm_resource_group.rg.location
+  location = azurerm_resource_group.rg.location
 
-# Resource Group की Location ही उपयोग होगी।
+  # Resource Group की Location ही उपयोग होगी।
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# यह Public IP हमारे Resource Group के अंदर बनेगी।
+  # यह Public IP हमारे Resource Group के अंदर बनेगी।
 
-  allocation_method   = "Static"
+  allocation_method = "Static"
 
-# Static Public IP हमेशा वही रहती है।
+  # Static Public IP हमेशा वही रहती है।
 
-  sku                 = "Standard"
+  sku = "Standard"
 
-# Standard SKU Production Environment के लिए Recommended है।
+  # Standard SKU Production Environment के लिए Recommended है।
 
 }
 
@@ -768,39 +768,41 @@ resource "azurerm_public_ip" "vm02_pip" {
 
 resource "azurerm_network_interface" "vm02_nic" {
 
-# VM-02 के लिए नई Network Interface (NIC) बनाई जा रही है।
+  # VM-02 के लिए नई Network Interface (NIC) बनाई जा रही है।
 
-  name                = "nic-vm02-dev-southeastasia-audix-001"
+  name = "nic-vm02-dev-southeastasia-audix-001"
 
-# Azure Portal में दिखाई देने वाला NIC का नाम।
+  # Azure Portal में दिखाई देने वाला NIC का नाम।
 
-  location            = azurerm_resource_group.rg.location
+  location = azurerm_resource_group.rg.location
 
-# NIC उसी Region में बनेगी जहाँ Resource Group है।
+  # NIC उसी Region में बनेगी जहाँ Resource Group है।
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# NIC उसी Resource Group में बनेगी।
+  # NIC उसी Resource Group में बनेगी।
 
   ip_configuration {
 
-# NIC की IP Configuration Define की जा रही है।
+    # NIC की IP Configuration Define की जा रही है।
 
-    name                          = "internal"
+    name = "internal"
 
-# IP Configuration का Logical Name।
+    # IP Configuration का Logical Name।
 
-    subnet_id                     = azurerm_subnet.subnet["subnet-vm02"].id
+   subnet_id = azurerm_subnet.subnet["StreamFlix"].id
 
-# VM-02 को VM-02 वाले Subnet में Connect किया जा रहा है।
+# "StreamFlix" हमारी for_each Map की Key है।
+# VM-02 इसी Subnet में Deploy होगी।
+# Reference हमेशा for_each की Key से किया जाता है।
 
     private_ip_address_allocation = "Dynamic"
 
-# Azure Automatically Private IP Assign करेगा।
+    # Azure Automatically Private IP Assign करेगा।
 
-    public_ip_address_id          = azurerm_public_ip.vm02_pip.id
+    public_ip_address_id = azurerm_public_ip.vm02_pip.id
 
-# अभी बनाई गई Public IP इसी NIC से Attach होगी।
+    # अभी बनाई गई Public IP इसी NIC से Attach होगी।
 
   }
 
@@ -811,88 +813,88 @@ resource "azurerm_network_interface" "vm02_nic" {
 
 resource "azurerm_linux_virtual_machine" "vm02" {
 
-# दूसरी Ubuntu Linux Virtual Machine बनाई जा रही है।
+  # दूसरी Ubuntu Linux Virtual Machine बनाई जा रही है।
 
-  name                = "vm02"
+  name = "vm02"
 
-# Azure Portal में VM का नाम।
+  # Azure Portal में VM का नाम।
 
-  location            = azurerm_resource_group.rg.location
+  location = azurerm_resource_group.rg.location
 
-# VM उसी Region में बनेगी।
+  # VM उसी Region में बनेगी।
 
   resource_group_name = azurerm_resource_group.rg.name
 
-# VM उसी Resource Group में बनेगी।
+  # VM उसी Resource Group में बनेगी।
 
-  size                = "Standard_D2s_v3"
+  size = "Standard_D2s_v3"
 
-# VM का Size।
+  # VM का Size।
 
-  admin_username      = "azureuser"
+  admin_username = "azureuser"
 
-# Linux Login User।
+  # Linux Login User।
 
   network_interface_ids = [
 
     azurerm_network_interface.vm02_nic.id
 
-# VM-02 के साथ VM-02 वाली NIC Attach की जा रही है।
+    # VM-02 के साथ VM-02 वाली NIC Attach की जा रही है।
 
   ]
 
   disable_password_authentication = true
 
-# Password Login Disable रहेगा, केवल SSH Key से Login होगा।
+  # Password Login Disable रहेगा, केवल SSH Key से Login होगा।
 
   admin_ssh_key {
 
-# SSH Public Key Configure की जा रही है।
+    # SSH Public Key Configure की जा रही है।
 
-    username   = "azureuser"
+    username = "azureuser"
 
-# SSH User।
+    # SSH User।
 
     public_key = file("~/.ssh/id_rsa.pub")
 
-# Local Machine की Public Key पढ़ी जाएगी।
-# यदि तुम Azure Generated Key उपयोग कर रहे हो तो उसी Key का Path देना।
+    # Local Machine की Public Key पढ़ी जाएगी।
+    # यदि तुम Azure Generated Key उपयोग कर रहे हो तो उसी Key का Path देना।
 
   }
 
   os_disk {
 
-# Operating System Disk Configuration।
+    # Operating System Disk Configuration।
 
-    caching              = "ReadWrite"
+    caching = "ReadWrite"
 
-# Read और Write दोनों के लिए Cache Enable रहेगा।
+    # Read और Write दोनों के लिए Cache Enable रहेगा।
 
     storage_account_type = "Premium_LRS"
 
-# Premium SSD Disk उपयोग होगी।
+    # Premium SSD Disk उपयोग होगी।
 
   }
 
   source_image_reference {
 
-# Ubuntu Image Define की जा रही है।
+    # Ubuntu Image Define की जा रही है।
 
     publisher = "Canonical"
 
-# Ubuntu का Publisher।
+    # Ubuntu का Publisher।
 
-    offer     = "ubuntu-24_04-lts"
+    offer = "ubuntu-24_04-lts"
 
-# Ubuntu 24.04 LTS।
+    # Ubuntu 24.04 LTS।
 
-    sku       = "server"
+    sku = "server"
 
-# Server Edition।
+    # Server Edition।
 
-    version   = "latest"
+    version = "latest"
 
-# हमेशा Latest Stable Version Deploy होगी।
+    # हमेशा Latest Stable Version Deploy होगी।
 
   }
 
