@@ -9902,14 +9902,14 @@ alert("Welcome to Anmol Jivan Foundation");
 ---
 # Step 9 - Update README.md
 
-````md
+```md
 # ❤️ Anmol Jivan Foundation
 
-# Mission
+## Mission
 
 Helping Poor Children, Orphans and Needy Families.
 
-# Technologies
+## Technologies
 
 - HTML5
 - CSS3
@@ -9924,12 +9924,21 @@ Helping Poor Children, Orphans and Needy Families.
 
 Shrikant Nadgauda
 
-GitHub
-
+GitHub:
 https://github.com/Shrikant-Nadgauda
 ```
 
-----
+---
+
+# Documentation Commit
+
+```bash
+git add .
+git commit -m "Updated README for Anmol Jivan Foundation"
+git push origin main
+```
+
+---
 
 # 33 - Configure Multiple Domains
 
