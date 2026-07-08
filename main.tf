@@ -503,3 +503,87 @@ resource "azurerm_public_ip" "pip_vm01" {
 
 
 
+
+
+resource "azurerm_network_interface" "nic_vm01" {
+
+# यह Azure Network Interface (NIC) Create करेगा।
+# NIC Virtual Machine का Network Card होता है।
+# VM सीधे VNet या Subnet से Connect नहीं होती।
+# VM हमेशा NIC के माध्यम से Network से जुड़ती है।
+
+  name = "nic-dev-southeastasia-audix-001"
+
+# Enterprise Naming Convention
+# nic = Network Interface
+# dev = Environment
+# southeastasia = Azure Region
+# audix = Company Name
+# 001 = Resource Number
+
+  location = azurerm_resource_group.rg.location
+
+# NIC उसी Region में बनेगी जहाँ Resource Group है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# NIC इसी Resource Group के अंदर Create होगी।
+
+  ip_configuration {
+
+# एक NIC के अंदर एक या अधिक IP Configuration हो सकती हैं।
+# अभी हम केवल एक Primary IP Configuration बना रहे हैं।
+
+    name = "internal"
+
+# IP Configuration का Logical Name।
+
+    subnet_id = azurerm_subnet.subnet["Management"].id
+
+# NIC Management Subnet से Connect होगी।
+# VM-01 इसी Subnet में Create होगी।
+
+    private_ip_address_allocation = "Dynamic"
+
+# Azure इस NIC को स्वतः एक Private IP देगा।
+# उदाहरण:
+# 10.0.1.4
+# 10.0.1.5
+# 10.0.1.6
+
+# यदि Fixed Private IP चाहिए तो "Static" उपयोग किया जाता है।
+
+    public_ip_address_id = azurerm_public_ip.pip_vm01.id
+
+# हमने जो Public IP पहले बनाई थी,
+# वही इस NIC के साथ Attach होगी।
+# Internet से आने वाला Traffic पहले Public IP पर आएगा,
+# फिर NIC पर आएगा,
+# और अंत में VM तक पहुँचेगा।
+
+    primary = true
+
+# यदि एक NIC में Multiple IP Configurations हों,
+# तो यह Primary IP Configuration होगी।
+
+  }
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+# हमने Subnet और Public IP दोनों का Reference दिया है।
+# Terraform स्वयं समझ जाता है कि
+# पहले Subnet और Public IP बनेंगे,
+# उसके बाद NIC Create होगी।
+# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+
+}
+
+
