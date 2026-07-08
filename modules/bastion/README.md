@@ -583,3 +583,1159 @@ azureuser@vm01:~$
 अगले Lab में हम Azure Bastion के Native Client Feature को समझेंगे और PowerShell, Azure CLI तथा MobaXterm का उपयोग करके Bastion के माध्यम से Virtual Machine Access करेंगे।
 
 ---
+
+# 🚀 28.0.1 - Troubleshooting Azure Bastion "You Have Been Disconnected"
+
+**Document:** `28.0.1-Troubleshooting-Azure-Bastion-Disconnected.md`
+
+---
+
+# 📖 Introduction
+
+Azure Bastion का उपयोग करते समय कभी-कभी Browser में निम्न Error दिखाई देती है।
+
+```text
+You have been disconnected.
+```
+
+या
+
+```text
+Disconnected
+
+The connection to the remote session has ended.
+```
+
+यह Error हमेशा Azure Bastion की समस्या नहीं होती।
+
+कई बार इसका कारण Browser Session, NSG Rule, Authentication या Virtual Machine Configuration होता है।
+
+इस Lab में हम Step-by-Step सभी संभावित कारणों को Verify करेंगे।
+
+---
+
+# 🎯 Objective
+
+इस Lab में हम सीखेंगे
+
+- Azure Bastion Disconnect क्यों होता है
+- Connection कैसे Verify करें
+- Common Issues कैसे Resolve करें
+- Production Troubleshooting Process
+
+---
+
+# 🏗️ Connection Flow
+
+```text
+Administrator
+
+        │
+
+        ▼
+
+Azure Portal
+
+        │
+
+        ▼
+
+Azure Bastion
+
+        │
+
+        ▼
+
+Virtual Machine
+```
+
+यदि इस Flow का कोई भी Component Fail होता है तो Bastion Session Disconnect हो सकती है।
+
+---
+
+# Root Cause 1 - Virtual Machine Stopped
+
+सबसे पहले Virtual Machine की स्थिति Verify करें।
+
+Azure Portal
+
+```
+Virtual Machine
+
+↓
+
+Overview
+
+↓
+
+Status
+```
+
+Expected
+
+```
+Running
+```
+
+यदि VM
+
+```
+Stopped
+
+Stopped (Deallocated)
+```
+
+दिख रही है
+
+तो पहले VM Start करें।
+
+---
+
+# Root Cause 2 - Bastion Status
+
+Azure Portal
+
+```
+Azure Bastion
+
+↓
+
+Overview
+```
+
+Verify
+
+```
+Status
+
+Running
+```
+
+यदि Bastion Provisioning में हो
+
+या
+
+Failed
+
+हो
+
+तो Connection स्थापित नहीं होगी।
+
+---
+
+# Root Cause 3 - Wrong Username
+
+Verify करें
+
+```
+azureuser
+```
+
+यदि
+
+```
+admin
+
+root
+
+ubuntu
+```
+
+जैसा Username उपयोग किया गया है
+
+तो Authentication Fail होगी।
+
+---
+
+# Root Cause 4 - Wrong SSH Key
+
+हमेशा
+
+```
+id_rsa
+```
+
+Select करें।
+
+कभी भी
+
+```
+id_rsa.pub
+```
+
+Select न करें।
+
+---
+
+# Root Cause 5 - SSH Service Stopped
+
+Azure Run Command
+
+↓
+
+RunShellScript
+
+Command
+
+```bash
+sudo systemctl status ssh
+```
+
+Expected
+
+```
+active (running)
+```
+
+यदि Service बंद है
+
+```bash
+sudo systemctl restart ssh
+```
+
+---
+
+# Root Cause 6 - Password Authentication
+
+यदि VM Password Authentication Disable है
+
+```hcl
+disable_password_authentication = true
+```
+
+तो केवल SSH Private Key से Login करें।
+
+Password उपयोग करने पर Connection Disconnect हो सकती है।
+
+---
+
+# Root Cause 7 - Network Security Group
+
+Verify करें
+
+```
+Virtual Machine
+
+↓
+
+Networking
+```
+
+Ensure
+
+```
+Allow SSH
+
+TCP
+
+22
+```
+
+और
+
+```
+AzureBastionSubnet
+
+Required Rules
+```
+
+दोनों उपलब्ध हों।
+
+---
+
+# Root Cause 8 - Browser Issue
+
+यदि Browser Session पुरानी हो
+
+तो
+
+- Refresh करें
+- Sign Out करें
+- पुनः Login करें
+- Incognito Mode में Try करें
+- दूसरे Browser से Test करें
+
+---
+
+# Root Cause 9 - Azure Bastion Session Timeout
+
+यदि लंबे समय तक कोई Activity नहीं होती
+
+तो Azure Bastion Session Automatically Disconnect हो सकती है।
+
+यह सामान्य व्यवहार है।
+
+---
+
+# Root Cause 10 - VM Resource Utilization
+
+Azure Run Command
+
+```bash
+top
+```
+
+या
+
+```bash
+free -h
+```
+
+यदि VM पूरी तरह Hang हो चुकी है
+
+तो Bastion Session भी Disconnect हो सकती है।
+
+---
+
+# Troubleshooting Flow
+
+```text
+Disconnected
+
+      │
+
+      ▼
+
+VM Running ?
+
+      │
+
+      ▼
+
+Bastion Running ?
+
+      │
+
+      ▼
+
+Correct Username ?
+
+      │
+
+      ▼
+
+Correct SSH Key ?
+
+      │
+
+      ▼
+
+SSH Service Running ?
+
+      │
+
+      ▼
+
+NSG Rules OK ?
+
+      │
+
+      ▼
+
+Reconnect
+```
+
+---
+
+# Best Practices
+
+- VM को हमेशा Running रखें।
+- Bastion Deploy होने के बाद ही Connection करें।
+- सही Username उपयोग करें।
+- हमेशा Private Key (`id_rsa`) Select करें।
+- Browser Refresh करके दोबारा Connect करें।
+- लंबे Idle Session से बचें।
+
+---
+
+# Verification Checklist
+
+- ✅ Virtual Machine Running
+- ✅ Azure Bastion Running
+- ✅ SSH Service Active
+- ✅ Correct Username
+- ✅ Correct Private Key
+- ✅ Browser Session Active
+
+---
+
+# 📚 What You Learned
+
+- Azure Bastion Disconnect Issue
+- Common Root Causes
+- Step-by-Step Troubleshooting
+- Production Verification Process
+
+---
+
+# 🚀 Next Lab
+
+```
+28.1 - Connect Azure Bastion Using Native Client
+```
+
+अब हम Azure Bastion का उपयोग PowerShell, Azure CLI और MobaXterm के साथ करेंगे।
+
+---
+
+# 🚀 28.0.2 - Troubleshooting Azure Bastion Authentication Issue (Password Login)
+
+**Document:** `28.0.2-Troubleshooting-Azure-Bastion-Authentication-Issue.md`
+
+---
+
+# 📖 Introduction
+
+Azure Bastion Deploy करने के बाद VM-01 में Login करते समय Browser में तुरंत
+
+```text
+You have been disconnected
+```
+
+Error दिखाई दे रही थी।
+
+Virtual Machine Running थी।
+
+Azure Bastion भी Running था।
+
+Network सही था।
+
+लेकिन Login नहीं हो रहा था।
+
+इस Lab में हम सीखेंगे कि समस्या कहाँ थी और उसे कैसे Resolve किया गया।
+
+---
+
+# 🎯 Problem Statement
+
+Login करते समय
+
+```text
+You have been disconnected
+```
+
+Browser Session तुरंत बंद हो जाती थी।
+
+---
+
+# Initial Assumption
+
+सबसे पहले हमने सोचा
+
+- Azure Bastion खराब है
+- VM बंद है
+- Port 22 Block है
+- NSG गलत है
+
+लेकिन इनमें से कोई भी कारण नहीं था।
+
+---
+
+# Environment
+
+Azure VM
+
+```
+VM-01
+```
+
+Authentication
+
+```
+Password Authentication
+```
+
+Username
+
+```
+azureuser
+```
+
+Azure Bastion
+
+```
+Running
+```
+
+VM Status
+
+```
+Running
+```
+
+---
+
+# Investigation Process
+
+हमने निम्न सभी चीज़ें Verify कीं।
+
+---
+
+## Step 1 - VM Status
+
+Azure Portal
+
+```
+Virtual Machine
+
+↓
+
+Overview
+```
+
+Verified
+
+```
+Running
+```
+
+---
+
+## Step 2 - Azure Bastion
+
+Verified
+
+```
+Provisioning State
+
+Succeeded
+```
+
+Status
+
+```
+Running
+```
+
+---
+
+## Step 3 - Network
+
+Verified
+
+```
+Virtual Network
+
+NIC
+
+NSG
+
+Port 22
+```
+
+सभी सही थे।
+
+---
+
+## Step 4 - SSH Service
+
+VM के अंदर SSH Service भी Running थी।
+
+---
+
+## Step 5 - Authentication Method
+
+यहीं गलती हुई।
+
+VM-01 Terraform से Password Authentication के साथ बनाई गई थी।
+
+```terraform
+disable_password_authentication = false
+
+admin_username = "azureuser"
+
+admin_password = "P@ssw0rd@123456"
+```
+
+लेकिन Login करते समय सही Authentication Method Select नहीं किया गया था।
+
+---
+
+# Root Cause
+
+Azure Bastion में Authentication Method गलत चुनी गई थी।
+
+गलती
+
+```
+SSH Private Key
+```
+
+या
+
+```
+Azure AD
+```
+
+Select किया गया।
+
+जबकि VM Password Authentication पर बनी थी।
+
+---
+
+# Correct Authentication
+
+Azure Portal
+
+```
+Virtual Machine
+
+↓
+
+Connect
+
+↓
+
+Bastion
+```
+
+Configuration
+
+```
+Authentication Type
+
+Password
+```
+
+Username
+
+```
+azureuser
+```
+
+Password
+
+```
+P@ssw0rd@123456
+```
+
+---
+
+# Result
+
+Login तुरंत Successful हो गया।
+
+```
+Connected Successfully
+```
+
+---
+
+# Authentication Flow
+
+```text
+Azure Portal
+
+        │
+
+        ▼
+
+Azure Bastion
+
+        │
+
+        ▼
+
+Authentication Type
+
+        │
+
+        ▼
+
+Password
+
+        │
+
+        ▼
+
+Username
+
+azureuser
+
+        │
+
+        ▼
+
+Password
+
+P@ssw0rd@123456
+
+        │
+
+        ▼
+
+VM-01 Login Successful
+```
+
+---
+
+# Lesson Learned
+
+हर Virtual Machine का Authentication Method अलग हो सकता है।
+
+यदि VM Password Authentication पर बनी है
+
+तो Azure Bastion में भी Password ही Select करना होगा।
+
+यदि VM SSH Key Authentication पर बनी है
+
+तो Private Key Select करनी होगी।
+
+Authentication Type गलत होने पर
+
+```
+You have been disconnected
+```
+
+या
+
+```
+Authentication Failed
+```
+
+जैसी Errors दिखाई दे सकती हैं।
+
+---
+
+# Best Practices
+
+- VM Create करते समय Authentication Method Documentation में लिखें।
+- Password VM के लिए Password Authentication ही उपयोग करें।
+- SSH Key VM के लिए केवल Private Key उपयोग करें।
+- Login Failure आने पर सबसे पहले Authentication Method Verify करें।
+
+---
+
+# Verification Checklist
+
+- ✅ VM Running
+- ✅ Azure Bastion Running
+- ✅ Correct Username
+- ✅ Correct Authentication Type
+- ✅ Login Successful
+
+---
+
+# 📚 What You Learned
+
+- Azure Bastion Authentication Process
+- Password vs SSH Key Authentication
+- Root Cause Analysis
+- Authentication Troubleshooting
+- Production Best Practices
+
+---
+
+# 🚀 Next Lab
+
+```
+29 - Connect VM-02 Using Azure Bastion (SSH Key Authentication)
+```
+
+इस Lab में हम Password Authentication से अलग, SSH Key Authentication वाली VM-02 में Azure Bastion के माध्यम से Login करेंगे।
+
+---
+
+# 🚀 28.0.2 - Troubleshooting Azure Bastion "You Have Been Disconnected"
+
+**Document:** `28.0.2-Troubleshooting-Azure-Bastion-Disconnected.md`
+
+---
+
+# 📖 Introduction
+
+Azure Bastion Deploy होने के बाद VM-01 में Login करते समय Browser में
+
+```text
+You have been disconnected
+```
+
+Error दिखाई दे रही थी।
+
+VM Running थी।
+
+Azure Bastion भी Running था।
+
+लेकिन Session तुरंत Disconnect हो रही थी।
+
+इस Lab में हम सीखेंगे कि Production Environment में इस प्रकार की समस्या को कैसे Troubleshoot किया जाता है।
+
+---
+
+# Understanding the Error
+
+```
+You have been disconnected
+```
+
+इस Error का मतलब हमेशा Password गलत होना नहीं होता।
+
+Azure Bastion Session कई कारणों से Disconnect हो सकती है।
+
+जैसे
+
+- Wrong Authentication Method
+- Wrong Username
+- SSH Service Down
+- VM Configuration
+- Bastion Configuration
+- NSG Issue
+- VM Boot Issue
+
+इसलिए Guess नहीं करना चाहिए।
+
+Step by Step Verification करनी चाहिए।
+
+---
+
+# Troubleshooting Flow
+
+```
+User
+
+    │
+
+    ▼
+
+Azure Bastion
+
+    │
+
+    ▼
+
+VM Configuration Verify
+
+    │
+
+    ▼
+
+Authentication Verify
+
+    │
+
+    ▼
+
+SSH Service Verify
+
+    │
+
+    ▼
+
+Network Verify
+
+    │
+
+    ▼
+
+Login Successful
+```
+
+---
+
+# Step 1 - Check VM Authentication Type
+
+सबसे पहले Terraform Code Verify करें।
+
+VM Password Authentication पर बनी है या SSH Key Authentication पर?
+
+PowerShell
+
+```powershell
+Select-String -Path .\main.tf -Pattern "disable_password_authentication|admin_password|admin_ssh_key"
+```
+
+---
+
+## If Output Shows
+
+```terraform
+disable_password_authentication = false
+
+admin_password = "P@ssw0rd@123456"
+```
+
+मतलब
+
+```
+Password Authentication
+```
+
+Use करनी होगी।
+
+---
+
+## If Output Shows
+
+```terraform
+disable_password_authentication = true
+
+admin_ssh_key {
+
+    username = "azureuser"
+
+}
+```
+
+मतलब
+
+```
+SSH Private Key
+```
+
+Use करनी होगी।
+
+---
+
+# Step 2 - Verify Username
+
+Terraform में
+
+```terraform
+admin_username = "azureuser"
+```
+
+Portal में भी
+
+```
+Username
+
+azureuser
+```
+
+ही होना चाहिए।
+
+गलत Username होने पर भी Disconnect हो सकता है।
+
+---
+
+# Step 3 - Verify VM State
+
+Portal
+
+```
+VM
+
+↓
+
+Overview
+```
+
+Check
+
+```
+Running
+```
+
+---
+
+# Step 4 - Verify Bastion State
+
+Portal
+
+```
+Azure Bastion
+
+↓
+
+Overview
+```
+
+Check
+
+```
+Provisioning State
+
+Succeeded
+```
+
+Status
+
+```
+Running
+```
+
+---
+
+# Step 5 - Verify SSH Service
+
+यदि Linux VM है
+
+Azure Run Command
+
+```
+RunShellScript
+```
+
+Command
+
+```bash
+sudo systemctl status ssh
+```
+
+Expected
+
+```
+Active (running)
+```
+
+---
+
+# Step 6 - Verify Authentication Method
+
+अब Terraform से Compare करें।
+
+VM Configuration
+
+```
+Password Authentication
+```
+
+↓
+
+Azure Bastion
+
+```
+Authentication Type
+
+Password
+```
+
+---
+
+या
+
+VM Configuration
+
+```
+SSH Key Authentication
+```
+
+↓
+
+Azure Bastion
+
+```
+SSH Private Key
+```
+
+दोनों Match होने चाहिए।
+
+---
+
+# Step 7 - Compare VM Configuration
+
+VM-01
+
+```terraform
+admin_username = "azureuser"
+
+disable_password_authentication = false
+
+admin_password = "P@ssw0rd@123456"
+```
+
+VM-02
+
+```terraform
+admin_username = "azureuser"
+
+disable_password_authentication = true
+
+admin_ssh_key {
+
+    username = "azureuser"
+
+    public_key = file("~/.ssh/id_rsa.pub")
+
+}
+```
+
+यहीं से तय होगा कि Bastion में Password देना है या Private Key।
+
+---
+
+# Root Cause Analysis
+
+हमने शुरुआत में सोचा
+
+```
+SSH Service Down
+```
+
+नहीं।
+
+```
+Port 22 Block
+```
+
+नहीं।
+
+```
+NSG Problem
+```
+
+नहीं।
+
+```
+Azure Bastion Problem
+```
+
+नहीं।
+
+असल कारण था
+
+VM Authentication Method और Bastion Authentication Method Match नहीं कर रहे थे।
+
+---
+
+# Lesson Learned
+
+Azure Bastion Login करने से पहले हमेशा VM Configuration Verify करें।
+
+Guess करके Password या SSH Key Select न करें।
+
+पहले Terraform Code देखें।
+
+फिर उसी के अनुसार Authentication चुनें।
+
+---
+
+# Production Troubleshooting Checklist
+
+✅ VM Running
+
+✅ Bastion Running
+
+✅ admin_username Verify
+
+✅ disable_password_authentication Verify
+
+✅ admin_password Verify
+
+✅ admin_ssh_key Verify
+
+✅ Authentication Type Match
+
+✅ SSH Service Running
+
+---
+
+# What You Learned
+
+- Bastion Disconnect का वास्तविक अर्थ
+- VM Configuration Verification
+- Password vs SSH Key Decision
+- Terraform आधारित Authentication Validation
+- Production Troubleshooting Methodology
+
+---
+
+# Next Lab
+
+```
+29 - Access VM-02 Using Azure Bastion (SSH Key Authentication)
+```
+
+अब हम Password Authentication नहीं, बल्कि SSH Key Authentication वाली VM-02 में Azure Bastion के माध्यम से Login करेंगे।
+
+---
