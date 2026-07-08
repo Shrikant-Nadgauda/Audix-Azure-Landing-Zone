@@ -617,3 +617,121 @@ resource "azurerm_network_interface_security_group_association" "nic_nsg" {
 
 }
 
+
+
+resource "azurerm_linux_virtual_machine" "vm01" {
+
+# यह Azure में Ubuntu Linux Virtual Machine Create करेगा।
+# VM Azure Cloud में हमारा Virtual Server होता है।
+# आगे इसी VM पर SSH करेंगे, Nginx Install करेंगे और पहली Website Host करेंगे।
+
+  name = "vm-dev-southeastasia-audix-001"
+
+# Enterprise Naming Convention
+# vm = Virtual Machine
+# dev = Environment
+# southeastasia = Azure Region
+# audix = Company Name
+# 001 = Resource Number
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# VM इसी Resource Group के अंदर Create होगी।
+# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+
+  location = azurerm_resource_group.rg.location
+
+# VM उसी Azure Region में Create होगी जहाँ बाकी Infrastructure बना है।
+
+  size = "Standard_D2s_v3"
+
+# VM का Hardware Size।
+# Azure for Students Subscription में यह Size उपलब्ध है।
+# इसमें 2 vCPU और 8 GB RAM मिलती है।
+# आगे Nginx, Docker और छोटे Applications आराम से चल जाएंगे।
+
+  admin_username = "azureuser"
+
+# Linux VM का Login User।
+# SSH करते समय यही Username उपयोग होगा।
+
+  disable_password_authentication = false
+
+# Password Authentication Enable की गई है।
+# Production में इसे false नहीं रखते।
+# वहाँ केवल SSH Key Authentication उपयोग की जाती है।
+# Learning Purpose के लिए Password Enable रखा है।
+
+  admin_password = "P@ssw0rd@123456"
+
+# VM Login Password।
+# Production Environment में Password Hardcode नहीं किया जाता।
+# वहाँ Azure Key Vault या Variables का उपयोग किया जाता है।
+
+  network_interface_ids = [
+
+    azurerm_network_interface.nic_vm01.id
+
+  ]
+
+# VM सीधे Network से Connect नहीं होती।
+# VM हमेशा NIC के माध्यम से Network से जुड़ती है।
+# यही NIC पहले से Management Subnet और Public IP से Connected है।
+
+  os_disk {
+
+    caching = "ReadWrite"
+
+# Disk Cache Mode।
+# सामान्य Linux VM के लिए ReadWrite Recommended है।
+
+    storage_account_type = "Premium_LRS"
+
+# Premium SSD Disk।
+# Fast Performance देती है।
+# Student Subscription में यदि उपलब्ध न हो तो StandardSSD_LRS या Standard_LRS उपयोग कर सकते हो।
+
+  }
+
+  source_image_reference {
+
+# यहाँ VM का Operating System Select किया जाता है।
+
+    publisher = "Canonical"
+
+# Ubuntu Publisher
+
+    offer = "ubuntu-24_04-lts"
+
+# Ubuntu Server 24.04 LTS
+
+    sku = "server"
+
+# Server Edition
+
+    version = "latest"
+
+# हमेशा Latest Stable Image Download होगी।
+
+  }
+
+  computer_name = "vm01"
+
+# Linux Hostname
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+# NIC का Reference होने के कारण Terraform स्वयं समझ जाता है कि
+# पहले NIC Create होगी, उसके बाद VM बनेगी।
+# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+
+}
+
