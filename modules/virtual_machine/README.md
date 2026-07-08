@@ -1086,3 +1086,424 @@ Website Display
 
 ---
 
+# 🐾 Build a Custom Animal Medical Care Website on Nginx
+
+> **Document:** `23-Build-Custom-Animal-Medical-Care-Website.md`
+
+![Nginx](https://img.shields.io/badge/Nginx-Web%20Server-009639?style=for-the-badge&logo=nginx)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04_LTS-E95420?style=for-the-badge&logo=ubuntu)
+![HTML5](https://img.shields.io/badge/HTML5-Web%20Development-E34F26?style=for-the-badge&logo=html5)
+![Azure](https://img.shields.io/badge/Azure-Linux%20VM-0078D4?style=for-the-badge&logo=microsoftazure)
+
+---
+
+# 📖 Introduction
+
+अब तक हमने
+
+- ✅ Azure VM Deploy की
+- ✅ SSH Login किया
+- ✅ Nginx Install किया
+- ✅ पहली Website Host की
+
+अब समय है एक Professional Custom Website बनाने का।
+
+इस Website का उद्देश्य Donation Collect करना नहीं है।
+
+यह Website केवल लोगों को प्रेरित करेगी कि वे
+
+- घायल जानवरों की मदद करें
+- दवाइयाँ उपलब्ध कराएँ
+- स्वयंसेवक (Volunteer) बनें
+- भोजन उपलब्ध कराएँ
+- पशु चिकित्सा शिविर आयोजित करें
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे
+
+- Default Website Remove करना
+- Professional HTML Website बनाना
+- CSS के साथ Beautiful Landing Page बनाना
+- Nginx पर Website Host करना
+- Browser में Verify करना
+
+---
+
+# 🌍 Website Theme
+
+```text
+🐾 Animal Care Foundation
+
+Healing Every Life
+
+Free Medical Care
+
+Dogs
+
+Cats
+
+Cows
+
+Birds
+
+Wild Animals
+
+Become a Volunteer
+```
+
+---
+
+# 📌 Step 1 - Website Directory में जाएँ
+
+```bash
+cd /var/www/html
+```
+
+Verify
+
+```bash
+pwd
+```
+
+Expected Output
+
+```text
+/var/www/html
+```
+
+---
+
+# 📌 Step 2 - पुरानी Website Delete करें
+
+```bash
+sudo rm -f index.html
+```
+
+Verify
+
+```bash
+ls
+```
+
+---
+
+# 📌 Step 3 - नई Website Create करें
+
+```bash
+sudo nano index.html
+```
+
+---
+
+# 📌 Step 4 - नीचे दिया गया HTML Paste करें
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Animal Care Foundation</title>
+
+<style>
+
+body{
+
+margin:0;
+padding:0;
+font-family:Arial,Helvetica,sans-serif;
+background:#eef7ee;
+
+}
+
+header{
+
+background:#2E7D32;
+padding:40px;
+text-align:center;
+color:white;
+
+}
+
+section{
+
+padding:40px;
+
+}
+
+.card{
+
+background:white;
+padding:25px;
+margin:20px 0;
+border-radius:10px;
+box-shadow:0 0 10px lightgray;
+
+}
+
+h2{
+
+color:#2E7D32;
+
+}
+
+footer{
+
+background:#1B5E20;
+color:white;
+padding:20px;
+text-align:center;
+
+}
+
+button{
+
+background:#2E7D32;
+color:white;
+padding:15px 30px;
+font-size:18px;
+border:none;
+border-radius:6px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>🐾 Animal Care Foundation</h1>
+
+<p>Healing Every Life with Love and Care</p>
+
+</header>
+
+<section>
+
+<div class="card">
+
+<h2>🏥 Free Animal Medical Care</h2>
+
+<p>
+
+Our volunteers organize free medical camps for injured
+
+dogs, cats, cows, birds and other animals.
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>❤️ Become a Volunteer</h2>
+
+<p>
+
+Join our mission by giving your time.
+
+Help rescue injured animals and support treatment camps.
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>🍚 Support with Essentials</h2>
+
+<p>
+
+You can contribute food, medicines, blankets,
+
+water bowls and first aid supplies.
+
+</p>
+
+</div>
+
+<div class="card">
+
+<h2>🌱 Every Life Matters</h2>
+
+<p>
+
+Compassion has no language.
+
+Together we can create a safer world for every animal.
+
+</p>
+
+</div>
+
+<center>
+
+<button>Join Our Mission</button>
+
+</center>
+
+</section>
+
+<footer>
+
+Made with ❤️ for Every Living Being
+
+</footer>
+
+</body>
+
+</html>
+```
+
+---
+
+# 📌 Step 5 - File Save करें
+
+Nano में
+
+```text
+CTRL + O
+
+Enter
+
+CTRL + X
+```
+
+---
+
+# 📌 Step 6 - Verify करें
+
+```bash
+ls -l
+```
+
+Expected Output
+
+```text
+index.html
+```
+
+---
+
+# 📌 Step 7 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+Status Check करें
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+---
+
+# 📌 Step 8 - Browser Test
+
+Browser में जाएँ
+
+```text
+http://<PUBLIC-IP>
+```
+
+Example
+
+```text
+http://20.xx.xx.xx
+```
+
+अब आपकी नई Website दिखाई देगी।
+
+---
+
+# 📌 Step 9 - Live Modification
+
+यदि Website Edit करनी हो
+
+```bash
+sudo nano /var/www/html/index.html
+```
+
+Save करें
+
+Browser Refresh करें।
+
+कोई Nginx Restart आवश्यक नहीं है यदि केवल HTML बदला है।
+
+---
+
+# 🏗️ Request Flow
+
+```text
+Browser
+
+      │
+
+      ▼
+
+Azure Public IP
+
+      │
+
+      ▼
+
+Ubuntu VM
+
+      │
+
+      ▼
+
+Nginx
+
+      │
+
+      ▼
+
+/var/www/html/index.html
+
+      │
+
+      ▼
+
+Animal Care Foundation Website
+```
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Custom HTML Website बनाना
+- ✅ Nginx पर Website Replace करना
+- ✅ HTML File Edit करना
+- ✅ Browser से Verify करना
+- ✅ Real-world Static Website Host करना
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `22-Host-First-Website-on-Nginx.md` | `README.md` | `24-Host-Multiple-Websites-on-Single-VM.md` |
+
+---
+
+> 🚀 **Project Status:** Custom Animal Care Foundation Website Successfully Hosted on Azure Linux VM using Nginx.
+
+---
+
