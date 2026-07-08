@@ -2711,3 +2711,369 @@ Ubuntu Server 24.04 LTS
 > 🚀 **Project Status:** Second Linux Virtual Machine (VM-02) Successfully Deployed.
 
 ---
+
+# 🚨 VM-02 Deployment Troubleshooting Guide
+
+> **Document:** `26.1-VM02-Troubleshooting-Guide.md`
+
+![Terraform](https://img.shields.io/badge/Terraform-Troubleshooting-7B42BC?style=for-the-badge&logo=terraform)
+![Azure](https://img.shields.io/badge/Azure-VM-0078D4?style=for-the-badge&logo=microsoftazure)
+![Linux](https://img.shields.io/badge/Linux-Debug-E95420?style=for-the-badge&logo=linux)
+
+---
+
+# 📖 Introduction
+
+Enterprise Environment में Terraform Code पहली बार में शायद ही बिना Error के Deploy होता है।
+
+एक अच्छे Cloud Engineer की पहचान केवल Code लिखने से नहीं बल्कि Error को पढ़कर उसका Root Cause समझने और उसे Resolve करने से होती है।
+
+इस Chapter में VM-02 Deploy करते समय आने वाले Common Errors और उन्हें Troubleshoot करने की पूरी प्रक्रिया दी गई है।
+
+---
+
+# 🎯 Troubleshooting Workflow
+
+```text
+terraform fmt
+        │
+        ▼
+terraform validate
+        │
+        ▼
+terraform plan
+        │
+        ▼
+Error आया?
+        │
+        ▼
+Error Message पढ़ो
+        │
+        ▼
+Code Fix करो
+        │
+        ▼
+terraform plan
+        │
+        ▼
+terraform apply
+```
+
+---
+
+# 🔍 Step 1 - Code Formatting Check
+
+Command
+
+```bash
+terraform fmt
+```
+
+## इसका उद्देश्य
+
+- Code को Proper Format में लाता है।
+- Indentation Automatically ठीक करता है।
+- Team के सभी Developers का Code एक जैसा दिखाई देता है।
+
+---
+
+# 🔍 Step 2 - Syntax Validation
+
+Command
+
+```bash
+terraform validate
+```
+
+## इसका उद्देश्य
+
+Terraform केवल Code की Syntax Check करता है।
+
+यह Azure में कोई Resource Create नहीं करता।
+
+---
+
+# 🔍 Step 3 - Execution Plan
+
+Command
+
+```bash
+terraform plan
+```
+
+## इसका उद्देश्य
+
+Terraform बताता है
+
+- कौन सा Resource बनेगा
+- कौन सा Update होगा
+- कौन सा Delete होगा
+
+Azure में अभी कोई बदलाव नहीं होता।
+
+---
+
+# 🔍 Step 4 - Deploy Resources
+
+Command
+
+```bash
+terraform apply
+```
+
+## इसका उद्देश्य
+
+Terraform वास्तव में Azure Resources Create करता है।
+
+---
+
+# 🚨 Error 1 - Invalid Index
+
+Error
+
+```text
+Error: Invalid index
+
+subnet_id = azurerm_subnet.subnet["subnet-vm02"].id
+```
+
+---
+
+## इसका मतलब
+
+Terraform को
+
+```text
+subnet-vm02
+```
+
+नाम की कोई Key नहीं मिली।
+
+---
+
+## Root Cause
+
+हमने Subnet Create करते समय
+
+```hcl
+for_each = {
+
+GatewaySubnet = ...
+
+AzureBastionSubnet = ...
+
+Management = ...
+
+StreamFlix = ...
+
+}
+```
+
+Use किया था।
+
+यहाँ
+
+```text
+StreamFlix
+```
+
+Key है।
+
+लेकिन VM में Reference दिया
+
+```hcl
+subnet["subnet-vm02"]
+```
+
+जो मौजूद ही नहीं था।
+
+---
+
+## Solution
+
+गलत
+
+```hcl
+subnet_id = azurerm_subnet.subnet["subnet-vm02"].id
+```
+
+सही
+
+```hcl
+subnet_id = azurerm_subnet.subnet["StreamFlix"].id
+```
+
+---
+
+# 💡 यह Error क्यों आया?
+
+Terraform हमेशा
+
+```text
+for_each
+```
+
+की Key से Resource खोजता है।
+
+Azure Portal में दिखाई देने वाले Name से नहीं।
+
+---
+
+# 🔍 Subnet Keys कैसे Check करें?
+
+PowerShell
+
+```powershell
+Select-String -Path .\main.tf -Pattern 'for_each|subnet\['
+```
+
+यह Command बताएगी
+
+- कहाँ for_each लिखा है
+- कहाँ Subnet Reference हो रहा है
+
+---
+
+# 🔍 किसी Resource का Name कैसे खोजें?
+
+PowerShell
+
+```powershell
+Select-String -Path .\main.tf -Pattern 'resource'
+```
+
+---
+
+# 🔍 किसी Variable को खोजें
+
+PowerShell
+
+```powershell
+Select-String -Path .\main.tf -Pattern 'variable'
+```
+
+---
+
+# 🔍 किसी Resource का Reference खोजें
+
+PowerShell
+
+```powershell
+Select-String -Path .\main.tf -Pattern 'azurerm_subnet'
+```
+
+---
+
+# 🔍 Terraform State Check
+
+Command
+
+```bash
+terraform state list
+```
+
+## इसका उद्देश्य
+
+Terraform State में कौन-कौन से Resources मौजूद हैं यह दिखाता है।
+
+---
+
+# 🔍 Resource Details
+
+Command
+
+```bash
+terraform state show azurerm_subnet.subnet["StreamFlix"]
+```
+
+## इसका उद्देश्य
+
+किसी एक Resource की पूरी Configuration दिखाता है।
+
+---
+
+# 🔍 Azure Resources Refresh
+
+Command
+
+```bash
+terraform refresh
+```
+
+## इसका उद्देश्य
+
+Azure Portal और Terraform State को Sync करता है।
+
+---
+
+# 🔍 Dependency Graph
+
+Command
+
+```bash
+terraform graph
+```
+
+## इसका उद्देश्य
+
+Resources की Dependency दिखाता है।
+
+---
+
+# 🔍 Destroy
+
+Command
+
+```bash
+terraform destroy
+```
+
+## इसका उद्देश्य
+
+Terraform द्वारा बनाए गए सभी Resources Delete करता है।
+
+---
+
+# 🧠 Debugging Tips
+
+✔ हमेशा Error की आखिरी Line पढ़ें।
+
+✔ Error में Resource Name पहचानें।
+
+✔ Resource का Reference Verify करें।
+
+✔ for_each की Key और Reference एक जैसे होने चाहिए।
+
+✔ Apply करने से पहले हमेशा Plan देखें।
+
+✔ Production में बिना Plan के Apply न करें।
+
+---
+
+# 📚 आपने क्या सीखा?
+
+- ✅ terraform fmt
+- ✅ terraform validate
+- ✅ terraform plan
+- ✅ terraform apply
+- ✅ terraform state list
+- ✅ terraform state show
+- ✅ terraform refresh
+- ✅ terraform graph
+- ✅ Invalid Index Error Resolve करना
+- ✅ for_each Key और Resource Reference समझना
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `26-Deploy-Second-Linux-Virtual-Machine-VM02.md` | `README.md` | `27-Create-Azure-Bastion-and-Secure-VM-Access.md` |
+
+---
+
+> 🚀 **Project Status:** VM-02 Troubleshooting Guide Completed Successfully.
+
+---
+
