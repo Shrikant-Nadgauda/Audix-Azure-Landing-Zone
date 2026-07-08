@@ -790,11 +790,11 @@ resource "azurerm_network_interface" "vm02_nic" {
 
     # IP Configuration का Logical Name।
 
-   subnet_id = azurerm_subnet.subnet["StreamFlix"].id
+    subnet_id = azurerm_subnet.subnet["StreamFlix"].id
 
-# "StreamFlix" हमारी for_each Map की Key है।
-# VM-02 इसी Subnet में Deploy होगी।
-# Reference हमेशा for_each की Key से किया जाता है।
+    # "StreamFlix" हमारी for_each Map की Key है।
+    # VM-02 इसी Subnet में Deploy होगी।
+    # Reference हमेशा for_each की Key से किया जाता है।
 
     private_ip_address_allocation = "Dynamic"
 
@@ -899,4 +899,83 @@ resource "azurerm_linux_virtual_machine" "vm02" {
   }
 
 }
+
+
+
+
+
+resource "azurerm_public_ip" "bastion_pip" {
+
+  # Azure Bastion को Internet से Connect करने के लिए Dedicated Public IP बनाई जा रही है।
+
+  name = "pip-bastion-dev-southeastasia-audix-001"
+
+  # Azure Portal में दिखाई देने वाला Public IP का नाम।
+
+  location = azurerm_resource_group.rg.location
+
+  # Public IP उसी Region में बनेगी जहाँ Resource Group है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+  # Public IP हमारे Resource Group के अंदर Create होगी।
+
+  allocation_method = "Static"
+
+  # Static Public IP हमेशा एक ही रहती है।
+  # Bastion के लिए Static IP Recommended है।
+
+  sku = "Standard"
+
+  # Azure Bastion केवल Standard SKU Public IP को Support करता है।
+  # Basic SKU यहाँ काम नहीं करेगी।
+
+}
+
+
+
+resource "azurerm_bastion_host" "bastion" {
+
+  # Azure Bastion Resource Create की जा रही है।
+  # इसके माध्यम से Browser से Secure SSH/RDP करेंगे।
+
+  name = "bas-dev-southeastasia-audix-001"
+
+  # Azure Portal में Bastion का नाम।
+
+  location = azurerm_resource_group.rg.location
+
+  # Bastion उसी Region में बनेगा जहाँ Resource Group है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+  # Bastion हमारे Resource Group में Create होगा।
+
+  sku = "Standard"
+
+  # Standard SKU Enterprise Environment के लिए Recommended है।
+
+  ip_configuration {
+
+    # Bastion की Network Configuration Define की जा रही है।
+
+    name = "bastion-ip-config"
+
+    # Bastion IP Configuration का Logical Name।
+
+    subnet_id = azurerm_subnet.subnet["AzureBastionSubnet"].id
+
+    # Bastion केवल AzureBastionSubnet में ही Deploy हो सकता है।
+    # इसलिए उसी Subnet का Reference दिया गया है।
+
+    public_ip_address_id = azurerm_public_ip.bastion_pip.id
+
+    # अभी जो Bastion Public IP बनाई थी उसे यहाँ Attach किया जा रहा है।
+
+  }
+
+}
+
+
+
 
