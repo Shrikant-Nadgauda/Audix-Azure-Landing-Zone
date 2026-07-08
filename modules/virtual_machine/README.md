@@ -1086,9 +1086,374 @@ Website Display
 
 ---
 
+# 🎬 Clone and Deploy StreamFlix Application on Azure Linux VM
+
+> **Document:** `23-Clone-and-Deploy-StreamFlix-Application.md`
+
+![Git](https://img.shields.io/badge/Git-Version%20Control-F05032?style=for-the-badge&logo=git)
+![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)
+![Nginx](https://img.shields.io/badge/Nginx-Web%20Server-009639?style=for-the-badge&logo=nginx)
+![Azure](https://img.shields.io/badge/Azure-Linux%20VM-0078D4?style=for-the-badge&logo=microsoftazure)
+
+---
+
+# 📖 Introduction
+
+अब तक हमने
+
+- ✅ Azure Linux VM Deploy की
+- ✅ SSH Login किया
+- ✅ Nginx Install किया
+- ✅ पहली HTML Website Host की
+
+लेकिन Enterprise में Developers HTML File Copy नहीं करते।
+
+वे अपना Source Code GitHub पर Push करते हैं और Server उस Repository को Clone करता है।
+
+इसी Process को हम इस Chapter में सीखेंगे।
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे
+
+- Git Install Verify करना
+- GitHub Repository Clone करना
+- Website Files को Nginx Directory में Copy करना
+- Browser से Website Access करना
+- Git Pull द्वारा Future Updates लेना
+
+---
+
+# 🏗️ Architecture
+
+```text
+Developer
+
+      │
+
+      ▼
+
+GitHub Repository
+
+      │
+
+      ▼
+
+Git Clone
+
+      │
+
+      ▼
+
+Ubuntu VM
+
+      │
+
+      ▼
+
+/var/www/html
+
+      │
+
+      ▼
+
+Nginx
+
+      │
+
+      ▼
+
+Browser
+```
+
+---
+
+# 📌 Step 1 - SSH Login
+
+```bash
+ssh azureuser@<PUBLIC-IP>
+```
+
+Example
+
+```bash
+ssh azureuser@20.xx.xx.xx
+```
+
+---
+
+# 📌 Step 2 - Verify Git
+
+```bash
+git --version
+```
+
+Expected Output
+
+```text
+git version 2.x.x
+```
+
+यदि Git Installed नहीं है
+
+```bash
+sudo apt update
+
+sudo apt install git -y
+```
+
+---
+
+# 📌 Step 3 - Home Directory में जाएँ
+
+```bash
+cd ~
+
+pwd
+```
+
+Expected
+
+```text
+/home/azureuser
+```
+
+---
+
+# 📌 Step 4 - GitHub Repository Clone करें
+
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+```
+
+Example
+
+```bash
+git clone https://github.com/<username>/streamflix.git
+```
+
+---
+
+# 📌 Step 5 - Verify Repository
+
+```bash
+ls
+```
+
+Expected
+
+```text
+streamflix
+```
+
+---
+
+# 📌 Step 6 - Repository के अंदर जाएँ
+
+```bash
+cd streamflix
+```
+
+Check करें
+
+```bash
+ls -la
+```
+
+Expected
+
+```text
+index.html
+
+css/
+
+js/
+
+images/
+```
+
+---
+
+# 📌 Step 7 - Nginx Directory Clean करें
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+Verify
+
+```bash
+ls /var/www/html
+```
+
+Folder Empty होना चाहिए।
+
+---
+
+# 📌 Step 8 - Website Copy करें
+
+```bash
+sudo cp -r * /var/www/html/
+```
+
+---
+
+# 📌 Step 9 - Verify Website Files
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+index.html
+
+css
+
+js
+
+images
+```
+
+---
+
+# 📌 Step 10 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+Status Check करें
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+active (running)
+```
+
+---
+
+# 📌 Step 11 - Browser Test
+
+Browser में जाएँ
+
+```text
+http://<PUBLIC-IP>
+```
+
+अब आपकी StreamFlix Website दिखाई देगी।
+
+---
+
+# 📌 Step 12 - Future Update
+
+यदि Developer GitHub पर नया Code Push करता है
+
+तो केवल
+
+```bash
+cd ~/streamflix
+
+git pull
+```
+
+फिर
+
+```bash
+sudo cp -r * /var/www/html/
+
+sudo systemctl restart nginx
+```
+
+बस Website Update हो जाएगी।
+
+---
+
+# 🏗️ Deployment Flow
+
+```text
+Developer
+
+      │
+
+git push
+
+      │
+
+      ▼
+
+GitHub Repository
+
+      │
+
+git clone / git pull
+
+      │
+
+      ▼
+
+Ubuntu VM
+
+      │
+
+Copy Files
+
+      │
+
+      ▼
+
+/var/www/html
+
+      │
+
+      ▼
+
+Nginx
+
+      │
+
+      ▼
+
+Browser
+```
+
+---
+
+# 🎯 आपने क्या सीखा?
+
+- ✅ Git Install Verify करना
+- ✅ GitHub Repository Clone करना
+- ✅ Nginx में Website Deploy करना
+- ✅ Browser से Website Access करना
+- ✅ Git Pull द्वारा Future Updates लेना
+- ✅ Real World Deployment Workflow समझना
+
+---
+
+# 📚 Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `22-Host-First-Website-on-Nginx.md` | `README.md` | `24-Build-Custom-Animal-Care-Foundation-Website.md` |
+
+---
+
+> 🚀 **Project Status:** StreamFlix Application Successfully Deployed from GitHub Repository to Azure Linux Virtual Machine.
+
+
+
+---
+
 # 🐾 Build a Custom Animal Medical Care Website on Nginx
 
-> **Document:** `23-Build-Custom-Animal-Medical-Care-Website.md`
+> **Document:** `24-Build-Custom-Animal-Medical-Care-Website.md`
 
 ![Nginx](https://img.shields.io/badge/Nginx-Web%20Server-009639?style=for-the-badge&logo=nginx)
 ![Ubuntu](https://img.shields.io/badge/Ubuntu-24.04_LTS-E95420?style=for-the-badge&logo=ubuntu)
