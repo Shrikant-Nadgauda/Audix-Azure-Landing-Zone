@@ -9232,7 +9232,6 @@ Animal-Care-Foundation
 ```powershell
 code .
 ```
-
 ---
 
 # Step 6 - Update index.html
@@ -9437,7 +9436,8 @@ color:white;
 padding:25px;
 text-align:center;
 }
-```---
+```
+---
 
 # Step 8 - Update script.js
 
@@ -9475,9 +9475,7 @@ GitHub
 
 https://github.com/Shrikant-Nadgauda
 ```
-
 ---
-
 # Step 10 - Test Website
 
 Double Click
@@ -9491,7 +9489,6 @@ Expected
 ```text
 Animal Care Foundation Homepage Opens Successfully
 ```
-
 ---
 
 # Step 11 - Verify Files
@@ -9515,7 +9512,6 @@ Animal-Care-Foundation
 ├── images
 └── js
 ```
-
 ---
 
 # Lab Summary
@@ -9555,10 +9551,7 @@ git commit -m "Added Lab 28.1.3 - Create Animal Care Foundation website"
 
 git push origin main
 ```
-
 ---
-
-
 # 28.1.4 - Create Anmol Jivan Foundation Website
 
 > **Objective**
@@ -9568,9 +9561,7 @@ git push origin main
 > यह Website गरीब बच्चों, अनाथ बच्चों, शिक्षा, भोजन, स्वास्थ्य और समाज सेवा पर आधारित होगी।
 >
 > आगे यही Website Azure VM-02 पर Host होगी।
-
 ---
-
 # Architecture
 
 ```text
@@ -9642,7 +9633,6 @@ mkdir Anmol-Jivan-Foundation
 
 cd Anmol-Jivan-Foundation
 ```
-
 ---
 
 # Step 3 - Create Folder Structure
@@ -9900,7 +9890,6 @@ text-align:center;
 }
 
 ```
-
 ---
 
 # Step 8 - Update script.js
@@ -9941,10 +9930,7 @@ GitHub
 
 https://github.com/Shrikant-Nadgauda
 
-
------
-
-
+----
 # 28.1.5 - Create GitHub Repositories and Push All Three Websites
 
 > **Objective**
@@ -10014,7 +10000,6 @@ Git Clone
 
 Nginx
 ```
-
 ---
 
 # Step 1 - Open GitHub
@@ -10100,9 +10085,7 @@ Save-Trees-Foundation
 
 Anmol-Jivan-Foundation
 ```
-
 ---
-
 # Step 3 - Open Animal Care Project
 
 PowerShell
@@ -10152,7 +10135,6 @@ origin
 
 https://github.com/Shrikant-Nadgauda/Animal-Care-Foundation.git
 ```
-
 ---
 
 # Step 7 - Push
@@ -10266,7 +10248,6 @@ Your branch is up to date.
 
 nothing to commit, working tree clean
 ```
-
 ---
 
 # Common Errors
@@ -10400,11 +10381,7 @@ git commit -m "Added Lab 28.1.5 - Create GitHub repositories and push all NGO we
 
 git push origin main
 ```
-
-
 -----
-
-
 # 29 - Clone All Three Websites on Azure VM-02
 
 > **Objective**
@@ -10897,12 +10874,7 @@ git commit -m "Added Lab 29 - Clone all NGO websites on Azure VM-02"
 
 git push origin main
 ```
-
-
-
 -----
-
-
 # 32 - Configure Nginx Virtual Hosts
 
 > **Objective**
