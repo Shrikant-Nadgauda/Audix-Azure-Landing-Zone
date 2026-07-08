@@ -295,3 +295,293 @@ resource "azurerm_network_security_group" "nsg" {
 
 
 
+resource "azurerm_network_security_rule" "allow_ssh" {
+
+# यह Rule SSH Traffic (Port 22) Allow करेगा।
+# इसी Rule की सहायता से हम VM-01 में SSH Login कर पाएँगे।
+
+  name = "Allow-SSH"
+
+# Rule का नाम।
+
+  priority = 100
+
+# Priority जितनी छोटी होगी, Rule उतना पहले Execute होगा।
+# Azure NSG Rules 100 से 4096 तक Priority स्वीकार करते हैं।
+
+  direction = "Inbound"
+
+# Internet से VM की तरफ आने वाले Traffic के लिए यह Rule लागू होगा।
+
+  access = "Allow"
+
+# Traffic Allow किया जाएगा।
+# यदि Deny लिखेंगे तो Traffic Block हो जाएगा।
+
+  protocol = "Tcp"
+
+# SSH केवल TCP Protocol का उपयोग करता है।
+
+  source_port_range = "*"
+
+# Client किसी भी Source Port से Connect हो सकता है।
+
+  destination_port_range = "22"
+
+# VM पर Port 22 Open किया जा रहा है।
+
+  source_address_prefix = "*"
+
+# किसी भी Source IP से SSH Allow होगा।
+# Production में यहाँ अपनी Public IP देना Best Practice है।
+
+  destination_address_prefix = "*"
+
+# यह Rule NSG से जुड़े सभी Resources पर लागू होगा।
+
+  resource_group_name         = azurerm_resource_group.rg.name
+
+# Rule इसी Resource Group में बनेगा।
+
+  network_security_group_name = azurerm_network_security_group.nsg.name
+
+# यह Rule हमारे NSG के अंदर Add होगा।
+# NSG का Reference होने के कारण Terraform पहले NSG बनाएगा फिर Rule।
+# इसे Implicit Dependency कहते हैं।
+
+}
+
+
+
+resource "azurerm_network_security_rule" "allow_http" {
+
+# यह Rule HTTP Traffic (Port 80) Allow करेगा।
+# आगे Nginx Website इसी Port पर चलेगी।
+
+  name = "Allow-HTTP"
+
+  priority = 110
+
+# प्रत्येक Rule की Priority Unique होनी चाहिए।
+
+  direction = "Inbound"
+
+  access = "Allow"
+
+  protocol = "Tcp"
+
+  source_port_range = "*"
+
+  destination_port_range = "80"
+
+# HTTP Port
+
+  source_address_prefix = "*"
+
+  destination_address_prefix = "*"
+
+  resource_group_name         = azurerm_resource_group.rg.name
+
+  network_security_group_name = azurerm_network_security_group.nsg.name
+
+}
+
+
+
+resource "azurerm_network_security_rule" "allow_https" {
+
+# यह Rule HTTPS Traffic (Port 443) Allow करेगा।
+# भविष्य में SSL Certificate लगाने के बाद Website इसी Port पर खुलेगी।
+
+  name = "Allow-HTTPS"
+
+  priority = 120
+
+  direction = "Inbound"
+
+  access = "Allow"
+
+  protocol = "Tcp"
+
+  source_port_range = "*"
+
+  destination_port_range = "443"
+
+# HTTPS Port
+
+  source_address_prefix = "*"
+
+  destination_address_prefix = "*"
+
+  resource_group_name         = azurerm_resource_group.rg.name
+
+  network_security_group_name = azurerm_network_security_group.nsg.name
+
+}
+
+
+
+resource "azurerm_public_ip" "pip_vm01" {
+
+# यह Azure Public IP Address Create करेगा।
+# Public IP की सहायता से Internet से Azure Resources तक पहुँच बनाई जाती है।
+# अभी यह Public IP VM-01 के साथ Attach होगी ताकि हम SSH द्वारा Login कर सकें।
+# बाद में इसी Public IP का उपयोग Nginx Website Access करने के लिए भी करेंगे।
+
+  name = "pip-dev-southeastasia-audix-001"
+
+# Enterprise Naming Convention
+# pip = Public IP
+# dev = Environment
+# southeastasia = Azure Region
+# audix = Company Name
+# 001 = Resource Number
+
+  location = azurerm_resource_group.rg.location
+
+# Public IP उसी Azure Region में Create होगी जहाँ हमारा Resource Group है।
+# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# Public IP इसी Resource Group के अंदर Create होगी।
+# Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
+
+  allocation_method = "Static"
+
+# Public IP दो प्रकार की होती है।
+#
+# Static
+# VM Restart होने पर भी Public IP नहीं बदलती।
+# Production Environment में यही उपयोग की जाती है।
+#
+# Dynamic
+# VM Restart या Recreate होने पर IP बदल सकती है।
+# Learning और Temporary Environment के लिए उपयोग होती है।
+#
+# हमारी Website, DNS और Cloudflare इसी IP पर Point करेंगे।
+# इसलिए Static Public IP आवश्यक है।
+
+  sku = "Standard"
+
+# Azure में मुख्यतः दो प्रकार की Public IP SKU होती हैं।
+#
+# Basic
+# पुरानी Generation
+# धीरे-धीरे Deprecate हो रही है।
+#
+# Standard
+# अधिक Secure
+# Zone Redundant Support
+# Enterprise Projects में Recommended
+#
+# इसलिए हमेशा Standard SKU का उपयोग करेंगे।
+
+  idle_timeout_in_minutes = 4
+
+# यदि 4 मिनट तक कोई Network Activity नहीं होती,
+# तो Idle Connection Close हो जाएगी।
+# आवश्यकता अनुसार इसे 4 से 30 मिनट तक बढ़ाया जा सकता है।
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# depends_on = [azurerm_resource_group.rg]
+
+# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+# Resource Group का Reference होने के कारण Terraform स्वयं समझ जाता है
+# कि पहले Resource Group Create होगा फिर Public IP।
+# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+
+}
+
+
+
+resource "azurerm_public_ip" "pip_vm01" {
+
+# यह Azure Public IP Address Create करेगा।
+# Public IP की सहायता से Internet से Azure Resources तक पहुँच बनाई जाती है।
+# अभी यह Public IP VM-01 के साथ Attach होगी ताकि हम SSH द्वारा Login कर सकें।
+# बाद में इसी Public IP का उपयोग Nginx Website Access करने के लिए भी करेंगे।
+
+  name = "pip-dev-southeastasia-audix-001"
+
+# Enterprise Naming Convention
+# pip = Public IP
+# dev = Environment
+# southeastasia = Azure Region
+# audix = Company Name
+# 001 = Resource Number
+
+  location = azurerm_resource_group.rg.location
+
+# Public IP उसी Azure Region में Create होगी जहाँ हमारा Resource Group है।
+# Resource Group का Reference देने से Implicit Dependency अपने आप बन जाती है।
+
+  resource_group_name = azurerm_resource_group.rg.name
+
+# Public IP इसी Resource Group के अंदर Create होगी।
+# Hardcode Name लिखने के बजाय Resource Reference देना Best Practice है।
+
+  allocation_method = "Static"
+
+# Public IP दो प्रकार की होती है।
+#
+# Static
+# VM Restart होने पर भी Public IP नहीं बदलती।
+# Production Environment में यही उपयोग की जाती है।
+#
+# Dynamic
+# VM Restart या Recreate होने पर IP बदल सकती है।
+# Learning और Temporary Environment के लिए उपयोग होती है।
+#
+# हमारी Website, DNS और Cloudflare इसी IP पर Point करेंगे।
+# इसलिए Static Public IP आवश्यक है।
+
+  sku = "Standard"
+
+# Azure में मुख्यतः दो प्रकार की Public IP SKU होती हैं।
+#
+# Basic
+# पुरानी Generation
+# धीरे-धीरे Deprecate हो रही है।
+#
+# Standard
+# अधिक Secure
+# Zone Redundant Support
+# Enterprise Projects में Recommended
+#
+# इसलिए हमेशा Standard SKU का उपयोग करेंगे।
+
+  idle_timeout_in_minutes = 4
+
+# यदि 4 मिनट तक कोई Network Activity नहीं होती,
+# तो Idle Connection Close हो जाएगी।
+# आवश्यकता अनुसार इसे 4 से 30 मिनट तक बढ़ाया जा सकता है।
+
+  tags = {
+
+    Environment = "Development"
+    Project     = "Azure Landing Zone"
+    Owner       = "Audix"
+    ManagedBy   = "Terraform"
+
+  }
+
+# depends_on = [azurerm_resource_group.rg]
+
+# यहाँ Explicit Dependency की आवश्यकता नहीं है।
+# Resource Group का Reference होने के कारण Terraform स्वयं समझ जाता है
+# कि पहले Resource Group Create होगा फिर Public IP।
+# इसे Implicit Dependency कहते हैं और यही Best Practice है।
+
+}
+
+
+
