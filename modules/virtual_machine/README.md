@@ -3942,7 +3942,408 @@ sudo systemctl restart nginx
 ---
 
 
+# 🔒 Remove Public IP and Access VMs Privately
 
+> **Document:** `30-Remove-Public-IP-and-Access-VMs-Privately.md`
+
+![Azure](https://img.shields.io/badge/Azure-Networking-0078D4?style=for-the-badge&logo=microsoftazure)
+![Security](https://img.shields.io/badge/Security-Private_Access-success?style=for-the-badge)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-7B42BC?style=for-the-badge&logo=terraform)
+
+---
+
+# 📖 Introduction
+
+अब तक हमने
+
+- VM-01
+- VM-02
+
+को Public IP के माध्यम से Access किया।
+
+इसके बाद Azure Bastion Configure किया और Browser से Secure Login करना सीख लिया।
+
+अब Production Environment की तरफ एक और महत्वपूर्ण कदम बढ़ाते हैं।
+
+हम दोनों Virtual Machines से Public IP Remove करेंगे और केवल Azure Bastion के माध्यम से Login करेंगे।
+
+यही Enterprise Security की Best Practice है।
+
+---
+
+# 🎯 Objective
+
+इस Chapter में हम सीखेंगे
+
+- Public IP Remove क्यों करते हैं।
+- Public IP Remove करने से क्या होगा।
+- Terraform में Public IP कैसे Remove करें।
+- Azure Bastion से Login Verify करें।
+- Private Access Verify करें।
+
+---
+
+# 🏗️ Current Architecture
+
+```text
+                    Internet
+
+            ┌────────┴────────┐
+
+       Public IP          Public IP
+
+           │                  │
+
+         VM-01             VM-02
+
+           ▲                  ▲
+
+           └──── Azure Bastion ────┘
+```
+
+---
+
+# 🏗️ Target Architecture
+
+```text
+                    Internet
+
+                        │
+
+                        ▼
+
+                 Azure Bastion
+
+                        │
+
+        ┌───────────────┴──────────────┐
+
+        │                              │
+
+      VM-01                         VM-02
+
+   Private IP                    Private IP
+```
+
+---
+
+# Azure में Public IP क्यों हटाते हैं?
+
+Production Environment में Servers को Internet पर Direct Expose नहीं किया जाता।
+
+यदि किसी VM का Public IP Internet पर उपलब्ध है तो
+
+- Unauthorized Login Attempt हो सकते हैं।
+- Port Scanning हो सकती है।
+- Brute Force Attack हो सकते हैं।
+- Attack Surface बढ़ जाता है।
+
+इसलिए Enterprise Environment में Public IP हटाकर Bastion या VPN के माध्यम से Access किया जाता है।
+
+---
+
+# Step 1 - Verify Bastion
+
+Azure Portal
+
+```text
+Azure Bastion
+
+↓
+
+Status
+
+↓
+
+Running
+```
+
+यदि Bastion Running नहीं है तो Public IP Remove न करें।
+
+---
+
+# Step 2 - Verify VM Access
+
+पहले
+
+VM-01
+
+और
+
+VM-02
+
+दोनों में Azure Bastion से Login करके Verify करें।
+
+Commands
+
+```bash
+hostname
+```
+
+```bash
+whoami
+```
+
+```bash
+hostname -I
+```
+
+यदि दोनों VM Accessible हैं तभी अगले Step पर जाएँ।
+
+---
+
+# Step 3 - Remove Public IP from VM-01
+
+Terraform में
+
+VM-01 NIC Resource खोजें।
+
+पुराना Code
+
+```hcl
+public_ip_address_id = azurerm_public_ip.vm01_pip.id
+```
+
+इसे Comment कर दें।
+
+```hcl
+# public_ip_address_id = azurerm_public_ip.vm01_pip.id
+```
+
+या पूरी Line Remove कर दें।
+
+---
+
+# Step 4 - Remove Public IP from VM-02
+
+VM-02 NIC में
+
+```hcl
+public_ip_address_id = azurerm_public_ip.vm02_pip.id
+```
+
+को भी Remove करें।
+
+---
+
+# Step 5 - Terraform Plan
+
+```bash
+terraform plan
+```
+
+Expected
+
+```text
+NIC will be updated
+
+Public IP association removed
+```
+
+---
+
+# Step 6 - Apply Changes
+
+```bash
+terraform apply
+```
+
+Terraform केवल NIC Update करेगा।
+
+VM Delete नहीं होगी।
+
+---
+
+# Step 7 - Verify Azure Portal
+
+VM
+
+↓
+
+Networking
+
+↓
+
+Public IP
+
+Expected
+
+```text
+None
+```
+
+---
+
+# Step 8 - Verify Bastion Login
+
+Azure Portal
+
+↓
+
+Virtual Machine
+
+↓
+
+Connect
+
+↓
+
+Bastion
+
+Login करें।
+
+Expected
+
+```text
+Connected Successfully
+```
+
+---
+
+# Step 9 - Verify Private Network
+
+VM-01
+
+```bash
+hostname -I
+```
+
+Expected
+
+```text
+10.0.1.x
+```
+
+---
+
+VM-02
+
+```bash
+hostname -I
+```
+
+Expected
+
+```text
+10.0.2.x
+```
+
+---
+
+# Step 10 - Verify Website
+
+यदि आगे Load Balancer नहीं लगाया है तो
+
+Browser से Public IP द्वारा Website Open नहीं होगी।
+
+यह Expected Behavior है।
+
+अब केवल
+
+Azure Bastion
+
+↓
+
+SSH
+
+↓
+
+Nginx Check
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+active (running)
+```
+
+---
+
+# Enterprise Architecture
+
+```text
+                    Internet
+
+                        │
+
+                        ▼
+
+                 Azure Bastion
+
+                        │
+
+            Private Azure Network
+
+        ┌─────────────┴─────────────┐
+
+        │                           │
+
+      VM-01                     VM-02
+
+     No Public IP             No Public IP
+```
+
+---
+
+# Best Practices
+
+- Production VM पर Public IP न रखें।
+- Azure Bastion या VPN का उपयोग करें।
+- NSG में केवल आवश्यक Rules रखें।
+- Bastion Verify किए बिना Public IP Remove न करें।
+- SSH Keys सुरक्षित रखें।
+
+---
+
+# Common Mistakes
+
+❌ Bastion Verify किए बिना Public IP Remove करना।
+
+❌ VM Running Verify न करना।
+
+❌ Terraform Plan देखे बिना Apply करना।
+
+❌ Public IP Delete करने के बाद Browser से Website Open करने की कोशिश करना।
+
+---
+
+# आपने क्या सीखा?
+
+- Public IP Remove करना
+- NIC Update
+- Bastion आधारित Access
+- Private Networking
+- Enterprise Security Best Practices
+
+---
+
+# अगले Chapter में
+
+```text
+31-Host-Multiple-Websites-on-VM02.md
+```
+
+इस Chapter में
+
+- VM-02 पर Multiple Website Directories बनाएँगे।
+- Nginx Virtual Hosts Configure करेंगे।
+- Multiple Domains Host करेंगे।
+- Enterprise Web Hosting सीखेंगे।
+
+---
+
+# Chapter Navigation
+
+| ⬅️ Previous | 🏠 Home | ➡️ Next |
+|------------|---------|----------|
+| `29-Access-Virtual-Machines-Using-Azure-Bastion.md` | `README.md` | `31-Host-Multiple-Websites-on-VM02.md` |
+
+---
+
+> 🚀 **Project Status:** Public IP Removed Successfully - Secure Private Infrastructure Ready
 
 
 ---
