@@ -9437,9 +9437,7 @@ color:white;
 padding:25px;
 text-align:center;
 }
-```
-
----
+```---
 
 # Step 8 - Update script.js
 
@@ -9447,9 +9445,7 @@ text-align:center;
 console.log("Animal Care Foundation Loaded Successfully");
 
 alert("Welcome to Animal Care Foundation");
-```
-
----
+```---
 
 # Step 9 - Update README.md
 
@@ -9695,7 +9691,9 @@ code .
 Replace everything
 
 ```html
+
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -9900,6 +9898,7 @@ color:white;
 padding:25px;
 text-align:center;
 }
+
 ```
 
 ---
@@ -10710,6 +10709,7 @@ ls /var/www/anmol
 
 ```bash
 tree /var/www
+
 ```
 
 Expected
