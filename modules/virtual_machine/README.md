@@ -6505,6 +6505,4436 @@ git push origin main
 
 ----
 
+
+# 28.8 - Create Animal Care Foundation GitHub Repository (Part-1)
+
+> **Objective**
+>
+> इस Lab में हम अपनी पहली Website (**Animal Care Foundation**) को Local System पर Proper Project Structure में बनाएंगे और उसे Git Repository में Convert करेंगे।
+>
+> अगले Part में हम इसे GitHub पर Push करेंगे और फिर Azure VM-02 पर Clone करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- D Drive में Project Structure बनाना
+- VS Code में Project Open करना
+- Website Files Create करना
+- Git Repository Initialize करना
+- Git Status समझना
+- First Commit करना
+
+---
+
+# Architecture
+
+```text
+Windows Laptop
+        │
+        ▼
+D:\Projects
+        │
+        ▼
+Animal-Care-Foundation
+        │
+        ▼
+Git Repository
+        │
+        ▼
+GitHub Repository (Part-2)
+```
+
+---
+
+# Step 1 - Open D Drive
+
+Open **File Explorer**
+
+Go to
+
+```text
+D:
+```
+
+---
+
+# Step 2 - Create Projects Folder
+
+यदि पहले से मौजूद नहीं है तो Create करें
+
+```text
+D:\Projects
+```
+
+Expected
+
+```text
+D:
+│
+└── Projects
+```
+
+---
+
+# Step 3 - Create Website Project Folder
+
+Inside
+
+```text
+D:\Projects
+```
+
+Create Folder
+
+```text
+Animal-Care-Foundation
+```
+
+Expected Structure
+
+```text
+D:\Projects
+
+└── Animal-Care-Foundation
+```
+
+---
+
+# Step 4 - Open VS Code
+
+Open VS Code
+
+Go to
+
+```text
+File
+
+↓
+
+Open Folder
+```
+
+Select
+
+```text
+D:\Projects\Animal-Care-Foundation
+```
+
+---
+
+# Step 5 - Verify Empty Folder
+
+Explorer में Folder खाली होना चाहिए।
+
+```text
+Animal-Care-Foundation
+
+(empty)
+```
+
+---
+
+# Step 6 - Create Website Files
+
+Create
+
+```text
+index.html
+```
+
+Create
+
+```text
+style.css
+```
+
+Create
+
+```text
+script.js
+```
+
+Create
+
+```text
+README.md
+```
+
+Create Folder
+
+```text
+images
+```
+
+---
+
+# Step 7 - Final Project Structure
+
+Expected
+
+```text
+Animal-Care-Foundation
+
+│
+
+├── images/
+
+├── index.html
+
+├── style.css
+
+├── script.js
+
+└── README.md
+```
+
+---
+
+# Why This Structure?
+
+| File | Purpose |
+|------|----------|
+| index.html | Main Website |
+| style.css | Design |
+| script.js | JavaScript |
+| images | Images |
+| README.md | Documentation |
+
+---
+
+# Step 8 - Open Terminal
+
+VS Code
+
+```
+Terminal
+
+↓
+
+New Terminal
+```
+
+---
+
+# Step 9 - Verify Current Directory
+
+PowerShell
+
+```powershell
+pwd
+```
+
+Expected
+
+```text
+D:\Projects\Animal-Care-Foundation
+```
+
+---
+
+# Step 10 - Verify Files
+
+```powershell
+dir
+```
+
+Expected
+
+```text
+images
+
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+# Step 11 - Initialize Git Repository
+
+```bash
+git init
+```
+
+Expected
+
+```text
+Initialized empty Git repository
+```
+
+अब Project के अंदर Hidden Folder बनेगा
+
+```text
+.git
+```
+
+---
+
+# What is .git Folder?
+
+```text
+Animal-Care-Foundation
+
+│
+
+├── .git
+
+├── images
+
+├── index.html
+
+├── style.css
+
+├── script.js
+
+└── README.md
+```
+
+यही Folder पूरे Git Repository को Manage करता है।
+
+इसमें
+
+- Commit History
+- Branches
+- Tags
+- Configuration
+- Objects
+
+Store होते हैं।
+
+⚠️ इसे कभी Delete नहीं करना चाहिए।
+
+---
+
+# Step 12 - Check Git Status
+
+```bash
+git status
+```
+
+Expected
+
+```text
+No commits yet
+
+Untracked files:
+```
+
+---
+
+# Understanding Git Status
+
+अभी Git बोल रहा है
+
+> "मैंने Project देख लिया है लेकिन अभी किसी File को Track नहीं कर रहा।"
+
+यानी
+
+```text
+Files Exist
+
+✔
+
+Git Tracking
+
+✘
+```
+
+---
+
+# Step 13 - Stage All Files
+
+```bash
+git add .
+```
+
+`.` का मतलब
+
+```text
+Current Folder की सभी Files
+```
+
+---
+
+# Step 14 - Verify Again
+
+```bash
+git status
+```
+
+Expected
+
+```text
+Changes to be committed
+```
+
+अब Git बोल रहा है
+
+> "मैं Commit करने के लिए तैयार हूँ।"
+
+---
+
+# Git Workflow
+
+```text
+Working Directory
+
+        │
+
+git add .
+
+        │
+
+        ▼
+
+Staging Area
+
+        │
+
+git commit
+
+        │
+
+        ▼
+
+Local Repository
+```
+
+---
+
+# Step 15 - Create First Commit
+
+```bash
+git commit -m "Initial commit - Animal Care Foundation website"
+```
+
+Expected
+
+```text
+1 file changed...
+
+create mode...
+```
+
+---
+
+# Step 16 - Verify Commit
+
+```bash
+git log --oneline
+```
+
+Expected
+
+```text
+a1b2c3 Initial commit - Animal Care Foundation website
+```
+
+---
+
+# Current Architecture
+
+```text
+Windows Laptop
+
+      │
+
+      ▼
+
+Animal-Care-Foundation
+
+      │
+
+Git Repository
+
+      │
+
+Local Commit Completed
+```
+
+---
+
+# Verification Commands
+
+Current Folder
+
+```bash
+pwd
+```
+
+List Files
+
+```bash
+dir
+```
+
+Git Status
+
+```bash
+git status
+```
+
+Git Log
+
+```bash
+git log --oneline
+```
+
+---
+
+# Common Errors
+
+## Git Not Installed
+
+```text
+git is not recognized
+```
+
+Solution
+
+Install Git
+
+---
+
+## Wrong Folder
+
+```text
+fatal: not a git repository
+```
+
+Solution
+
+```bash
+cd D:\Projects\Animal-Care-Foundation
+```
+
+---
+
+## Nothing to Commit
+
+```text
+nothing to commit
+```
+
+Reason
+
+पहले से Commit हो चुका है।
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| D Drive Ready | ✅ |
+| Project Folder Created | ✅ |
+| Website Files Created | ✅ |
+| Git Initialized | ✅ |
+| Files Staged | ✅ |
+| First Commit Completed | ✅ |
+
+---
+
+# Next Lab
+
+```
+28.8-Part-2
+```
+
+हम सीखेंगे
+
+- GitHub Repository Create करना
+- Remote Add करना
+- Push करना
+- README Update
+- GitHub Verification
+- Common Push Errors
+- Troubleshooting
+- Enterprise Best Practices
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.8 Part-1 - Create Animal Care Foundation local Git repository"
+
+git push origin main
+```
+
+---
+
+
+# 28.8 - Create Animal Care Foundation GitHub Repository (Part-2)
+
+> **Objective**
+>
+> इस Lab में हम Local Git Repository को GitHub Repository से Connect करेंगे, पहली बार Code Push करेंगे और Repository को Production Ready बनाएंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- GitHub Repository Create करना
+- Local Repository को Remote से Connect करना
+- First Push करना
+- GitHub Repository Verify करना
+- Common Git Errors Fix करना
+- Production Git Workflow
+
+---
+
+# Architecture
+
+```text
+Windows Laptop
+
+        │
+
+        ▼
+
+Animal-Care-Foundation
+
+        │
+
+Git Repository
+
+        │
+
+git push
+
+        │
+
+        ▼
+
+GitHub Repository
+
+        │
+
+        ▼
+
+Ready for Azure VM Deployment
+```
+
+---
+
+# Step 1 - Open GitHub
+
+Browser में जाएँ
+
+```
+https://github.com
+```
+
+Login करें।
+
+---
+
+# Step 2 - Create New Repository
+
+Click
+
+```
+New Repository
+```
+
+---
+
+# Step 3 - Repository Name
+
+Repository Name
+
+```
+Animal-Care-Foundation
+```
+
+Visibility
+
+```
+Public
+```
+
+---
+
+# Step 4 - Important
+
+इन Options को **Select नहीं करना है**
+
+❌ Add README
+
+❌ Add .gitignore
+
+❌ Add License
+
+क्यों?
+
+क्योंकि Local Repository पहले से बनी हुई है।
+
+यदि GitHub पर README बना दिया तो बाद में Push करते समय Conflict आ सकता है।
+
+---
+
+# Step 5 - Create Repository
+
+Click
+
+```
+Create Repository
+```
+
+अब GitHub Repository बन जाएगी।
+
+---
+
+# Step 6 - Copy Repository URL
+
+GitHub आपको ऐसा URL देगा
+
+```text
+https://github.com/<GitHub-Username>/Animal-Care-Foundation.git
+```
+
+इसे Copy करें।
+
+---
+
+# Step 7 - Verify Local Repository
+
+VS Code Terminal
+
+```bash
+git status
+```
+
+Expected
+
+```text
+nothing to commit, working tree clean
+```
+
+---
+
+# Step 8 - Add Remote Repository
+
+```bash
+git remote add origin https://github.com/<GitHub-Username>/Animal-Care-Foundation.git
+```
+
+---
+
+# What is Remote?
+
+Remote मतलब
+
+```
+Local Project
+
+↓
+
+GitHub Repository
+```
+
+अब Git को पता चल गया कि Code कहाँ भेजना है।
+
+---
+
+# Step 9 - Verify Remote
+
+```bash
+git remote -v
+```
+
+Expected
+
+```text
+origin  https://github.com/<GitHub-Username>/Animal-Care-Foundation.git (fetch)
+
+origin  https://github.com/<GitHub-Username>/Animal-Care-Foundation.git (push)
+```
+
+---
+
+# Step 10 - Rename Branch
+
+```bash
+git branch -M main
+```
+
+---
+
+# Why?
+
+आज लगभग सभी GitHub Repositories
+
+```
+main
+```
+
+Branch Use करती हैं।
+
+---
+
+# Step 11 - Push Code
+
+```bash
+git push -u origin main
+```
+
+Expected
+
+```text
+Enumerating objects...
+
+Writing objects...
+
+To https://github.com/...
+
+Branch 'main' set up to track 'origin/main'
+```
+
+---
+
+# Step 12 - Verify GitHub
+
+GitHub Repository Refresh करें।
+
+अब दिखाई देगा
+
+```text
+README.md
+
+index.html
+
+style.css
+
+script.js
+
+images/
+```
+
+अब Code Cloud में Store हो चुका है।
+
+---
+
+# Step 13 - Verify Tracking
+
+```bash
+git branch
+```
+
+Expected
+
+```text
+* main
+```
+
+---
+
+# Step 14 - Verify Remote Branch
+
+```bash
+git branch -vv
+```
+
+Expected
+
+```text
+* main xxxx [origin/main]
+```
+
+इसका मतलब
+
+Local Branch और GitHub Branch Sync हैं।
+
+---
+
+# Git Workflow
+
+```text
+Create File
+
+      │
+
+git add
+
+      │
+
+      ▼
+
+Staging Area
+
+      │
+
+git commit
+
+      │
+
+      ▼
+
+Local Repository
+
+      │
+
+git push
+
+      │
+
+      ▼
+
+GitHub Repository
+```
+
+---
+
+# Daily Workflow
+
+Website Update
+
+↓
+
+```bash
+git add .
+```
+
+↓
+
+```bash
+git commit -m "Updated homepage"
+```
+
+↓
+
+```bash
+git push
+```
+
+बस।
+
+---
+
+# Common Errors
+
+## Error 1
+
+```text
+remote origin already exists
+```
+
+Solution
+
+```bash
+git remote remove origin
+```
+
+फिर
+
+```bash
+git remote add origin https://github.com/<GitHub-Username>/Animal-Care-Foundation.git
+```
+
+---
+
+## Error 2
+
+```text
+Permission denied (publickey)
+```
+
+Reason
+
+SSH Key Configure नहीं है।
+
+HTTPS Remote Use करें
+
+या
+
+SSH Key Configure करें।
+
+---
+
+## Error 3
+
+```text
+failed to push some refs
+```
+
+Reason
+
+GitHub Repository में पहले से Files हैं।
+
+Solution
+
+```bash
+git pull origin main --rebase
+```
+
+फिर
+
+```bash
+git push
+```
+
+---
+
+## Error 4
+
+```text
+Repository not found
+```
+
+Check
+
+- Repository Name
+- GitHub Username
+- Repository Visibility
+
+---
+
+## Error 5
+
+```text
+fatal: not a git repository
+```
+
+Wrong Folder
+
+Solution
+
+```bash
+cd D:\Projects\Animal-Care-Foundation
+```
+
+---
+
+# Final Verification
+
+```bash
+git status
+```
+
+Expected
+
+```text
+Your branch is up to date with 'origin/main'
+
+nothing to commit
+```
+
+---
+
+# Enterprise Best Practice
+
+Project Structure
+
+```text
+D:\Projects
+
+│
+
+├── Animal-Care-Foundation
+
+├── Save-Trees-Foundation
+
+└── Anmol-Jivan-Foundation
+```
+
+हर Website
+
+- अपना Git Repository
+- अपना README
+- अपना Deployment
+- अपना Domain
+
+रखेगी।
+
+---
+
+# Final Architecture
+
+```text
+Developer
+
+     │
+
+     ▼
+
+VS Code
+
+     │
+
+     ▼
+
+Git
+
+     │
+
+     ▼
+
+GitHub
+
+     │
+
+     ▼
+
+Azure VM
+
+     │
+
+     ▼
+
+Nginx
+
+     │
+
+     ▼
+
+Browser
+```
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| GitHub Repository Created | ✅ |
+| Remote Added | ✅ |
+| Branch Renamed | ✅ |
+| First Push Completed | ✅ |
+| Repository Verified | ✅ |
+| Ready for Azure VM | ✅ |
+
+---
+
+# Next Lab
+
+```
+28.9 - Build Save Trees Foundation Website
+```
+
+इस Lab में हम अपनी दूसरी Social Impact Website बनाएँगे और फिर उसे भी GitHub पर Push करेंगे।
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.8 Part-2 - Connect local repository to GitHub and push source code"
+
+git push origin main
+```
+
+---
+
+# 🎉 Congratulations
+
+अब आपकी **Animal Care Foundation Website** केवल Local Project नहीं रही।
+
+अब यह:
+
+- ✅ Git Version Controlled है
+- ✅ GitHub पर सुरक्षित है
+- ✅ Team Collaboration के लिए Ready है
+- ✅ Azure VM पर `git clone` करने के लिए Ready है
+- ✅ CI/CD Pipeline और Future Deployments के लिए तैयार है
+
+
+---
+
+
+
+# 28.9 - Build Save Trees Foundation Website (Part-1)
+
+> **Objective**
+>
+> इस Lab में हम अपनी दूसरी Website **Save Trees Foundation** को Zero से बनाएंगे।
+>
+> यह Website Environment Awareness के लिए होगी।
+>
+> आगे चलकर यही Website Azure VM-02 पर Deploy होगी और Nginx Virtual Host से अलग Domain पर चलेगी।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- नया Website Project Create करना
+- Project Folder Structure बनाना
+- HTML, CSS, JavaScript Files बनाना
+- Git Repository Initialize करना
+- First Commit करना
+- Azure Deployment के लिए Project तैयार करना
+
+---
+
+# Final Architecture
+
+```text
+D:\Projects
+
+│
+
+├── Animal-Care-Foundation
+
+│
+
+└── Save-Trees-Foundation
+```
+
+---
+
+# Website Theme
+
+Website Name
+
+```text
+Save Trees Foundation
+```
+
+Mission
+
+```text
+Plant Trees
+
+Protect Nature
+
+Save Earth
+```
+
+---
+
+# Step 1 - Open D Drive
+
+Go to
+
+```text
+D:\Projects
+```
+
+---
+
+# Step 2 - Create Project Folder
+
+Create Folder
+
+```text
+Save-Trees-Foundation
+```
+
+Expected
+
+```text
+Projects
+
+│
+
+├── Animal-Care-Foundation
+
+└── Save-Trees-Foundation
+```
+
+---
+
+# Step 3 - Open VS Code
+
+Open Folder
+
+```text
+Save-Trees-Foundation
+```
+
+---
+
+# Step 4 - Create Files
+
+Create
+
+```text
+index.html
+```
+
+Create
+
+```text
+style.css
+```
+
+Create
+
+```text
+script.js
+```
+
+Create
+
+```text
+README.md
+```
+
+Create Folder
+
+```text
+images
+```
+
+---
+
+# Final Folder Structure
+
+```text
+Save-Trees-Foundation
+
+│
+
+├── images
+
+├── index.html
+
+├── style.css
+
+├── script.js
+
+└── README.md
+```
+
+---
+
+# Step 5 - Create Home Page
+
+Open
+
+```text
+index.html
+```
+
+Add Basic HTML Structure
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Save Trees Foundation</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<h1>Save Trees Foundation</h1>
+
+<p>Plant Trees • Save Earth • Protect Nature</p>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
+```
+
+Save
+
+---
+
+# Step 6 - Add CSS
+
+Open
+
+```text
+style.css
+```
+
+Example
+
+```css
+body{
+
+font-family:Arial;
+
+text-align:center;
+
+background:#eef8ee;
+
+}
+
+h1{
+
+color:green;
+
+}
+```
+
+---
+
+# Step 7 - Add JavaScript
+
+Open
+
+```text
+script.js
+```
+
+Example
+
+```javascript
+console.log("Save Trees Foundation Loaded");
+```
+
+---
+
+# Step 8 - Create README
+
+Open
+
+```text
+README.md
+```
+
+Example
+
+```text
+# Save Trees Foundation
+
+Environment Awareness Website
+
+Built using
+
+HTML
+
+CSS
+
+JavaScript
+```
+
+---
+
+# Step 9 - Verify Files
+
+Terminal
+
+```powershell
+dir
+```
+
+Expected
+
+```text
+images
+
+index.html
+
+style.css
+
+script.js
+
+README.md
+```
+
+---
+
+# Step 10 - Initialize Git
+
+```bash
+git init
+```
+
+---
+
+# Step 11 - Verify Status
+
+```bash
+git status
+```
+
+Expected
+
+```text
+Untracked files
+```
+
+---
+
+# Step 12 - Stage Files
+
+```bash
+git add .
+```
+
+---
+
+# Step 13 - Commit
+
+```bash
+git commit -m "Initial commit - Save Trees Foundation website"
+```
+
+---
+
+# Git Workflow
+
+```text
+Create Files
+
+↓
+
+git add .
+
+↓
+
+git commit
+
+↓
+
+Local Repository
+```
+
+---
+
+# Verify Commit
+
+```bash
+git log --oneline
+```
+
+Expected
+
+```text
+Initial commit
+```
+
+---
+
+# Common Errors
+
+## Git Not Installed
+
+```text
+git is not recognized
+```
+
+Install Git
+
+---
+
+## Wrong Folder
+
+```text
+fatal: not a git repository
+```
+
+Go to
+
+```text
+D:\Projects\Save-Trees-Foundation
+```
+
+---
+
+## Nothing To Commit
+
+```text
+nothing to commit
+```
+
+Files पहले ही Commit हो चुकी हैं।
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| Project Folder Created | ✅ |
+| HTML Created | ✅ |
+| CSS Created | ✅ |
+| JS Created | ✅ |
+| README Created | ✅ |
+| Git Initialized | ✅ |
+| First Commit Completed | ✅ |
+
+---
+
+# Next Lab
+
+```text
+29 - Create GitHub Repository for Save Trees Foundation
+```
+
+इस Lab में
+
+- GitHub Repository बनाएंगे
+- Remote Add करेंगे
+- First Push करेंगे
+- फिर Azure VM-02 पर Clone करेंगे।
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.9 - Build Save Trees Foundation website"
+
+git push origin main
+```
+
+---
+
+
+# 28.1.1 - Create GitHub Repository for Save Trees Foundation
+
+> **Objective**
+>
+> इस Lab में हम अपनी **Save Trees Foundation** Website को GitHub पर Upload करेंगे ताकि आगे Azure VM-02 पर आसानी से Deploy कर सकें।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- GitHub Repository Create करना
+- Local Repository को GitHub से Connect करना
+- Remote Add करना
+- First Push करना
+- GitHub Repository Verify करना
+- Azure Deployment के लिए Repository तैयार करना
+
+---
+
+# Architecture
+
+```text
+Windows Laptop
+
+        │
+
+        ▼
+
+Save-Trees-Foundation
+
+        │
+
+Git Repository
+
+        │
+
+git push
+
+        │
+
+        ▼
+
+GitHub Repository
+
+        │
+
+git clone
+
+        │
+
+        ▼
+
+Azure VM-02
+
+        │
+
+Nginx
+
+        │
+
+        ▼
+
+Website Live
+```
+
+---
+
+# Step 1 - Open GitHub
+
+Open Browser
+
+```
+https://github.com
+```
+
+Login करें।
+
+---
+
+# Step 2 - Create Repository
+
+Click
+
+```
+New Repository
+```
+
+---
+
+# Step 3 - Repository Details
+
+Repository Name
+
+```
+Save-Trees-Foundation
+```
+
+Visibility
+
+```
+Public
+```
+
+---
+
+# Step 4 - Do NOT Select
+
+इन Options को Tick मत करें
+
+```
+❌ Add README
+
+❌ Add .gitignore
+
+❌ Add License
+```
+
+क्योंकि Local Repository पहले से बनी हुई है।
+
+---
+
+# Step 5 - Create Repository
+
+Click
+
+```
+Create Repository
+```
+
+---
+
+# Step 6 - Copy HTTPS URL
+
+Example
+
+```text
+https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+Copy करें।
+
+---
+
+# Step 7 - Open VS Code
+
+Open Folder
+
+```
+D:\Projects\Save-Trees-Foundation
+```
+
+Open Terminal।
+
+---
+
+# Step 8 - Verify Git Repository
+
+```bash
+git status
+```
+
+Expected
+
+```text
+On branch main
+
+nothing to commit
+```
+
+---
+
+# Step 9 - Add Remote Repository
+
+```bash
+git remote add origin https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+---
+
+# Step 10 - Verify Remote
+
+```bash
+git remote -v
+```
+
+Expected
+
+```text
+origin
+
+(fetch)
+
+origin
+
+(push)
+```
+
+---
+
+# Step 11 - Rename Branch
+
+```bash
+git branch -M main
+```
+
+---
+
+# Step 12 - Push Code
+
+```bash
+git push -u origin main
+```
+
+Expected
+
+```text
+Enumerating objects...
+
+Writing objects...
+
+Done
+
+Branch 'main' set up to track origin/main
+```
+
+---
+
+# Step 13 - Verify GitHub
+
+Refresh Repository
+
+Expected Files
+
+```text
+README.md
+
+index.html
+
+style.css
+
+script.js
+
+images/
+```
+
+---
+
+# Step 14 - Verify Tracking
+
+```bash
+git branch -vv
+```
+
+Expected
+
+```text
+* main
+
+[origin/main]
+```
+
+---
+
+# Step 15 - Clone Repository on Azure VM-02
+
+Login to VM-02
+
+```bash
+cd ~
+
+git clone https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+---
+
+# Step 16 - Verify Clone
+
+```bash
+ls
+```
+
+Expected
+
+```text
+Save-Trees-Foundation
+```
+
+---
+
+# Step 17 - Verify Files
+
+```bash
+cd Save-Trees-Foundation
+
+ls
+```
+
+Expected
+
+```text
+README.md
+
+index.html
+
+style.css
+
+script.js
+
+images
+```
+
+---
+
+# Git Workflow
+
+```text
+VS Code
+
+      │
+
+git add .
+
+      │
+
+git commit
+
+      │
+
+git push
+
+      │
+
+GitHub
+
+      │
+
+git clone
+
+      │
+
+Azure VM
+
+      │
+
+Nginx
+
+      │
+
+Website Live
+```
+
+---
+
+# Common Errors
+
+## Remote Already Exists
+
+```text
+remote origin already exists
+```
+
+Solution
+
+```bash
+git remote remove origin
+
+git remote add origin https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+---
+
+## Permission Denied
+
+```text
+Permission denied (publickey)
+```
+
+Solution
+
+Use HTTPS Repository
+
+या
+
+SSH Key Configure करें।
+
+---
+
+## Repository Not Found
+
+```text
+Repository not found
+```
+
+Check
+
+- GitHub Username
+- Repository Name
+- Repository Visibility
+
+---
+
+## Push Rejected
+
+```text
+failed to push some refs
+```
+
+Solution
+
+```bash
+git pull origin main --rebase
+
+git push
+```
+
+---
+
+## Clone Failed
+
+```text
+fatal: destination path already exists
+```
+
+Solution
+
+```bash
+rm -rf Save-Trees-Foundation
+
+git clone https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+---
+
+# Final Verification
+
+Local
+
+```bash
+git status
+```
+
+Expected
+
+```text
+nothing to commit
+
+working tree clean
+```
+
+GitHub
+
+```
+Repository Visible
+```
+
+Azure VM
+
+```
+Repository Successfully Cloned
+```
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| GitHub Repository Created | ✅ |
+| Remote Added | ✅ |
+| First Push Completed | ✅ |
+| GitHub Verified | ✅ |
+| VM-02 Clone Successful | ✅ |
+| Ready for Nginx Deployment | ✅ |
+
+---
+
+# Next Lab
+
+```text
+29 - Deploy Save Trees Foundation Website on Azure VM-02
+```
+
+इस Lab में हम:
+
+- Website Files को `/var/www/html` में Copy करेंगे
+- Nginx Restart करेंगे
+- Browser से Website Verify करेंगे
+- फिर Multiple Website Hosting की तैयारी शुरू करेंगे।
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.1.1 - Create GitHub repository and clone Save Trees Foundation on Azure VM-02"
+
+git push origin main
+```
+
+---
+
+# 28.1.2 - Deploy Save Trees Foundation Website on Azure VM-02
+
+> **Objective**
+>
+> इस Lab में हम GitHub Repository से **Save Trees Foundation** Website को Azure VM-02 पर Deploy करेंगे और Nginx के माध्यम से Live करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- VM-02 में Login करना
+- GitHub Repository Clone करना
+- Website Files Verify करना
+- Nginx Default Website Remove करना
+- Website Files Deploy करना
+- Nginx Restart करना
+- Browser से Website Verify करना
+
+---
+
+# Deployment Architecture
+
+```text
+GitHub Repository
+
+        │
+
+git clone
+
+        │
+
+        ▼
+
+Azure VM-02
+
+        │
+
+Save-Trees-Foundation
+
+        │
+
+Copy Files
+
+        │
+
+        ▼
+
+/var/www/html
+
+        │
+
+Nginx
+
+        │
+
+        ▼
+
+Browser
+```
+
+---
+
+# Step 1 - Login to VM-02
+
+SSH Login
+
+```bash
+ssh azureuser@<VM02-Public-IP>
+```
+
+या
+
+Azure Bastion से Login करें।
+
+---
+
+# Step 2 - Go to Home Directory
+
+```bash
+cd ~
+```
+
+Verify
+
+```bash
+pwd
+```
+
+Expected
+
+```text
+/home/azureuser
+```
+
+---
+
+# Step 3 - Clone GitHub Repository
+
+```bash
+git clone https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+Expected
+
+```text
+Cloning into 'Save-Trees-Foundation'...
+Receiving objects...
+Resolving deltas...
+```
+
+---
+
+# Step 4 - Verify Repository
+
+```bash
+ls
+```
+
+Expected
+
+```text
+Save-Trees-Foundation
+```
+
+---
+
+# Step 5 - Verify Website Files
+
+```bash
+cd Save-Trees-Foundation
+
+ls
+```
+
+Expected
+
+```text
+README.md
+
+index.html
+
+style.css
+
+script.js
+
+images
+```
+
+---
+
+# Step 6 - Go Back
+
+```bash
+cd ~
+```
+
+---
+
+# Step 7 - Verify Existing Website
+
+```bash
+ls /var/www/html
+```
+
+यदि Default Nginx Website मौजूद है तो Remove करेंगे।
+
+---
+
+# Step 8 - Remove Existing Website
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+---
+
+# Step 9 - Verify Folder
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+(No Output)
+```
+
+---
+
+# Step 10 - Copy Website Files
+
+```bash
+sudo cp -r ~/Save-Trees-Foundation/* /var/www/html/
+```
+
+---
+
+# Step 11 - Verify Deployment
+
+```bash
+ls /var/www/html
+```
+
+Expected
+
+```text
+README.md
+
+index.html
+
+style.css
+
+script.js
+
+images
+```
+
+---
+
+# Step 12 - Check File Permissions
+
+```bash
+ls -la /var/www/html
+```
+
+Expected
+
+```text
+index.html
+
+style.css
+
+script.js
+```
+
+---
+
+# Step 13 - Restart Nginx
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+# Step 14 - Verify Nginx Status
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+Exit Status Screen
+
+```text
+Press q
+```
+
+---
+
+# Step 15 - Verify Browser
+
+Open
+
+```text
+http://<VM02-Public-IP>
+```
+
+Expected
+
+```text
+Save Trees Foundation Website
+```
+
+Website Successfully Loaded.
+
+---
+
+# Step 16 - Verify Using Curl
+
+```bash
+curl localhost
+```
+
+Expected
+
+```html
+<!DOCTYPE html>
+<html>
+...
+Save Trees Foundation
+...
+```
+
+---
+
+# Deployment Flow
+
+```text
+GitHub
+
+      │
+
+git clone
+
+      │
+
+VM-02
+
+      │
+
+Copy Files
+
+      │
+
+/var/www/html
+
+      │
+
+Restart Nginx
+
+      │
+
+Browser
+```
+
+---
+
+# Common Errors
+
+## Permission Denied
+
+```text
+Permission denied
+```
+
+Solution
+
+```bash
+sudo cp -r ~/Save-Trees-Foundation/* /var/www/html/
+```
+
+---
+
+## Repository Already Exists
+
+```text
+destination path already exists
+```
+
+Solution
+
+```bash
+rm -rf ~/Save-Trees-Foundation
+
+git clone https://github.com/<GitHub-Username>/Save-Trees-Foundation.git
+```
+
+---
+
+## Repository Not Found
+
+```text
+Repository not found
+```
+
+Check:
+
+- GitHub Username
+- Repository Name
+- Repository Visibility (Public)
+
+---
+
+## Nginx Not Running
+
+```text
+Failed to connect
+```
+
+Check
+
+```bash
+sudo systemctl status nginx
+```
+
+Start
+
+```bash
+sudo systemctl start nginx
+```
+
+Enable
+
+```bash
+sudo systemctl enable nginx
+```
+
+---
+
+## Website Not Updating
+
+Force Refresh Browser
+
+```
+Ctrl + F5
+```
+
+---
+
+## Default Nginx Page Still Showing
+
+Check Files
+
+```bash
+ls /var/www/html
+```
+
+Old Files Remove करें
+
+```bash
+sudo rm -rf /var/www/html/*
+```
+
+Copy Again
+
+```bash
+sudo cp -r ~/Save-Trees-Foundation/* /var/www/html/
+```
+
+Restart
+
+```bash
+sudo systemctl restart nginx
+```
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| SSH/Bastion Login | ✅ |
+| Repository Cloned | ✅ |
+| Website Verified | ✅ |
+| Old Files Removed | ✅ |
+| New Files Copied | ✅ |
+| Nginx Restarted | ✅ |
+| Website Live | ✅ |
+
+---
+
+# Next Lab
+
+```text
+32 - Configure Nginx Virtual Hosts
+```
+
+अगले Lab में हम एक ही VM-02 पर तीन अलग-अलग Websites Host करेंगे:
+
+- 🐾 Animal Care Foundation
+- 🌳 Save Trees Foundation
+- ❤️ Anmol Jivan Foundation
+
+प्रत्येक Website अपने अलग Domain और अलग Nginx Virtual Host के साथ चलेगी।
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 28.1.2 - Deploy Save Trees Foundation website on Azure VM-02"
+
+git push origin main
+```
+
+----
+
+
+# 32 - Configure Nginx Virtual Hosts
+
+> **Objective**
+>
+> इस Lab में हम एक ही **Azure VM-02** पर **Multiple Websites** Host करेंगे।
+>
+> प्रत्येक Website का अपना अलग **Document Root**, **Nginx Virtual Host Configuration** और भविष्य में अपना अलग **Domain Name** होगा।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- Nginx Virtual Host क्या होता है
+- Document Root क्या होता है
+- Multiple Websites कैसे Host होती हैं
+- Server Block कैसे बनाया जाता है
+- Nginx Configuration Verify करना
+- Nginx Reload करना
+
+---
+
+# Enterprise Architecture
+
+```text
+                    Internet
+                        │
+                        ▼
+                 Azure Public IP
+                        │
+                        ▼
+                    Nginx Server
+                        │
+        ┌───────────────┼───────────────┐
+        │               │               │
+        ▼               ▼               ▼
+ Animal Care      Save Trees      Anmol Jivan
+ Foundation       Foundation      Foundation
+
+/var/www/animal   /var/www/trees  /var/www/anmol
+```
+
+---
+
+# Current Situation
+
+अभी
+
+```text
+/var/www/html
+```
+
+में केवल एक Website चल रही है।
+
+लेकिन Enterprise Environment में प्रत्येक Website का अलग Folder होता है।
+
+---
+
+# Final Folder Structure
+
+```text
+/var/www
+
+│
+
+├── animal
+
+│      ├── index.html
+│      ├── style.css
+│      └── images
+
+│
+
+├── trees
+
+│      ├── index.html
+│      ├── style.css
+│      └── images
+
+│
+
+└── anmol
+
+       ├── index.html
+       ├── style.css
+       └── images
+```
+
+---
+
+# Final Nginx Structure
+
+```text
+/etc/nginx
+
+│
+
+├── nginx.conf
+
+│
+
+├── sites-available
+
+│      ├── animal.conf
+│      ├── trees.conf
+│      └── anmol.conf
+
+│
+
+└── sites-enabled
+
+       ├── animal.conf
+       ├── trees.conf
+       └── anmol.conf
+```
+
+---
+
+# Step 1 - Login to VM-02
+
+```bash
+ssh azureuser@<VM02-IP>
+```
+
+या
+
+Azure Bastion
+
+---
+
+# Step 2 - Create Website Directories
+
+```bash
+sudo mkdir -p /var/www/animal
+```
+
+```bash
+sudo mkdir -p /var/www/trees
+```
+
+```bash
+sudo mkdir -p /var/www/anmol
+```
+
+---
+
+# Step 3 - Verify
+
+```bash
+ls /var/www
+```
+
+Expected
+
+```text
+animal
+
+trees
+
+anmol
+
+html
+```
+
+---
+
+# Step 4 - Copy Animal Website
+
+```bash
+sudo cp -r ~/Animal-Care-Foundation/* /var/www/animal/
+```
+
+---
+
+# Step 5 - Copy Save Trees Website
+
+```bash
+sudo cp -r ~/Save-Trees-Foundation/* /var/www/trees/
+```
+
+---
+
+# Step 6 - Copy Anmol Jivan Website
+
+```bash
+sudo cp -r ~/Anmol-Jivan-Foundation/* /var/www/anmol/
+```
+
+---
+
+# Step 7 - Verify
+
+```bash
+ls /var/www/animal
+```
+
+```bash
+ls /var/www/trees
+```
+
+```bash
+ls /var/www/anmol
+```
+
+---
+
+# Step 8 - Create Animal Virtual Host
+
+```bash
+sudo nano /etc/nginx/sites-available/animal.conf
+```
+
+---
+
+Paste
+
+```nginx
+server {
+
+    listen 80;
+
+    server_name animal.local;
+
+    root /var/www/animal;
+
+    index index.html;
+
+    location / {
+
+        try_files $uri $uri/ =404;
+
+    }
+
+}
+```
+
+Save
+
+```
+CTRL + O
+
+Enter
+
+CTRL + X
+```
+
+---
+
+# Step 9 - Create Save Trees Virtual Host
+
+```bash
+sudo nano /etc/nginx/sites-available/trees.conf
+```
+
+Paste
+
+```nginx
+server {
+
+    listen 80;
+
+    server_name trees.local;
+
+    root /var/www/trees;
+
+    index index.html;
+
+    location / {
+
+        try_files $uri $uri/ =404;
+
+    }
+
+}
+```
+
+Save File.
+
+---
+
+# Step 10 - Create Anmol Jivan Virtual Host
+
+```bash
+sudo nano /etc/nginx/sites-available/anmol.conf
+```
+
+Paste
+
+```nginx
+server {
+
+    listen 80;
+
+    server_name anmol.local;
+
+    root /var/www/anmol;
+
+    index index.html;
+
+    location / {
+
+        try_files $uri $uri/ =404;
+
+    }
+
+}
+```
+
+---
+
+# Step 11 - Enable Sites
+
+```bash
+sudo ln -s /etc/nginx/sites-available/animal.conf /etc/nginx/sites-enabled/
+```
+
+```bash
+sudo ln -s /etc/nginx/sites-available/trees.conf /etc/nginx/sites-enabled/
+```
+
+```bash
+sudo ln -s /etc/nginx/sites-available/anmol.conf /etc/nginx/sites-enabled/
+```
+
+---
+
+# Step 12 - Verify Configuration
+
+```bash
+sudo nginx -t
+```
+
+Expected
+
+```text
+syntax is ok
+
+test is successful
+```
+
+---
+
+# Step 13 - Reload Nginx
+
+```bash
+sudo systemctl reload nginx
+```
+
+---
+
+# Step 14 - Verify Service
+
+```bash
+sudo systemctl status nginx
+```
+
+Expected
+
+```text
+Active: active (running)
+```
+
+Exit
+
+```text
+q
+```
+
+---
+
+# Verify Configuration Files
+
+```bash
+ls /etc/nginx/sites-available
+```
+
+Expected
+
+```text
+animal.conf
+
+trees.conf
+
+anmol.conf
+```
+
+---
+
+# Verify Enabled Sites
+
+```bash
+ls /etc/nginx/sites-enabled
+```
+
+Expected
+
+```text
+animal.conf
+
+trees.conf
+
+anmol.conf
+```
+
+---
+
+# Enterprise Flow
+
+```text
+Internet
+
+      │
+
+Public IP
+
+      │
+
+Nginx
+
+      │
+
+Server Name
+
+      │
+
+Virtual Host
+
+      │
+
+Website Folder
+
+      │
+
+index.html
+```
+
+---
+
+# Common Errors
+
+## nginx: configuration file test failed
+
+Check
+
+```bash
+sudo nginx -t
+```
+
+Configuration ठीक करें।
+
+---
+
+## File Not Found
+
+```text
+403
+
+404
+```
+
+Verify
+
+```bash
+ls /var/www/animal
+```
+
+---
+
+## Permission Denied
+
+```bash
+sudo chown -R www-data:www-data /var/www
+```
+
+---
+
+## Symlink Already Exists
+
+```text
+File exists
+```
+
+Remove
+
+```bash
+sudo rm /etc/nginx/sites-enabled/animal.conf
+```
+
+Create Again
+
+---
+
+## Default Website Opens
+
+Disable Default Site
+
+```bash
+sudo rm /etc/nginx/sites-enabled/default
+```
+
+Reload
+
+```bash
+sudo systemctl reload nginx
+```
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| Website Directories Created | ✅ |
+| Animal Website Copied | ✅ |
+| Save Trees Website Copied | ✅ |
+| Anmol Jivan Website Copied | ✅ |
+| Virtual Hosts Created | ✅ |
+| Sites Enabled | ✅ |
+| Configuration Verified | ✅ |
+| Nginx Reloaded | ✅ |
+
+---
+
+# Next Lab
+
+```text
+33 - Configure Multiple Domains
+```
+
+इस Lab में हम:
+
+- Local DNS Mapping
+- Host Header
+- Domain Binding
+- Multiple Domain Testing
+- Production Domain Planning
+
+सीखेंगे।
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 32 - Configure Nginx Virtual Hosts"
+
+git push origin main
+```
+
+
+----
+
+# 33 - Configure Multiple Domains
+
+> **Objective**
+>
+> इस Lab में हम एक ही **Azure VM-02** पर Host की गई Multiple Websites के लिए अलग-अलग Domain Names Configure करेंगे।
+>
+> अभी हमारे पास Real Domain नहीं है, इसलिए पहले Local Testing करेंगे। बाद में Cloudflare और Public DNS से Production Configuration करेंगे।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- Domain Name कैसे काम करता है
+- DNS Resolution क्या होता है
+- Host Header क्या है
+- Nginx Server Name कैसे Match करता है
+- Windows Hosts File से Local Domain Mapping
+- Browser से Multiple Websites Test करना
+
+---
+
+# Enterprise Architecture
+
+```text
+                  Browser
+
+                     │
+
+      animal.local
+      trees.local
+      anmol.local
+
+                     │
+
+               Hosts File
+
+                     │
+
+          20.212.xx.xx (VM-02)
+
+                     │
+
+                  Nginx
+
+         ┌──────────┼──────────┐
+         │          │          │
+         ▼          ▼          ▼
+
+ animal.conf   trees.conf   anmol.conf
+
+         │          │          │
+
+         ▼          ▼          ▼
+
+ /var/www/animal
+ /var/www/trees
+ /var/www/anmol
+```
+
+---
+
+# Current Situation
+
+हमने पिछले Lab में तीन Virtual Hosts बनाए थे।
+
+```
+animal.conf
+
+trees.conf
+
+anmol.conf
+```
+
+लेकिन Browser को अभी यह नहीं पता कि
+
+```
+animal.local
+```
+
+कहाँ है।
+
+उसके लिए DNS चाहिए।
+
+---
+
+# How DNS Works
+
+```text
+Browser
+
+      │
+
+animal.local
+
+      │
+
+DNS Lookup
+
+      │
+
+20.212.xx.xx
+
+      │
+
+Azure VM
+
+      │
+
+Nginx
+
+      │
+
+animal.conf
+
+      │
+
+Website
+```
+
+---
+
+# Production vs Lab
+
+Production
+
+```text
+animal.org
+
+savetrees.org
+
+anmoljivan.org
+```
+
+Lab
+
+```text
+animal.local
+
+trees.local
+
+anmol.local
+```
+
+---
+
+# Step 1 - Verify VM Public IP
+
+Azure Portal
+
+```
+VM-02
+
+↓
+
+Overview
+
+↓
+
+Public IP
+```
+
+Example
+
+```
+20.212.32.210
+```
+
+इसी IP का उपयोग करेंगे।
+
+---
+
+# Step 2 - Open Windows Hosts File
+
+Windows Search
+
+```
+Notepad
+```
+
+Run as Administrator
+
+---
+
+Open File
+
+```
+C:\Windows\System32\drivers\etc\hosts
+```
+
+---
+
+# Step 3 - Add Domain Mapping
+
+File के अंत में जोड़ें
+
+```text
+20.212.32.210    animal.local
+
+20.212.32.210    trees.local
+
+20.212.32.210    anmol.local
+```
+
+Save File.
+
+---
+
+# Step 4 - Flush DNS Cache
+
+PowerShell
+
+```powershell
+ipconfig /flushdns
+```
+
+Expected
+
+```text
+Successfully flushed the DNS Resolver Cache.
+```
+
+---
+
+# Step 5 - Verify DNS Resolution
+
+PowerShell
+
+```powershell
+ping animal.local
+```
+
+Expected
+
+```text
+Pinging animal.local
+
+20.212.32.210
+```
+
+---
+
+Verify
+
+```powershell
+ping trees.local
+```
+
+---
+
+Verify
+
+```powershell
+ping anmol.local
+```
+
+---
+
+# Step 6 - Verify Nginx Server Name
+
+VM-02
+
+```bash
+sudo cat /etc/nginx/sites-available/animal.conf
+```
+
+Expected
+
+```nginx
+server_name animal.local;
+```
+
+---
+
+Verify
+
+```bash
+sudo cat /etc/nginx/sites-available/trees.conf
+```
+
+Expected
+
+```nginx
+server_name trees.local;
+```
+
+---
+
+Verify
+
+```bash
+sudo cat /etc/nginx/sites-available/anmol.conf
+```
+
+Expected
+
+```nginx
+server_name anmol.local;
+```
+
+---
+
+# Step 7 - Verify Nginx Configuration
+
+```bash
+sudo nginx -t
+```
+
+Expected
+
+```text
+syntax is ok
+
+test is successful
+```
+
+---
+
+# Step 8 - Reload Nginx
+
+```bash
+sudo systemctl reload nginx
+```
+
+---
+
+# Step 9 - Test Websites
+
+Open Browser
+
+```
+http://animal.local
+```
+
+Expected
+
+```
+Animal Care Foundation
+```
+
+---
+
+Open
+
+```
+http://trees.local
+```
+
+Expected
+
+```
+Save Trees Foundation
+```
+
+---
+
+Open
+
+```
+http://anmol.local
+```
+
+Expected
+
+```
+Anmol Jivan Foundation
+```
+
+---
+
+# Host Header Explained
+
+जब Browser Request भेजता है
+
+```
+http://animal.local
+```
+
+तो Request कुछ ऐसी होती है
+
+```http
+GET /
+
+Host: animal.local
+```
+
+Nginx उसी Host Header को पढ़कर सही Website Serve करता है।
+
+---
+
+# Request Flow
+
+```text
+Browser
+
+      │
+
+Host: trees.local
+
+      │
+
+Nginx
+
+      │
+
+server_name trees.local
+
+      │
+
+/var/www/trees
+
+      │
+
+index.html
+```
+
+---
+
+# Verify Using Curl
+
+Animal
+
+```bash
+curl -H "Host: animal.local" http://localhost
+```
+
+---
+
+Trees
+
+```bash
+curl -H "Host: trees.local" http://localhost
+```
+
+---
+
+Anmol
+
+```bash
+curl -H "Host: anmol.local" http://localhost
+```
+
+---
+
+# Common Errors
+
+## DNS Not Resolving
+
+Check
+
+```powershell
+ping animal.local
+```
+
+Verify Hosts File।
+
+---
+
+## Wrong Website Opens
+
+Check
+
+```bash
+server_name
+```
+
+हर Virtual Host में सही होना चाहिए।
+
+---
+
+## Forgot Reload
+
+```bash
+sudo systemctl reload nginx
+```
+
+---
+
+## Syntax Error
+
+```bash
+sudo nginx -t
+```
+
+---
+
+## Hosts File Not Saving
+
+Run Notepad
+
+```
+Run as Administrator
+```
+
+---
+
+# Lab Summary
+
+हमने सीखा
+
+✅ Local DNS Mapping
+
+✅ Hosts File
+
+✅ Host Header
+
+✅ Multiple Domains
+
+✅ Domain Testing
+
+✅ Nginx Server Name
+
+---
+
+# Production Architecture (Next Goal)
+
+```text
+Internet
+
+      │
+
+Cloudflare DNS
+
+      │
+
+animal.org
+
+trees.org
+
+anmoljivan.org
+
+      │
+
+Azure Public IP
+
+      │
+
+Nginx
+
+      │
+
+Virtual Hosts
+
+      │
+
+Three Independent Websites
+```
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| VM Public IP Verified | ✅ |
+| Hosts File Updated | ✅ |
+| DNS Cache Flushed | ✅ |
+| Domains Resolved | ✅ |
+| Nginx Verified | ✅ |
+| Websites Tested | ✅ |
+
+---
+
+# Next Lab
+
+```text
+34 - Configure Azure Load Balancer
+```
+
+इस Lab में हम सीखेंगे:
+
+- Azure Load Balancer क्या है
+- Frontend IP
+- Backend Pool
+- Health Probe
+- Load Balancing Rules
+- High Availability
+- Enterprise Architecture
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 33 - Configure Multiple Domains using Windows Hosts File and Nginx"
+
+git push origin main
+```
+
+
+----
+
+# 34 - Configure Azure Load Balancer
+
+> **Objective**
+>
+> इस Lab में हम Azure Load Balancer Configure करेंगे ताकि भविष्य में हमारी Websites एक से अधिक Web Servers (VMs) पर चल सकें और यदि एक Server Down हो जाए तो दूसरा Server Request Handle कर सके।
+>
+> यह Enterprise Production Architecture की शुरुआत है।
+
+---
+
+# 📚 Learning Objectives
+
+इस Lab के अंत तक आप सीखेंगे:
+
+- Azure Load Balancer क्या होता है
+- Layer-4 Load Balancer कैसे काम करता है
+- Frontend IP
+- Backend Pool
+- Health Probe
+- Load Balancing Rule
+- High Availability
+- Fault Tolerance
+- Enterprise Web Architecture
+
+---
+
+# Current Architecture
+
+अभी हमारे पास केवल एक Web Server है।
+
+```text
+Internet
+
+      │
+
+Public IP
+
+      │
+
+VM-02
+
+      │
+
+Nginx
+
+      │
+
+3 Websites
+```
+
+यदि VM-02 बंद हो गया
+
+↓
+
+सभी Websites बंद हो जाएँगी।
+
+---
+
+# Enterprise Architecture
+
+```text
+                    Internet
+
+                        │
+
+                Azure Public IP
+
+                        │
+
+                Azure Load Balancer
+
+              Frontend Public IP
+
+                        │
+
+          ┌─────────────┴─────────────┐
+
+          │                           │
+
+      Backend Pool               Backend Pool
+
+          │                           │
+
+        VM-02                      VM-03
+
+          │                           │
+
+       Nginx                       Nginx
+
+          │                           │
+
+   Same Websites              Same Websites
+```
+
+---
+
+# Azure Load Balancer Components
+
+| Component | Purpose |
+|-----------|----------|
+| Frontend IP | Public IP जिससे Users Connect करेंगे |
+| Backend Pool | जिन VMs पर Traffic जाएगा |
+| Health Probe | VM Healthy है या नहीं |
+| Rule | Port Mapping (80 → 80) |
+| Backend VM | Actual Web Servers |
+
+---
+
+# Traffic Flow
+
+```text
+User
+
+    │
+
+HTTP Request
+
+    │
+
+Load Balancer
+
+    │
+
+Health Check
+
+    │
+
+Healthy?
+
+    │
+
+ ┌──┴─────┐
+
+ │        │
+
+VM-02   VM-03
+
+ │        │
+
+Response
+```
+
+---
+
+# Step 1 - Create Public IP
+
+Azure Portal
+
+```
+Create Resource
+
+↓
+
+Public IP
+```
+
+---
+
+Settings
+
+```
+Name
+
+pip-loadbalancer-dev
+```
+
+```
+SKU
+
+Standard
+```
+
+```
+Assignment
+
+Static
+```
+
+```
+IPv4
+```
+
+Click
+
+```
+Review + Create
+```
+
+---
+
+# Step 2 - Create Load Balancer
+
+Azure Portal
+
+```
+Create Resource
+
+↓
+
+Load Balancer
+```
+
+---
+
+Configuration
+
+```
+Name
+
+lb-dev-web
+```
+
+```
+SKU
+
+Standard
+```
+
+```
+Type
+
+Public
+```
+
+```
+Frontend IP
+
+Select pip-loadbalancer-dev
+```
+
+```
+Backend Pool
+
+Later
+```
+
+Create
+
+---
+
+# Architecture
+
+```text
+Internet
+
+      │
+
+pip-loadbalancer-dev
+
+      │
+
+Azure Load Balancer
+```
+
+---
+
+# Step 3 - Create Backend Pool
+
+Open
+
+```
+Load Balancer
+
+↓
+
+Backend Pools
+
+↓
+
+Add
+```
+
+---
+
+Name
+
+```
+backend-web
+```
+
+Network
+
+```
+Select
+
+vnet-dev-southeastasia-audix-001
+```
+
+Backend Targets
+
+```
+VM-02
+```
+
+Save
+
+---
+
+# Step 4 - Create Health Probe
+
+Load Balancer
+
+↓
+
+Health Probe
+
+↓
+
+Add
+
+---
+
+Settings
+
+```
+Name
+
+http-probe
+```
+
+```
+Protocol
+
+HTTP
+```
+
+```
+Port
+
+80
+```
+
+```
+Path
+
+/
+```
+
+Save
+
+---
+
+# Health Probe Flow
+
+```text
+Azure Load Balancer
+
+      │
+
+GET /
+
+      │
+
+VM-02
+
+      │
+
+200 OK
+
+      │
+
+Healthy
+```
+
+---
+
+# Step 5 - Create Load Balancing Rule
+
+Load Balancer
+
+↓
+
+Rules
+
+↓
+
+Add
+
+---
+
+Configuration
+
+```
+Frontend
+
+LoadBalancerFrontEnd
+```
+
+```
+Backend Pool
+
+backend-web
+```
+
+```
+Protocol
+
+TCP
+```
+
+```
+Frontend Port
+
+80
+```
+
+```
+Backend Port
+
+80
+```
+
+```
+Health Probe
+
+http-probe
+```
+
+Save
+
+---
+
+# Step 6 - Verify Backend Health
+
+Portal
+
+```
+Load Balancer
+
+↓
+
+Backend Pools
+```
+
+Expected
+
+```
+VM-02
+
+Healthy
+```
+
+---
+
+# Step 7 - Test Website
+
+Open Browser
+
+```
+http://<LoadBalancer-Public-IP>
+```
+
+Expected
+
+```
+Website Opens Successfully
+```
+
+---
+
+# Current Request Flow
+
+```text
+User
+
+     │
+
+Load Balancer Public IP
+
+     │
+
+Azure Load Balancer
+
+     │
+
+Backend Pool
+
+     │
+
+VM-02
+
+     │
+
+Nginx
+
+     │
+
+Website
+```
+
+---
+
+# Future Architecture
+
+Next Chapter में
+
+VM-03 जोड़ेंगे
+
+```text
+Internet
+
+      │
+
+Azure Load Balancer
+
+      │
+
+ ┌────┴─────┐
+
+ │          │
+
+VM-02     VM-03
+
+ │          │
+
+Nginx     Nginx
+
+ │          │
+
+Same Website
+```
+
+अब यदि VM-02 Down हो जाए
+
+↓
+
+Traffic VM-03 पर चला जाएगा।
+
+---
+
+# Verify Using Curl
+
+Linux
+
+```bash
+curl http://<LoadBalancer-Public-IP>
+```
+
+Expected
+
+```html
+<!DOCTYPE html>
+
+<html>
+
+...
+```
+
+---
+
+# Common Errors
+
+## Backend Unhealthy
+
+Check
+
+```bash
+sudo systemctl status nginx
+```
+
+---
+
+## Health Probe Failed
+
+Check
+
+```bash
+curl localhost
+```
+
+---
+
+## NSG Blocking
+
+Allow
+
+```
+TCP 80
+```
+
+---
+
+## Website Not Opening
+
+Check
+
+```
+VM Public IP
+
+↓
+
+Nginx
+
+↓
+
+Health Probe
+```
+
+---
+
+## Backend Pool Empty
+
+Verify
+
+```
+VM-02
+
+Added
+```
+
+---
+
+## Load Balancer Rule Missing
+
+Verify
+
+```
+Frontend Port
+
+80
+```
+
+```
+Backend Port
+
+80
+```
+
+---
+
+# Enterprise Best Practices
+
+✅ Use Standard Load Balancer
+
+✅ Static Public IP
+
+✅ Health Probe
+
+✅ Multiple Backend Servers
+
+✅ Separate Web Tier
+
+✅ Backend Pool Monitoring
+
+---
+
+# Final Checklist
+
+| Task | Status |
+|------|--------|
+| Public IP Created | ✅ |
+| Load Balancer Created | ✅ |
+| Backend Pool Created | ✅ |
+| VM-02 Added | ✅ |
+| Health Probe Configured | ✅ |
+| Rule Created | ✅ |
+| Website Tested | ✅ |
+
+---
+
+# What's Next?
+
+```text
+35 - Configure Cloudflare with Azure Load Balancer
+```
+
+इस Chapter में सीखेंगे:
+
+- Buy Domain
+- Cloudflare Account
+- DNS Records
+- Proxy Mode
+- SSL/TLS
+- WAF
+- DDoS Protection
+- Domain → Load Balancer → Multiple Azure VMs
+
+---
+
+# Documentation Commit
+
+```bash
+git add .
+
+git commit -m "Added Lab 34 - Configure Azure Standard Load Balancer with Backend Pool and Health Probe"
+
+git push origin main
+```
+
+---
+
 # 28.6 - Deploy Second Website on VM-02 (StreamFlix)
 
 > **Objective**
